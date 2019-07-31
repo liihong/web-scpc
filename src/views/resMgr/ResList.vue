@@ -21,7 +21,7 @@
     </el-col>
 
     <!--列表-->
-    <el-table ref="elTable" highlight-current-row @selection-change="selsChange" @row-click="rowClick" :data="resDatas" v-loading="listLoading" header-cell-class-name="table_th" stripe border :max-height="tableHeight" style="width: 100%;">
+    <el-table ref="elTable" highlight-current-row stripe @selection-change="selsChange" @row-click="rowClick" :data="resDatas" v-loading="listLoading" header-cell-class-name="table_th" stripe border :max-height="tableHeight" style="width: 100%;">
       <el-table-column fixed="left" type="selection" width="50" align="center">
       </el-table-column>
       <el-table-column fixed="left" type="index" width="50" align="center">
