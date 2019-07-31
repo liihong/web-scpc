@@ -1,0 +1,54 @@
+
+let api = {
+    // 首页统计
+    getStatistics: 'scglxt/statistics',
+    
+    //数据字典操作
+    getSjzdById: 'scglxt/sjzd/getSjzdById',
+    getBzList: 'scglxt/sjzd/getBzList',
+    getPeopleByBz: 'scglxt/sjzd/getPeopleByBz',
+    
+
+    getJggyList: 'scglxt/gygx/getJggyList',
+    getJggxByBOMId: 'scglxt/gygx/getJggxByBOMId',
+    getSblxList: 'scglxt/gygx/getSblxList',
+    getSbList: 'scglxt/gygx/getSbList',
+    saveGygxInfo: 'scglxt/gygx/saveGygxInfo',
+
+    // 报价单
+    addBjd: 'scglxt/bjd/addBjd',
+
+    //订单操作
+    getDdTz: 'scglxt/ddgl/getDdTz',
+    copyDd: 'scglxt/ddgl/copyDd',
+    deleteDd: 'scglxt/ddgl/deleteDd',
+    exportDdByZj: '/api/scglxt/ddgl/exportDdByZj',
+    getNewDDbh: 'scglxt/ddgl/getNewDDbh',
+    
+    //bom表操作
+    addBomData: 'scglxt/bom/addBom',
+    addBomMany: 'scglxt/bom/addBomMany',
+    editBomData: 'scglxt/bom/editBom',
+    copyBomData: 'scglxt/bom/copyBom',
+    updateBLZT: 'scglxt/bom/updateBLZT',
+    getBLlist: 'scglxt/bom/getBLlist',
+    getZjByBomId: 'scglxt/bom/getZjByBomId',
+    getGYgslist: 'scglxt/bom/getGYgslist',
+    //组件操作
+    addZj: 'scglxt/zj/addZj',
+    editZj: 'scglxt/zj/editZj',
+    getBzjByZjId: 'scglxt/zj/getBzjByZjId',
+    deleteZjById: 'scglxt/zj/deleteZjById',
+
+    //工艺流程标准管理
+    getGyByBzId: 'scglxt/gybz/getGyByBzId',
+    addGyBzMany: 'scglxt/gybz/addGyBzMany',
+    getGyBzList: 'scglxt/gybz/getGyBzList',
+
+    beginWork: 'scglxt/gygx/beginWork',
+    overWork: 'scglxt/gygx/overWork',
+    getCheckList: 'scglxt/gygx/getCheckList',// 获取检验列表
+    gygxCheckPassAll: 'scglxt/gygx/gygxCheckPassAll',
+    
+  }
+  export default api

@@ -1,0 +1,61 @@
+<template>
+    <div class="dashboard-container">
+        <statistics />
+        <el-row :gutter="20">
+            <el-col :xs="24" :sm="14" :lg="12">
+                <el-card class="box-card">
+                    <div slot="header" class="clearfix">
+                        <span>订单进度</span>
+                    </div>
+                    <ddTable/>
+                </el-card>
+            </el-col>
+            <el-col :xs="24" :sm="14" :lg="12" >
+                <el-card class="box-card">
+                    <div slot="header" class="clearfix">
+                        <span>BOM状态</span>
+                    </div>
+                    <ddTable/>
+                </el-card>
+            </el-col>
+        </el-row>
+    </div>
+</template>
+
+<script>
+import { mapGetters } from 'vuex'
+import statistics from './components/statistics.vue'
+import ddTable from './components/ddTable.vue'
+export default {
+  name: 'Dashboard',
+  components: {
+    statistics,
+    ddTable
+  },
+  computed: {
+    ...mapGetters(['name', 'roles'])
+  },
+  data() {
+    return {
+    }
+  },
+  mounted() {},
+  methods: {}
+}
+</script>
+
+<style rel="stylesheet/scss" lang="scss" scoped>
+.dashboard {
+  &-container {
+    padding: 30px;
+    background-color: #f0f2f5;
+    .projectAll {
+      display: flex;
+    }
+  }
+  &-text {
+    font-size: 30px;
+    line-height: 46px;
+  }
+}
+</style>
