@@ -23,6 +23,7 @@ let api = {
     copyDd: 'scglxt/ddgl/copyDd',
     deleteDd: 'scglxt/ddgl/deleteDd',
     exportDdByZj: '/api/scglxt/ddgl/exportDdByZj',
+    exportDdBOM: '/api/scglxt/ddgl/exportDdBOM',
     getNewDDbh: 'scglxt/ddgl/getNewDDbh',
     
     //bom表操作
@@ -34,6 +35,9 @@ let api = {
     getBLlist: 'scglxt/bom/getBLlist',
     getZjByBomId: 'scglxt/bom/getZjByBomId',
     getGYgslist: 'scglxt/bom/getGYgslist',
+    BOMFinallyCheck: 'scglxt/bom/BOMFinallyCheck',
+    BOMInStore: 'scglxt/bom/BOMInStore',
+    BOMOutStore: 'scglxt/bom/BOMOutStore',
     //组件操作
     addZj: 'scglxt/zj/addZj',
     editZj: 'scglxt/zj/editZj',
@@ -49,6 +53,7 @@ let api = {
     overWork: 'scglxt/gygx/overWork',
     getCheckList: 'scglxt/gygx/getCheckList',// 获取检验列表
     gygxCheckPassAll: 'scglxt/gygx/gygxCheckPassAll',
+    gygxCheckPassPart: 'scglxt/gygx/gygxCheckPassPart',
     
   }
   export default api

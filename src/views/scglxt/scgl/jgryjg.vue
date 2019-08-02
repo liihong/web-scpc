@@ -11,7 +11,7 @@
         <span class="spanText" @click="gybpClick(scope.row)">{{scope.row.BOMID_TEXT}}</span>
       </template>
        <template slot="GYNR" slot-scope="scope">
-        {{scope.row.GYNR_TEXT}}
+       <span :style="{color:scope.row.CZRYID? 'red': ''}"> {{scope.row.GYNR_TEXT}}</span>
           <i  v-if="scope.row.CZRYID" class="ingIcon"> <svg-icon icon-class="ing" /></i>
       </template>
     </ResList>

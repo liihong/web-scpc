@@ -91,19 +91,55 @@ module.exports = class extends Base {
         return this.success(deleteDd)
     }
 
+    //导出BOM
+    async exportDdBOMAction() {
+        let ddid = this.get('id')
+        const res = this.ctx.res;
+        let ddsql = `select ht.htbh,dd.xmname,zd.mc ddlevel, starttime,endtime from scglxt_t_dd dd,scglxt_t_ht ht,scglxt_tyzd zd where dd.ssht=ht.id and zd.xh = dd.ddlevel and dd.id = '` + ddid + `'`
+        let infos = await this.model().query(ddsql)
+
+        let sql = `SELECT
+        ( @i := @i + 1 ) AS rownum,
+            zddmc,
+            t2.clmc,
+            concat_ws('    ',cldx,concat(bljs,'件')) cldx,
+            jgsl,
+            gxnr,
+            bmcl,
+            '' bz,
+            '' endtime
+            FROM
+        (select @i := 0) b,
+        scglxt_t_bom bom
+        LEFT JOIN scglxt_t_cl t2 ON bom.zddcz = t2.id 
+    WHERE
+        ssdd = '` + ddid + `' order by sjcjsj
+        `
+        let datas = await this.model().query(sql)
+
+        let _data = datas.map((item, i) => {
+            item.jhrq = ''
+            item.yjdhrq = ''
+            item.sjdhrq = ''
+            item.bz = ''
+            return item
+        })
+        exportXls.exportBOMXls(infos[0], datas, res)
+    }
+    //导出组件
     async exportDdByZjAction() {
         let ddid = this.get('id')
         const res = this.ctx.res;
         let ddsql = `select ht.htbh,dd.xmname,zd.mc ddlevel, starttime,endtime from scglxt_t_dd dd,scglxt_t_ht ht,scglxt_tyzd zd where dd.ssht=ht.id and zd.xh = dd.ddlevel and dd.id = '` + ddid + `'`
         let infos = await this.model().query(ddsql)
 
-        let sql = `select (@i := @i + 1) as xh,zjmc ljmc,'' ljcz,'' ljgg,zjkc jgsl,'' ljlx, '' sccj from scglxt_t_zj,(select @i := 0) b where ssdd = '` + ddid + `' union all
+        let sql = `select (@i := @i + 1) as xh,id zjid,zjmc ljmc,'' ljcz,'' ljgg,zjkc jgsl,'' ljlx, '' sccj from scglxt_t_zj,(select @i := 0) b where ssdd = '` + ddid + `' union all
 
-        select '' xh,bom.zddmc ljmc, cl.clmc ljcz,concat_ws('    ',cldx,concat(bljs,'件'))  ljgg,jgsl ljsl,'机加工' ljlx,'' sccj from scglxt_t_bom bom,scglxt_t_bom_zj bomzj,scglxt_t_zj zj,scglxt_t_cl cl
+        select '' xh,zjid,bom.zddmc ljmc, cl.clmc ljcz,concat_ws('    ',cldx,concat(bljs,'件'))  ljgg,jgsl ljsl,'机加工' ljlx,'' sccj from scglxt_t_bom bom,scglxt_t_bom_zj bomzj,scglxt_t_zj zj,scglxt_t_cl cl
         where bom.zddcz=cl.id and bom.id = bomzj.bomid and bomzj.zjid=zj.id and zj.ssdd='` + ddid + `'
         union all
-        select '' xh,ljmc,ljcz,ljgg,(bzjzj.bzjsl*zj.zjkc) ljsl, ljlx,sccj from scglxt_t_bzj bzj,scglxt_t_bzj_zj bzjzj,scglxt_t_zj zj
-        where bzj.id = bzjzj.bzjid and bzjzj.zjid=zj.id and zj.ssdd='` + ddid + `'
+        select '' xh,zjid,ljmc,ljcz,ljgg,(bzjzj.bzjsl*zj.zjkc) ljsl, ljlx,sccj from scglxt_t_bzj bzj,scglxt_t_bzj_zj bzjzj,scglxt_t_zj zj
+        where bzj.id = bzjzj.bzjid and bzjzj.zjid=zj.id and zj.ssdd='` + ddid + `'  order by zjid,xh desc
         `
         let datas = await this.model().query(sql)
 

@@ -1,5 +1,5 @@
 <template>
-  <ResList tableId='010408' :query="this.$route.query" noEdit ref="zjryjy">
+  <ResList tableId='010407' :query="this.$route.query" noEdit ref="zjryjy">
     <el-table-column slot="operate" fixed="left" label="操作" min-width="200" align="center">
       <template slot-scope="scope">
         <el-radio @change="pass(scope.row)" class="radio" :label="1">通过并入库</el-radio>
@@ -17,11 +17,11 @@
 
 <script>
 export default {
-methods: {
+  methods: {
     //终检通过
     pass(row) {
       this.$ajax
-        .post(this.$api.BOMInStore, {
+        .post(this.$api.BOMFinallyCheck, {
           id: row.ID
         })
         .then(res => {
@@ -35,6 +35,12 @@ methods: {
 }
 </script>
 
-<style>
-
+<style lang="scss" scoped>
+.radioGroup {
+  text-align: left;
+}
+.radio {
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+}
 </style>

@@ -203,4 +203,42 @@ module.exports = class extends Base {
         let data = await this.model().query(sql)
         return this.success(data)
     }
+
+    //BOM单终检通过
+    async BOMFinallyCheckAction(){
+        let id = this.post('id')
+
+        let data = await this.model(bomModel).where({id: id}).update({
+            zddzt: '0504'
+        })
+
+        return this.success(data)
+    }
+
+    //BOM单入库
+    async BOMInStoreAction(){
+        let id = this.post('id')
+
+        let data = await this.model(bomModel).where({id: id}).update({
+            zddzt: '0505',
+            rksj: util.getNowTime()
+        })
+
+        return this.success(data)
+    }
+
+    //BOM单出库
+    async BOMOutStoreAction(){
+        let id = this.post('id')
+
+        let data = await this.model(bomModel).where({id: id}).update({
+            zddzt: '0506',
+            cksj: util.getNowTime()
+        })
+
+        let sql = `update scglxt_t_dd set ckzt='完成',ckdate=DATE_FORMAT(NOW(), '%Y-%m-%d %H:%i:%s') where id=(select ssdd from scglxt_t_bom where id='`+id+`')`
+        let ddData = await this.model().execute(sql)
+        
+        return this.success(data)
+    }
 };

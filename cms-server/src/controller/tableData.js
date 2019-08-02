@@ -106,8 +106,7 @@ module.exports = class extends Base {
                         displayColumnArr.push(`(SELECT NAME FROM (${item.TYPESQL}) tras WHERE tras.id=${item.COLUMN_NAME}) ${item.COLUMN_NAME}_TEXT`)
                         break;
                     case '4': //字段数据
-                        displayColumnArr.push(item.COLUMN_NAME);
-                        displayColumnArr.push(`(SELECT NAME FROM (${item.TYPESQL}) tras WHERE tras.id=${item.COLUMN_NAME}) ${item.COLUMN_NAME}_TEXT`)
+                        displayColumnArr.push(`(${item.TYPESQL}) ${item.COLUMN_NAME}`)
                         break;
                     case '7': //自动填充
                         displayColumnArr.push(`${item.TYPESQL} ${item.COLUMN_NAME}`);

@@ -40,7 +40,7 @@
       </el-table-column>
       <el-table-column v-if="row.PROPERTY_TYPE != '10'" align="center" v-for="(row,index) in resRows" :key="index" :prop="row.COLUMN_NAME" :fixed="(row.IS_FROZEN == 1?'left':false)" :label="row.COLUMN_CNAME" :min-width="(row.COLUMNLENGTH != '')?row.COLUMNLENGTH:150">
         <template slot-scope="scope">
-          <span v-if="row.PROPERTY_TYPE == '2' || row.PROPERTY_TYPE == '4'">
+          <span v-if="row.PROPERTY_TYPE == '2'">
             <slot :name="row.COLUMN_NAME" v-bind:row="scope.row">
               <!-- 后备内容 -->
               {{scope.row[`${row.COLUMN_NAME}_TEXT`]}}

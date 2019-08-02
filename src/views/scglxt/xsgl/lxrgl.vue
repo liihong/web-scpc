@@ -1,5 +1,5 @@
 <template>
-  <div class="ddgl">
+  <div class="lxrgl">
     <ResList tableId='0103'/>
   </div>
 </template>
