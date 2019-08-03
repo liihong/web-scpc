@@ -99,6 +99,7 @@ export default {
     }
   },
   mounted() {
+    this.$set(this.formData,'DDLEVEL', '0403')
     this.getSjzdData(
       'ssht',
       'SELECT id,htbh NAME,htjc FROM scglxt_t_ht'
@@ -114,7 +115,7 @@ export default {
     },
     onSave() {
       let params = {}
-      let data = this.$refs['form'].model
+      let data = this.$refs['rulesForm'].model
       params.tableId = this.tableId
       params.form = {}
       Object.keys(data).map(item => {

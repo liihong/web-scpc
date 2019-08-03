@@ -35,6 +35,12 @@ methods: {
 }
 </script>
 
-<style>
-
+<style lang="scss" scoped>
+.radioGroup {
+  text-align: left;
+}
+.radio {
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+}
 </style>

@@ -162,7 +162,7 @@ module.exports = class extends Base {
     //获取检验人员检验列表数据
     async getCheckListAction() {
         let sql = `SELECT jggl.id, dd.xmname DDMC,
-        bom.zddmc BOMID, bom.zddjb ZDDJB, bom.bmcl BMCL, tz.tzlx, tz.url tzurl, jggy.gymc GYNR,gygc.kjgjs KJGJS,
+        bom.zddmc BOMID, bom.zddjb ZDDJB, bom.bmcl BMCL, tz.tzlx, tz.url tzurl, jggy.gymc GYNR,gygc.kjgjs KJGJS,gygc.YJGJS,
         ry.rymc CZRY,jggl.jgryid, sb.sbmc SBID, jggl.jgjs SJJS, gygc.bomid,gygc.id gygcid, date_format( dd.endtime, '%Y-%m-%d' ) ddjssj,
         gygc.serial  FROM
             scglxt_t_gygc gygc,
@@ -199,7 +199,7 @@ module.exports = class extends Base {
             sfjy: '1',
             jyryid: jyryid,
             bfjs: bfjs,
-            fgjs: 0
+            fgjs: bfjs
         }
         //更新该条加工信息的检验信息
         await this.model('scglxt_t_jggl').where({id: id}).update(updateJggl)
@@ -231,5 +231,33 @@ module.exports = class extends Base {
         }
 
         return this.success(data)
+    }
+
+    // 检验部分通过
+    async gygxCheckPassPartAction(){
+        let {id, gygcid,jyryid,sjzt,dhjs,dhyy,jgjs,yjgjs }  = this.post()
+
+        let jgglUpdate = {
+            sfjy: '1',
+            jysj: 'now()',
+            jyryid: jyryid
+        }
+        let gygcUpdate = {
+            yjgjs: yjgjs - bfjs + jgjs,
+            bfjs: bfjs
+        }
+        let jgglData = await this.model('scglxt_t_jggl').where({id: id}).find()
+        
+        await this.model('scglxt_t_gygc').where({gygcid: gygcid}).update(gygcUpdate)
+
+        //生成打回记录
+        
+        //返工
+        if(sjzt == '2201'){
+            gygcUpdate.fgcs = "(select count(*) from scglxt_t_jggl_tmp where jgglid='"+jgglId+" and sjzt='2201')+1"
+            await this.model('scglxt_t_jggl').where({id :id}).update(jgglUpdate)
+            
+        }else{//报废
+        }
     }
 };

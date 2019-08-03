@@ -11,21 +11,28 @@
         </template>
       </el-table-column>
     </DataResList>
+    <passPart :dialogState="dialogState"/>
   </div>
 </template>
 
 <script>
 import DataResList from '../../resMgr/ResDataList'
+import passPart from './components/passPart'
 import { mapGetters } from 'vuex'
 
 export default {
   data() {
     return {
-      checkList: []
+      checkList: [],
+      dialogState:{
+        show: false,
+        row: {}
+      }
     }
   },
   components: {
-    DataResList
+    DataResList,
+    passPart
   },
    computed: {
     ...mapGetters(['token'])
@@ -42,23 +49,8 @@ export default {
     },
     //部分通过
     passSection(row){
-      let params = row.ID
-      this.$ajax
-        .post(this.$api.gygxCheckPassPart, {
-          id: row.id,
-          gygcid: row.gygcid,
-          jgryid: row.jgryid,
-          jyryid: this.token,
-          bomid: row.bomid,
-          bfjs: 0,
-          serial: row.serial
-        })
-        .then(res => {
-          if (res.errno == 0) {
-            this.$message.success('全部通过成功！')
-            this.initData()
-          }
-        })
+      this.dialogState.row = row
+      this.dialogState.show = true
     },
     changeRadio(row) {
       let params = row.ID

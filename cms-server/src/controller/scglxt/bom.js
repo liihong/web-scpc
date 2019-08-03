@@ -236,9 +236,16 @@ module.exports = class extends Base {
             cksj: util.getNowTime()
         })
 
-        let sql = `update scglxt_t_dd set ckzt='完成',ckdate=DATE_FORMAT(NOW(), '%Y-%m-%d %H:%i:%s') where id=(select ssdd from scglxt_t_bom where id='`+id+`')`
-        let ddData = await this.model().execute(sql)
-        
+        let bomData = await this.model(bomModel).where({id: id}).find()
+
+
+        let allBom = await this.model(bom).where({ssdd: bomData.ssdd,zddzt:['!=', '0506']}).select()
+        //如果该订单下所有BOM都完成了就更新订单状态为完成
+        if(allBom.length == 0){
+            let sql = `update scglxt_t_dd set ckzt='完成',ckdate=DATE_FORMAT(NOW(), '%Y-%m-%d %H:%i:%s') where id=(select ssdd from scglxt_t_bom where id='`+id+`')`
+            let ddData = await this.model().execute(sql)
+        }
+       
         return this.success(data)
     }
 };
