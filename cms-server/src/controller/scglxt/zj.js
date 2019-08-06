@@ -16,9 +16,12 @@ module.exports = class extends Base {
             let jgj = this.post('jgj')
             
             let data =  await this.model(zjModel).add(form);
-            
-            let bzjData = await this.model('scglxt_t_bzj_zj').addMany(bzj,{pk: 'ID'});
-            let jgjData = await this.model('scglxt_t_bom_zj').addMany(jgj,{pk: 'ID'});
+            if(bzj.length > 0) {
+                let bzjData = await this.model('scglxt_t_bzj_zj').addMany(bzj,{pk: 'ID'});
+            }
+            if(jgj.length > 0){
+                let jgjData = await this.model('scglxt_t_bom_zj').addMany(jgj,{pk: 'ID'});
+            }
             
             return this.success(data)
         }catch(ex){

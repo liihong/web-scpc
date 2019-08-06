@@ -246,12 +246,19 @@ module.exports = class extends Base {
             yjgjs: yjgjs - bfjs + jgjs,
             bfjs: bfjs
         }
-        let jgglData = await this.model('scglxt_t_jggl').where({id: id}).find()
-        
+        let jgglData = await this.model('scglxt_t_jggl').where({id: id}).field('jgryid,jgsl jgjs,jyryid,jgkssj,jgjssj,jysj,sbid,gygcid,id jgglid').find()
+
         await this.model('scglxt_t_gygc').where({gygcid: gygcid}).update(gygcUpdate)
 
         //生成打回记录
-        
+        let tmpLogData = jgglData
+        tmpLogData.id = util.getUUId()
+        tmpLogData.sjzt = sjzt
+        tmpLogData.dhjs = dhjs
+        tmpLogData.dhyy = dhyy
+
+        await this.model('scglxt_t_jggl_tmp').add(tmpLogData)
+           
         //返工
         if(sjzt == '2201'){
             gygcUpdate.fgcs = "(select count(*) from scglxt_t_jggl_tmp where jgglid='"+jgglId+" and sjzt='2201')+1"

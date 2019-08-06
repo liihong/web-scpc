@@ -87,7 +87,7 @@ export default {
           '-' +
           ddbh.data,
         ddlevel: '0403',
-        starttime: htInfo.jssj,
+        starttime: htInfo.kssj,
         endtime: htInfo.jssj,
         xmfzr: '李勇',
         xmlxr: '李勇',

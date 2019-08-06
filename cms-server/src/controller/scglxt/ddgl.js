@@ -13,8 +13,9 @@ module.exports = class extends Base {
 
     //根据订单表数据，生成新的订单编号
     async getNewDDbhAction() {
-        let count = await this.model('scglxt_t_dd').count()
-        count ='00000'+count;
+        let count = await this.model('scglxt_t_dd').query(`SELECT SUBSTRING_INDEX(xmname,'-',-1) AS count FROM scglxt_t_dd order by sjcjsj desc limit 1`)
+        
+        count ='00000'+(parseInt(count[0].count) + 1);
         count =  count.substring(3,count.length);
         
         return this.success(count)
@@ -133,13 +134,13 @@ module.exports = class extends Base {
         let ddsql = `select ht.htbh,dd.xmname,zd.mc ddlevel, starttime,endtime from scglxt_t_dd dd,scglxt_t_ht ht,scglxt_tyzd zd where dd.ssht=ht.id and zd.xh = dd.ddlevel and dd.id = '` + ddid + `'`
         let infos = await this.model().query(ddsql)
 
-        let sql = `select (@i := @i + 1) as xh,id zjid,zjmc ljmc,'' ljcz,'' ljgg,zjkc jgsl,'' ljlx, '' sccj from scglxt_t_zj,(select @i := 0) b where ssdd = '` + ddid + `' union all
+        let sql = `select (@i := @i + 1) as xh,id zjid,zjmc ljmc,'' ljcz,'' ljgg,zjkc jgsl,'' ljlx, '' sccj,'0' lx from scglxt_t_zj,(select @i := 0) b where ssdd = '` + ddid + `' union all
 
-        select '' xh,zjid,bom.zddmc ljmc, cl.clmc ljcz,concat_ws('    ',cldx,concat(bljs,'件'))  ljgg,jgsl ljsl,'机加工' ljlx,'' sccj from scglxt_t_bom bom,scglxt_t_bom_zj bomzj,scglxt_t_zj zj,scglxt_t_cl cl
+        select '' xh,zjid,bom.zddmc ljmc, cl.clmc ljcz,concat_ws('    ',cldx,concat(bljs,'件'))  ljgg,jgsl ljsl,'机加工' ljlx,'' sccj,'1' lx from scglxt_t_bom bom,scglxt_t_bom_zj bomzj,scglxt_t_zj zj,scglxt_t_cl cl
         where bom.zddcz=cl.id and bom.id = bomzj.bomid and bomzj.zjid=zj.id and zj.ssdd='` + ddid + `'
         union all
-        select '' xh,zjid,ljmc,ljcz,ljgg,(bzjzj.bzjsl*zj.zjkc) ljsl, ljlx,sccj from scglxt_t_bzj bzj,scglxt_t_bzj_zj bzjzj,scglxt_t_zj zj
-        where bzj.id = bzjzj.bzjid and bzjzj.zjid=zj.id and zj.ssdd='` + ddid + `'  order by zjid,xh desc
+        select '' xh,zjid,ljmc,ljcz,ljgg,(bzjzj.bzjsl*zj.zjkc) ljsl, ljlx,sccj,'2' lx from scglxt_t_bzj bzj,scglxt_t_bzj_zj bzjzj,scglxt_t_zj zj
+        where bzj.id = bzjzj.bzjid and bzjzj.zjid=zj.id and zj.ssdd='` + ddid + `'  order by zjid,xh desc,lx,ljlx
         `
         let datas = await this.model().query(sql)
 

@@ -145,19 +145,17 @@ export default {
         '.gygxTable .el-table__body-wrapper tbody'
       )
       const _this = this
-        Sortable.create(
-          tbody,
-          {
-            group: '.gxnr',
-            handle: '.gxnr'
-          },
-          {
-            onEnd({ newIndex, oldIndex }) {
-              const currRow = _this.gygxList.splice(oldIndex, 1)[0]
-              _this.gygxList.splice(newIndex, 0, currRow)
-            }
+      let sortTable = Sortable.create(
+        tbody,
+        {
+          group: '.gxnr',
+          handle: '.gxnr',
+          onEnd({ newIndex, oldIndex }) {
+            const currRow = _this.gygxList.splice(oldIndex, 1)[0]
+            _this.gygxList.splice(newIndex, 0, currRow)
           }
-        )
+        }
+      )
     },
     initData() {
       this.$ajax.get(this.$api.getJggyList).then(res => {

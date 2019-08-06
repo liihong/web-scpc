@@ -21,6 +21,9 @@ module.exports = class extends Base {
         data.ddIsFinish = await this.model(ddModel).where({
             'ckzt': '完成'
         }).count()
+        data.ddNoStart = await this.model(ddModel).where({
+            'ckzt': ['!=','完成']
+        }).count()
         data.peopleTotal = await this.model('scglxt_t_ry').count()
         return this.success(data)
     }

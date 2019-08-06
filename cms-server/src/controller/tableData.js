@@ -90,6 +90,8 @@ module.exports = class extends Base {
 
             let queryColumn = this.get('queryColumn')
             let queryKey = this.get('queryKey')
+            let order = this.get('order')
+            
             let table = await this.model('resource_table').getTableInfo(tableId);
             let displayColumn = await this.model('resource_table_column').getColumnList(tableId);
             let queryColumns = [],
@@ -197,9 +199,15 @@ module.exports = class extends Base {
                     whereObj[`${queryColumn}`] = ['like', `%${queryKey}%`]
                 }
             }
-            const data = await this.model(table.table_name)
+            let data;
+            if(order && order.length > 0){
+                data = await this.model(table.table_name)
+                .field(displayColumnArr.join(',')).page(pageNumber, pageSize).where(table.where_sql).where(whereObj).order(order).countSelect();
+            }else{
+                data = await this.model(table.table_name)
                 .field(displayColumnArr.join(',')).page(pageNumber, pageSize).where(table.where_sql).where(whereObj).order(table.orderby_sql).countSelect();
-            return this.success(data)
+            }
+             return this.success(data)
         } catch (err) {
             return this.fail(err)
         }

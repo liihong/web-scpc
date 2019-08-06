@@ -24,6 +24,10 @@ $--color-primary: #42b983;
 }
 .el-table .cell{
   overflow: inherit !important;
+  padding: 0 !important;
+}
+.el-table-column--selection .cell{
+  padding: 0 !important;
 }
 //暂时性解决diolag 问题 https://github.com/ElemeFE/element/issues/2461
 .el-dialog {

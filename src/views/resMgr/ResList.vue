@@ -21,10 +21,10 @@
     </el-col>
 
     <!--列表-->
-    <el-table ref="elTable" highlight-current-row stripe @selection-change="selsChange" @row-click="rowClick" :data="resDatas" v-loading="listLoading" header-cell-class-name="table_th" stripe border :max-height="tableHeight" style="width: 100%;">
-      <el-table-column fixed="left" type="selection" width="50" align="center">
+    <el-table ref="elTable" highlight-current-row stripe @sort-change="tableSort" @selection-change="selsChange" @row-click="rowClick" :data="resDatas" v-loading="listLoading" header-cell-class-name="table_th" stripe border :max-height="tableHeight" style="width: 100%;">
+      <el-table-column fixed="left" type="selection" width="25" align="center">
       </el-table-column>
-      <el-table-column fixed="left" type="index" width="50" align="center">
+      <el-table-column fixed="left" type="index" width="30" align="center">
         <template slot-scope="scope">
           <span>{{scope.$index+(queryParams.pageNumber - 1) * queryParams.pageSize + 1}} </span>
         </template>
@@ -38,7 +38,7 @@
           </el-button-group>
         </template>
       </el-table-column>
-      <el-table-column v-if="row.PROPERTY_TYPE != '10'" align="center" v-for="(row,index) in resRows" :key="index" :prop="row.COLUMN_NAME" :fixed="(row.IS_FROZEN == 1?'left':false)" :label="row.COLUMN_CNAME" :min-width="(row.COLUMNLENGTH != '')?row.COLUMNLENGTH:150">
+      <el-table-column sortable="custom" v-if="row.PROPERTY_TYPE != '10'" align="center" v-for="(row,index) in resRows" :key="index" :prop="row.COLUMN_NAME" :fixed="(row.IS_FROZEN == 1?'left':false)" :label="row.COLUMN_CNAME" :min-width="(row.COLUMNLENGTH != '')?row.COLUMNLENGTH:150">
         <template slot-scope="scope">
           <span v-if="row.PROPERTY_TYPE == '2'">
             <slot :name="row.COLUMN_NAME" v-bind:row="scope.row">
@@ -114,6 +114,7 @@ export default {
       },
       queryParams: {
         tableId: this.tableId,
+        order: '',
         pageNumber: 1,
         pageSize: 30,
         queryColumn: '',
@@ -288,11 +289,19 @@ export default {
         .then(res => {
           this.$set(this.selectObj, attr, res.data)
         })
+    },
+    tableSort({ column, prop, order }) {
+      if (order && order != null) {
+        this.queryParams.order = prop + ' ' + order.replace('ending', '')
+      } else {
+        this.queryParams.order = ''
+      }
+      this.getResList()
     }
   },
   mounted() {
     var offsetHeight = window.innerHeight
-    this.tableHeight = offsetHeight - 220
+    // this.tableHeight = offsetHeight - 150
     if (this.query != undefined) {
       this.queryParams.query = this.query
     }
