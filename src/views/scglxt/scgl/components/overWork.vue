@@ -9,7 +9,7 @@
                     </el-select>
                 </el-form-item>
                 <el-form-item label="完成件数：">
-                    <el-input-number v-model="jgjs" :min="1" :max="10" label="描述文字"></el-input-number><br/>
+                    <el-input-number v-model="jgjs" :min="1" label="描述文字"></el-input-number><br/>
                 </el-form-item>
                 <el-form-item>
                     <el-button @click="overWork" class="namesBtn" type="primary">完成加工</el-button>

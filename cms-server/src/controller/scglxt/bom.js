@@ -53,13 +53,15 @@ module.exports = class extends Base {
     async addBomManyAction() {
         let form = this.post('form')
         let ssdd = this.post('ssdd')
+        let ssht = this.post('ssht')
         const vm = this
         let pArr = []
-        let zddjb = await this.model('scglxt_t_dd').where({
-            id: ssdd
-        }).getField('ddlevel', true)
+        let ddinfo = await this.model('scglxt_t_dd').where({
+            ssht: ssht
+        }).field('id,ddlevel').find()
         for (let i = 0; i < form.length; i++) {
-            form[i].zddjb = zddjb
+            form[i].zddjb = ddinfo.ddlevel
+            form[i].ssdd = ddinfo.id
             pArr.push(vm.getData(form[i]))
         }
         let data = {}

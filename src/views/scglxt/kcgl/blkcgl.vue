@@ -152,7 +152,6 @@ export default {
     },
     //批量备料
     manyBOMBl() {
-      console.log(this.selBomList)
       let params = ''
       this.selBomList.map(item => {
         params = params + item.ID + ','

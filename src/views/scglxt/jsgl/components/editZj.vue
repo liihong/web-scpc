@@ -92,7 +92,7 @@ export default {
           id: this.$util.getUUId(),
           zjmc: '',
           zjid: this.dialogState.formData.ID,
-          bzjsl: 0,
+          bzjsl: 1,
           bzjid: '',
           bzjmc: '',
           bz: ''
@@ -131,7 +131,7 @@ export default {
         id: this.$util.getUUId(),
         zjid: this.formData.id,
         zjmc: this.formData.zjmc,
-        bzjsl: 0,
+        bzjsl: 1,
         bz: ''
       })
     },
@@ -145,7 +145,7 @@ export default {
         bomid: '',
         zjid: this.formData.id,
         zjmc: this.formData.zjmc,
-        zjsl: 0
+        zjsl: 1
       })
     },
     delJgj(i) {
@@ -246,7 +246,7 @@ export default {
                   id: this.$util.getUUId(),
                   zjid: this.formData.id,
                   zjmc: this.formData.zjmc,
-                  bzjsl: 0,
+                  bzjsl: 1,
                   bz: ''
                 }
               ]

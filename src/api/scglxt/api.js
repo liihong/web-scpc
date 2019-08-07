@@ -43,7 +43,9 @@ let api = {
     editZj: 'scglxt/zj/editZj',
     getBzjByZjId: 'scglxt/zj/getBzjByZjId',
     deleteZjById: 'scglxt/zj/deleteZjById',
-
+    getZJTreeList: 'scglxt/zj/getZJTreeList',
+    getZJListBySSDd: 'scglxt/zj/getZJListBySSDd',
+    
     //工艺流程标准管理
     getGyByBzId: 'scglxt/gybz/getGyByBzId',
     addGyBzMany: 'scglxt/gybz/addGyBzMany',

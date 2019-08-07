@@ -145,7 +145,7 @@ export default {
         '.gygxTable .el-table__body-wrapper tbody'
       )
       const _this = this
-      let sortTable = Sortable.create(
+      Sortable.create(
         tbody,
         {
           group: '.gxnr',

@@ -57,6 +57,7 @@ export default {
           
           this.$ajax.post(this.$api.addBomMany, {
             ssdd: this.dialogState.query.SSDD,
+            ssht: this.dialogState.query.SSHT,
             form: arrs
           }).then(res => {
             if (res && res.errno == 0) {

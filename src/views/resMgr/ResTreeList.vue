@@ -68,7 +68,7 @@
 
 <script>
 import resEdit from './ResEdit'
-
+import { arrGroupBy } from '@/utils/index'
 export default {
   name: 'resList',
   props: {
@@ -86,6 +86,10 @@ export default {
     query: {
       type: Object,
       String
+    },
+    treeBy: {
+        type: String,
+        default: ''
     }
   },
   components: {
@@ -134,6 +138,7 @@ export default {
     }
   },
   methods: {
+    arrGroupBy,
     changeSelectQuery(name) {
       this.selectObj = this.resRows.filter(item => {
         return item.COLUMN_NAME == name
@@ -162,6 +167,12 @@ export default {
       this.$ajax.get(this.$api.queryTableData, this.queryParams).then(res => {
         if (res.data) {
           this.resDatas = res.data.data
+          if(this.treeBy) {
+            this.resDatas = this.arrGroupBy(this.resDatas,(item)=>{
+                return item[this.treeBy]
+            })   
+            console.log(this.resDatas) 
+          }
           this.total = parseInt(res.data.count)
           this.listLoading = false
         }

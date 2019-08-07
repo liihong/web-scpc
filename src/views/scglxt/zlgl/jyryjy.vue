@@ -53,7 +53,7 @@ export default {
       this.dialogState.show = true
     },
     changeRadio(row) {
-      let params = row.ID
+     
       this.$ajax
         .post(this.$api.gygxCheckPassAll, {
           id: row.id,
