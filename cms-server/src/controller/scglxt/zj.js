@@ -80,7 +80,7 @@ module.exports = class extends Base {
 
     //获取组件树型数据
     async getZJTreeListAction(){
-        let sql = `SELECT DISTINCT dd.ID,XMNAME,DDLEVEL,(SELECT NAME FROM (SELECT id,mc NAME FROM scglxt_tyzd WHERE xh LIKE '04__') tras WHERE tras.id=DDLEVEL) DDLEVEL_TEXT,STARTTIME,ENDTIME,sjcjsj FROM scglxt_t_dd dd,scglxt_t_zj zj where dd.id = zj.ssdd  ORDER BY dd.sjcjsj desc`
+        let sql = `SELECT DISTINCT dd.ID,XMNAME,DDLEVEL,(SELECT NAME FROM (SELECT id,mc NAME FROM scglxt_tyzd WHERE xh LIKE '04__') tras WHERE tras.id=DDLEVEL) DDLEVEL_TEXT,STARTTIME,ENDTIME,dd.sjcjsj FROM scglxt_t_dd dd,scglxt_t_zj zj where dd.id = zj.ssdd  ORDER BY dd.sjcjsj desc`
         let data = await this.model().query(sql)
 
         let zjData = await this.model(zjModel).select()

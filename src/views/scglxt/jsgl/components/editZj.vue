@@ -200,7 +200,7 @@ export default {
               if (res && res.errno == 0) {
                 this.$message.editSuccess()
                 this.dialogState.show = false
-                this.$parent.$refs.zjgl.getResList()
+                this.$parent.$refs.initData()
               } else {
                 this.$message.editError(res.errmsg)
               }
@@ -276,7 +276,7 @@ export default {
                 id: this.$util.getUUId(),
                 zjmc: '',
                 zjid: this.dialogState.formData.ID,
-                bzjsl: 0,
+                bzjsl: 1,
                 bz: ''
               }
             ]

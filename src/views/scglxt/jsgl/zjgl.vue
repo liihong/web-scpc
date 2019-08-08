@@ -1,16 +1,17 @@
 <template>
   <div class="zjgl">
-    <!-- <ResTreeList tableId='0117' treeBy="ssdd_TEXT" noEdit ref="zjgl">
-      <el-table-column slot="operate" fixed="left" label="操作" min-width="110" align="center">
-        <template slot-scope="scope">
-          <el-button-group size="mini">
-            <el-button size="mini" type="primary" @click="exportZj(scope.row)">导出</el-button>
-            <el-button size="mini" type="primary" @click="editBomRow(scope.row)">编辑</el-button>
-            <el-button size="mini" type="danger" @click="handleDelete(scope.row)">删除</el-button>
-          </el-button-group>
-        </template>
-      </el-table-column>
-    </ResTreeList> -->
+    <!--工具条-->
+    <el-col :span="24" class="toolbar">
+      <el-form :inline="true">
+        <el-col :span="4">
+        </el-col>
+        <el-col :span="20">
+          <el-form-item>
+            <el-button size="mini" @click="handleAdd" type="primary" icon="el-icon-circle-plus">新增</el-button>
+          </el-form-item>
+        </el-col>
+      </el-form>
+    </el-col>
     <el-table class="el-table" @expand-change="expandChange" :data="ddList" stripe border style="width: 100%;">
       <el-table-column fixed="left" label="操作" min-width="50" align="center">
         <template slot-scope="scope">
@@ -167,7 +168,7 @@ export default {
           .then(res => {
             if (res && res.errno == 0) {
               this.$message.deleteSuccess('删除该组件关系成功！')
-              this.$refs.zjgl.getResList()
+              this.getData(this.activeRow)
             } else {
               this.$message.deleteError(res.data.errmsg)
             }
