@@ -112,4 +112,21 @@ service.getBolb = function(url, param) {
     })
   })
 }
+service.postBolb = function(url, param) {
+  return new Promise((resolve, reject) => {
+    return axios({
+      url: url,
+      method: 'POST',
+      processData: false,
+      params: param,
+      headers:{
+        'Content-Type': 'multipart/form-data'
+      }
+    }).then(res => {
+      resolve(res)
+    }).catch(err => {
+      reject(err)
+    })
+  })
+}
 export default service

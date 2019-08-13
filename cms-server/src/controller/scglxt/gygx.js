@@ -161,6 +161,9 @@ module.exports = class extends Base {
 
     //获取检验人员检验列表数据
     async getCheckListAction() {
+        let pageNumber = this.post('pageNumber')
+        let pageSize = this.post('pageSize')
+        let curPage = (pageNumber - 1) * pageSize
         let sql = `SELECT jggl.id, dd.xmname DDMC,
         bom.zddmc BOMID, bom.zddjb ZDDJB, bom.bmcl BMCL, tz.tzlx, tz.url tzurl, jggy.gymc GYNR,gygc.kjgjs KJGJS,gygc.YJGJS,
         ry.rymc CZRY,jggl.jgryid, sb.sbmc SBID, jggl.jgjs SJJS, gygc.bomid,gygc.id gygcid, date_format( dd.endtime, '%Y-%m-%d' ) ddjssj,
@@ -182,18 +185,52 @@ module.exports = class extends Base {
         AND jggl.sfjy = '0' 
         AND jggl.jgjs IS NOT NULL 
     ORDER BY
-        jgkssj`
+        jgkssj  limit ` + curPage + `,` + pageSize + `;`
 
-        let data = await this.model().query(sql) 
-
-        return this.success(data)
+        let countSql = `SELECT count(*) count  FROM
+                        scglxt_t_gygc gygc,
+                        scglxt_t_bom bom
+                        LEFT JOIN scglxt_t_dd_tz tz ON bom.ddtz LIKE CONCAT( tz.tzmc, "%" ),
+                        scglxt_t_jggy jggy,
+                        scglxt_t_jggl jggl
+                        LEFT JOIN scglxt_t_sb sb ON sb.id = jggl.sbid,
+                        scglxt_t_ry ry,
+                        scglxt_t_dd dd
+                WHERE
+                    bom.ssdd = dd.id
+                    AND gygc.bomid = bom.id
+                    AND jggy.id = gygc.gynr
+                    AND jggl.gygcid = gygc.id
+                    AND ry.id = jggl.jgryid
+                    AND jggl.sfjy = '0'
+                    AND jggl.jgjs IS NOT NULL
+                ORDER BY
+                    jgkssj `
+        let data = await this.model().query(sql)
+        let count = await this.model().query(countSql)
+        let info = {
+            count: count[0].count,
+            currentPage: pageNumber,
+            data: data,
+            pageSize: pageSize,
+            totalPages: (count[0].count +pageSize - 1) / pageSize
+        }
+        return this.success(info)
     }
 
     //质检全部通过
     //如果是最后一道工序则更新BOM的状态
-    async gygxCheckPassAllAction(){
-        let {id, gygcid, jgryid, jyryid, bomid, bfjs, serial} = this.post()
-        
+    async gygxCheckPassAllAction() {
+        let {
+            id,
+            gygcid,
+            jgryid,
+            jyryid,
+            bomid,
+            bfjs,
+            serial
+        } = this.post()
+
         let updateJggl = {
             jysj: util.getNowTime(),
             sfjy: '1',
@@ -202,31 +239,53 @@ module.exports = class extends Base {
             fgjs: bfjs
         }
         //更新该条加工信息的检验信息
-        await this.model('scglxt_t_jggl').where({id: id}).update(updateJggl)
-       
+        await this.model('scglxt_t_jggl').where({
+            id: id
+        }).update(updateJggl)
+
         let updateSql = `
         update scglxt_t_gygc a set yjgjs =  yjgjs+(select c.jgjs from scglxt_t_jggl c where c.id = '` + id + `') ,bfjs=0,sjjs=0 where id = '` + gygcid + `'`
-        
-        //更新工艺的已加工件数
-       let data =  await this.model().execute(updateSql)
 
-        let yjgjs = await this.model('scglxt_t_gygc').where({id: gygcid}).getField('yjgjs', true)
-        
-        let nextJGgy = await this.model('scglxt_t_gygc').where({bomid, serial: serial+1}).select()
-         //更新下一道工序
-         //如果有下一到工序则更新开始下一道工序的可加工数量
-        if(nextJGgy.length == 1){
-            await this.model('scglxt_t_gygc').where({bomid: bomid, serial: serial+1}).update({
+        //更新工艺的已加工件数
+        let data = await this.model().execute(updateSql)
+
+        let yjgjs = await this.model('scglxt_t_gygc').where({
+            id: gygcid
+        }).getField('yjgjs', true)
+
+        let nextJGgy = await this.model('scglxt_t_gygc').where({
+            bomid,
+            serial: serial + 1
+        }).select()
+        //更新下一道工序
+        //如果有下一到工序则更新开始下一道工序的可加工数量
+        if (nextJGgy.length == 1) {
+            await this.model('scglxt_t_gygc').where({
+                bomid: bomid,
+                serial: serial + 1
+            }).update({
                 kjgjs: yjgjs
             })
-        }else{
+        } else {
             //如果已加工件数+报废件数=第一条工艺的可加工件数，说明整个流程加工完成，则修改订单状态
-            let bfjs = await this.model('scglxt_t_gygc').where({bomid: bomid}).sum('bfjs')
-            let kjgjsFirst = await this.model('scglxt_t_gygc').where({bomid: bomid, serial: 0}).getField('kjgjs', true)
-            let yjgjsLast = await  this.model('scglxt_t_gygc').where({bomid: bomid, serial: serial}).getField('yjgjs', true)
-            
-            if(kjgjsFirst == (bfjs + yjgjsLast)){
-                await this.model('scglxt_t_bom').where({id: bomid}).update({zddzt: '0503'})
+            let bfjs = await this.model('scglxt_t_gygc').where({
+                bomid: bomid
+            }).sum('bfjs')
+            let kjgjsFirst = await this.model('scglxt_t_gygc').where({
+                bomid: bomid,
+                serial: 0
+            }).getField('kjgjs', true)
+            let yjgjsLast = await this.model('scglxt_t_gygc').where({
+                bomid: bomid,
+                serial: serial
+            }).getField('yjgjs', true)
+
+            if (kjgjsFirst == (bfjs + yjgjsLast)) {
+                await this.model('scglxt_t_bom').where({
+                    id: bomid
+                }).update({
+                    zddzt: '0503'
+                })
             }
         }
 
@@ -234,8 +293,17 @@ module.exports = class extends Base {
     }
 
     // 检验部分通过
-    async gygxCheckPassPartAction(){
-        let {id, gygcid,jyryid,sjzt,dhjs,dhyy,jgjs,yjgjs }  = this.post()
+    async gygxCheckPassPartAction() {
+        let {
+            id,
+            gygcid,
+            jyryid,
+            sjzt,
+            dhjs,
+            dhyy,
+            jgjs,
+            yjgjs
+        } = this.post()
 
         let jgglUpdate = {
             sfjy: '1',
@@ -246,9 +314,13 @@ module.exports = class extends Base {
             yjgjs: yjgjs - bfjs + jgjs,
             bfjs: bfjs
         }
-        let jgglData = await this.model('scglxt_t_jggl').where({id: id}).field('jgryid,jgsl jgjs,jyryid,jgkssj,jgjssj,jysj,sbid,gygcid,id jgglid').find()
+        let jgglData = await this.model('scglxt_t_jggl').where({
+            id: id
+        }).field('jgryid,jgsl jgjs,jyryid,jgkssj,jgjssj,jysj,sbid,gygcid,id jgglid').find()
 
-        await this.model('scglxt_t_gygc').where({gygcid: gygcid}).update(gygcUpdate)
+        await this.model('scglxt_t_gygc').where({
+            gygcid: gygcid
+        }).update(gygcUpdate)
 
         //生成打回记录
         let tmpLogData = jgglData
@@ -258,13 +330,15 @@ module.exports = class extends Base {
         tmpLogData.dhyy = dhyy
 
         await this.model('scglxt_t_jggl_tmp').add(tmpLogData)
-           
+
         //返工
-        if(sjzt == '2201'){
-            gygcUpdate.fgcs = "(select count(*) from scglxt_t_jggl_tmp where jgglid='"+jgglId+" and sjzt='2201')+1"
-            await this.model('scglxt_t_jggl').where({id :id}).update(jgglUpdate)
-            
-        }else{//报废
+        if (sjzt == '2201') {
+            gygcUpdate.fgcs = "(select count(*) from scglxt_t_jggl_tmp where jgglid='" + jgglId + " and sjzt='2201')+1"
+            await this.model('scglxt_t_jggl').where({
+                id: id
+            }).update(jgglUpdate)
+
+        } else { //报废
         }
     }
 };

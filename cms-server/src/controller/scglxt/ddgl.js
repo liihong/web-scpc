@@ -6,6 +6,7 @@ let ddModel = 'scglxt_t_dd'
 import util from '../../../utils/util'
 import exportXls from '../../../utils/exportXls'
 const fs = require('fs');
+const path = require('path');
 const xlsx = require('xlsx-style');
 const _ = require('lodash');
 
@@ -74,6 +75,7 @@ module.exports = class extends Base {
         return this.success(addData)
     }
 
+
     //订单删除数据
     async deleteDdAction() {
         let where = this.post()
@@ -92,6 +94,13 @@ module.exports = class extends Base {
         return this.success(deleteDd)
     }
 
+    // 根据不同条件查询订单数据
+    async getDdListByWhereAction(){
+        let where = this.post('where')
+        let sql = `select ID,XMNAME,DDLEVEL,(SELECT NAME FROM (SELECT id,mc NAME FROM scglxt_tyzd WHERE xh LIKE '04__') tras WHERE tras.id=DDLEVEL) DDLEVEL_TEXT,STARTTIME,ENDTIME from scglxt_t_dd where 1=1 and (`+ where +`) ORDER BY DDLEVEL,SJCJSJ`
+        let data = await this.model().query(sql)
+        return this.success(data)
+    }
     //导出BOM
     async exportDdBOMAction() {
         let ddid = this.get('id')
@@ -152,5 +161,32 @@ module.exports = class extends Base {
             return item
         })
         exportXls.exportXls(infos[0], datas, res)
+    }
+
+    // 上传订单图纸
+    async uploadDrawingAction() {
+        let themefile = this.post('file');
+        let ssdd = this.post('ssdd');
+        // let filepath = themefile.path;//为防止上传的时候因文件名重复而覆盖同名已上传文件，path是MD5方式产生的随机名称
+        // let uploadpath = think.ROOT_PATH + '/upload/' + ssdd;
+        // let uploadpath = '/upload/';
+        console.log(themefile)
+        console.log(ssdd)
+        // think.mkdir(uploadpath);//创建该目录
+        // //提取出用 ‘/' 隔开的path的最后一部分。
+
+        // let newFileName = path.basename(filepath);
+        // //将上传的文件（路径为filepath的文件）移动到第二个参数所在的路径，并改为第二个参数的文件名。
+        // themefile.path = uploadpath +  newFileName;
+        // fs.rename(filepath, uploadpath + newFileName, function (err) {
+        //     if (err) {
+        //         console.log(err)
+        //     }
+        // })
+        //读取压缩文件信息存数据库
+
+        // let zip = new JSZip();
+
+        // this.success(themefile);
     }
 };

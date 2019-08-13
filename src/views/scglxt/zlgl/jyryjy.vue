@@ -1,6 +1,6 @@
 <template>
   <div class="ddgl">
-    <DataResList :tableData="checkList" tableId='010403' noEdit>
+    <DataResList @refreshData="refreshData" :tableData="checkList" tableId='010403' noEdit>
       <el-table-column slot="operate" fixed="left" label="操作" min-width="300" align="center">
         <template slot-scope="scope">
           <el-radio-group v-model="scope.row.SFJY" class="radioGroup">
@@ -23,10 +23,14 @@ import { mapGetters } from 'vuex'
 export default {
   data() {
     return {
-      checkList: [],
+      checkList: {},
       dialogState:{
         show: false,
         row: {}
+      },
+      query:{
+        pageSize: 30,
+        pageNumber: 1
       }
     }
   },
@@ -42,10 +46,14 @@ export default {
   },
   methods: {
     async initData() {
-      let res = await this.$ajax.post(this.$api.getCheckList)
+      let res = await this.$ajax.post(this.$api.getCheckList, this.query)
       if (res.errno == 0) {
         this.checkList = res.data
       }
+    },
+    refreshData(params){
+      this.query = params
+      this.initData()
     },
     //部分通过
     passSection(row){

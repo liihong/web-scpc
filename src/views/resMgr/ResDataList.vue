@@ -24,7 +24,7 @@
     </el-col>
 
     <!--列表-->
-    <el-table ref="elTable" highlight-current-row @selection-change="selsChange" @row-click="rowClick"  default-expand-all :data="tableData" row-key="ID" v-loading="listLoading" header-cell-class-name="table_th" stripe border :max-height="tableHeight" style="width: 100%;">
+    <el-table ref="elTable" highlight-current-row @selection-change="selsChange" @row-click="rowClick"  default-expand-all :data="tableData.data" row-key="ID" v-loading="listLoading" header-cell-class-name="table_th" stripe border :max-height="tableHeight" style="width: 100%;">
       <el-table-column fixed="left" type="selection" width="50" align="center">
       </el-table-column>
       <el-table-column fixed="left" type="index" width="50" align="center">
@@ -61,7 +61,7 @@
     <!--工具条-->
     <el-col :span="24" class="pagination">
       <!-- <el-button v-if="!noEdit" type="danger" @click="batchRemove" :disabled="this.sels.length===0">批量删除</el-button> -->
-      <el-pagination background @current-change="handleCurrentChange" :current-page="queryParams.pageNumber" :page-sizes="[30, 60, 100, 150]" :page-size="queryParams.pageSize" layout="total, sizes, prev, pager, next, jumper" :total="total">
+      <el-pagination background @current-change="handleCurrentChange" :current-page="queryParams.pageNumber" :page-sizes="[30, 60, 100, 150]" :page-size="queryParams.pageSize" layout="total, sizes, prev, pager, next, jumper" :total="tableData.count">
       </el-pagination>
     </el-col>
     <resEdit @saveAfter="saveAfter" :dialogState="dialogState" />
@@ -76,7 +76,7 @@ export default {
   name: 'resList',
   props: {
     tableData: {
-      type: Array
+      type: Object
     },
     tableId: {
       type: String
@@ -109,7 +109,7 @@ export default {
         value: ''
       },
       resRows: [],
-      total: this.tableData.length || 0,
+      total: this.tableData.count || 0,
       listLoading: false,
       sels: [], //列表选中列
       selectObj: {},
@@ -305,15 +305,9 @@ export default {
           return item.COLUMN_NAME
         })
         this.queryParams.queryColumn = columns.join(',')
+        this.$emit('refreshData', this.queryParams)
       }
-    },
-    // dialogState: {
-    //   deep: true,
-    //   handler() {
-    //     if (!this.dialogState.show) {
-    //     }
-    //   }
-    // }
+    }
   }
 }
 </script>

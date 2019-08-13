@@ -22,8 +22,18 @@ module.exports = class extends Base {
             'ckzt': '完成'
         }).count()
         data.ddNoStart = await this.model(ddModel).where({
-            'ckzt': ['!=','完成']
+            'ckzt': null
         }).count()
+        data.bomNoStart = await this.model('scglxt_t_bom').where({
+            'zddzt': ['=','0501']
+        }).count()
+        data.bomInProcess = await this.model('scglxt_t_bom').where({
+            'zddzt': ['in','0502,0503,0504']
+        }).count()
+        data.bomIsFinish = await this.model('scglxt_t_bom').where({
+            'zddzt': ['=','0506']
+        }).count()
+        data.bomTotal = await this.model('scglxt_t_bom').count()
         data.peopleTotal = await this.model('scglxt_t_ry').count()
         return this.success(data)
     }

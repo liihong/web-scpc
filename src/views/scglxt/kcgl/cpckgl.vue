@@ -2,7 +2,7 @@
   <ResList tableId='010409' :query="this.$route.query" noEdit ref="zjryjy">
     <el-table-column slot="operate" fixed="left" label="操作" min-width="200" align="center">
       <template slot-scope="scope">
-        <el-radio @change="pass(scope.row)" class="radio" :label="1">通过并入库</el-radio>
+        <el-radio @change="pass(scope.row)" class="radio" :label="1">通过并出库</el-radio>
         <el-radio @change="passSection(scope.row)" class="radio" :label="2">不通过</el-radio>
       </template>
     </el-table-column>

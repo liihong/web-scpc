@@ -7,7 +7,6 @@ let api = {
     getSjzdById: 'scglxt/sjzd/getSjzdById',
     getBzList: 'scglxt/sjzd/getBzList',
     getPeopleByBz: 'scglxt/sjzd/getPeopleByBz',
-    
 
     getJggyList: 'scglxt/gygx/getJggyList',
     getJggxByBOMId: 'scglxt/gygx/getJggxByBOMId',
@@ -25,7 +24,9 @@ let api = {
     exportDdByZj: '/api/scglxt/ddgl/exportDdByZj',
     exportDdBOM: '/api/scglxt/ddgl/exportDdBOM',
     getNewDDbh: 'scglxt/ddgl/getNewDDbh',
-    
+    getDdListByWhere: 'scglxt/ddgl/getDdListByWhere',
+    uploadDrawing: 'scglxt/ddgl/uploadDrawing',
+
     //bom表操作
     addBomData: 'scglxt/bom/addBom',
     addBomMany: 'scglxt/bom/addBomMany',
@@ -35,9 +36,11 @@ let api = {
     getBLlist: 'scglxt/bom/getBLlist',
     getZjByBomId: 'scglxt/bom/getZjByBomId',
     getGYgslist: 'scglxt/bom/getGYgslist',
-    BOMFinallyCheck: 'scglxt/bom/BOMFinallyCheck',
-    BOMInStore: 'scglxt/bom/BOMInStore',
-    BOMOutStore: 'scglxt/bom/BOMOutStore',
+    BOMFinallyCheck: 'scglxt/bom/BOMFinallyCheck',//终检
+    BOMInStore: 'scglxt/bom/BOMInStore',//入库
+    BOMOutStore: 'scglxt/bom/BOMOutStore',//出库
+    BOMSpeedProgress: 'scglxt/bom/BOMSpeedProgress',//进度跟踪
+
     //组件操作
     addZj: 'scglxt/zj/addZj',
     editZj: 'scglxt/zj/editZj',
