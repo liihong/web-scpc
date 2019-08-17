@@ -25,7 +25,7 @@ let api = {
     exportDdBOM: '/api/scglxt/ddgl/exportDdBOM',
     getNewDDbh: 'scglxt/ddgl/getNewDDbh',
     getDdListByWhere: 'scglxt/ddgl/getDdListByWhere',
-    uploadDrawing: 'scglxt/ddgl/uploadDrawing',
+    uploadDrawing: '/api/scglxt/ddgl/uploadDrawing',
 
     //bom表操作
     addBomData: 'scglxt/bom/addBom',
@@ -59,6 +59,7 @@ let api = {
     getCheckList: 'scglxt/gygx/getCheckList',// 获取检验列表
     gygxCheckPassAll: 'scglxt/gygx/gygxCheckPassAll',
     gygxCheckPassPart: 'scglxt/gygx/gygxCheckPassPart',
+    gygxCheckNoPass: 'scglxt/gygx/gygxCheckNoPass'
     
   }
   export default api

@@ -9,16 +9,17 @@ const fs = require('fs');
 const path = require('path');
 const xlsx = require('xlsx-style');
 const _ = require('lodash');
+const rename = think.promisify(fs.rename, fs);
 
 module.exports = class extends Base {
 
     //根据订单表数据，生成新的订单编号
     async getNewDDbhAction() {
         let count = await this.model('scglxt_t_dd').query(`SELECT SUBSTRING_INDEX(xmname,'-',-1) AS count FROM scglxt_t_dd order by sjcjsj desc limit 1`)
-        
-        count ='00000'+(parseInt(count[0].count) + 1);
-        count =  count.substring(3,count.length);
-        
+
+        count = '00000' + (parseInt(count[0].count) + 1);
+        count = count.substring(3, count.length);
+
         return this.success(count)
     }
     /**
@@ -95,9 +96,9 @@ module.exports = class extends Base {
     }
 
     // 根据不同条件查询订单数据
-    async getDdListByWhereAction(){
+    async getDdListByWhereAction() {
         let where = this.post('where')
-        let sql = `select ID,XMNAME,DDLEVEL,(SELECT NAME FROM (SELECT id,mc NAME FROM scglxt_tyzd WHERE xh LIKE '04__') tras WHERE tras.id=DDLEVEL) DDLEVEL_TEXT,STARTTIME,ENDTIME from scglxt_t_dd where 1=1 and (`+ where +`) ORDER BY DDLEVEL,SJCJSJ`
+        let sql = `select ID,XMNAME,DDLEVEL,(SELECT NAME FROM (SELECT id,mc NAME FROM scglxt_tyzd WHERE xh LIKE '04__') tras WHERE tras.id=DDLEVEL) DDLEVEL_TEXT,STARTTIME,ENDTIME from scglxt_t_dd where 1=1 and (` + where + `) ORDER BY DDLEVEL,SJCJSJ`
         let data = await this.model().query(sql)
         return this.success(data)
     }
@@ -145,11 +146,11 @@ module.exports = class extends Base {
 
         let sql = `select (@i := @i + 1) as xh,id zjid,zjmc ljmc,'' ljcz,'' ljgg,zjkc jgsl,'' ljlx, '' sccj,'0' lx from scglxt_t_zj,(select @i := 0) b where ssdd = '` + ddid + `' union all
 
-        select '' xh,zjid,bom.zddmc ljmc, cl.clmc ljcz,concat_ws('    ',cldx,concat(bljs,'件'))  ljgg,jgsl ljsl,'机加工' ljlx,'' sccj,'1' lx from scglxt_t_bom bom,scglxt_t_bom_zj bomzj,scglxt_t_zj zj,scglxt_t_cl cl
+        select '' xh,zjid,bom.zddmc ljmc, cl.clmc ljcz,concat_ws('    ',cldx,concat(bljs,'件'))  ljgg,jgsl ljsl,'机加工' ljlx,'' sccj,'1' lx from scglxt_t_bom bom,scglxt_t_bom_zj bomzj,scglxt_t_zj zj,scglxt_t_cl cl,( SELECT @i := 0 ) b 
         where bom.zddcz=cl.id and bom.id = bomzj.bomid and bomzj.zjid=zj.id and zj.ssdd='` + ddid + `'
         union all
-        select '' xh,zjid,ljmc,ljcz,ljgg,(bzjzj.bzjsl*zj.zjkc) ljsl, ljlx,sccj,'2' lx from scglxt_t_bzj bzj,scglxt_t_bzj_zj bzjzj,scglxt_t_zj zj
-        where bzj.id = bzjzj.bzjid and bzjzj.zjid=zj.id and zj.ssdd='` + ddid + `'  order by zjid,xh desc,lx,ljlx
+        select '' xh,zjid,ljmc,ljcz,ljgg,(bzjzj.bzjsl*zj.zjkc) ljsl, ljlx,sccj,'2' lx from scglxt_t_bzj bzj,scglxt_t_bzj_zj bzjzj,scglxt_t_zj zj,( SELECT @i := 0 ) b 
+        where bzj.id = bzjzj.bzjid and bzjzj.zjid=zj.id and zj.ssdd='` + ddid + `'  order by zjid,lx,ljlx,xh desc
         `
         let datas = await this.model().query(sql)
 
@@ -165,28 +166,31 @@ module.exports = class extends Base {
 
     // 上传订单图纸
     async uploadDrawingAction() {
-        let themefile = this.post('file');
+        let themefile = this.file('file');
         let ssdd = this.post('ssdd');
-        // let filepath = themefile.path;//为防止上传的时候因文件名重复而覆盖同名已上传文件，path是MD5方式产生的随机名称
-        // let uploadpath = think.ROOT_PATH + '/upload/' + ssdd;
+        let filepath = themefile.path; //为防止上传的时候因文件名重复而覆盖同名已上传文件，path是MD5方式产生的随机名称
+        let uploadpath = think.ROOT_PATH + '/../public/upload/' + ssdd + '/';
         // let uploadpath = '/upload/';
-        console.log(themefile)
-        console.log(ssdd)
-        // think.mkdir(uploadpath);//创建该目录
+
+        if (!think.isExist(uploadpath))
+            think.mkdir(uploadpath); //创建该目录
         // //提取出用 ‘/' 隔开的path的最后一部分。
 
-        // let newFileName = path.basename(filepath);
-        // //将上传的文件（路径为filepath的文件）移动到第二个参数所在的路径，并改为第二个参数的文件名。
-        // themefile.path = uploadpath +  newFileName;
-        // fs.rename(filepath, uploadpath + newFileName, function (err) {
-        //     if (err) {
-        //         console.log(err)
-        //     }
-        // })
-        //读取压缩文件信息存数据库
+        let newFileName = uploadpath + path.basename(filepath);
+        let form = new formidable.IncomingForm();
+        form.uploadDir = "tmp";
+        //将上传的文件（路径为filepath的文件）移动到第二个参数所在的路径，并改为第二个参数的文件名。
+        console.log(newFileName)
+        console.log(filepath)
+        var readStream = fs.createReadStream(filepath);
+        var writeStream = fs.createWriteStream(newFileName);
+        await rename(filepath, newFileName);
+        themefile.path = newFileName;
 
-        // let zip = new JSZip();
+        // 读取压缩文件信息存数据库
 
-        // this.success(themefile);
+        let zip = new JSZip();
+
+        this.success(themefile);
     }
 };

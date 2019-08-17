@@ -6,12 +6,12 @@
           <el-radio-group v-model="scope.row.SFJY" class="radioGroup">
             <el-radio @change="changeRadio(scope.row)" class="radio" :label="1">全部通过</el-radio>
             <el-radio @change="passSection(scope.row)" class="radio" :label="2">部分通过</el-radio>
-            <el-radio @change="changeRadio(scope.row)" class="radio" :label="3">全部返工</el-radio>
+            <el-radio @change="noPass(scope.row)" class="radio" :label="3">全部返工</el-radio>
           </el-radio-group>
         </template>
       </el-table-column>
     </DataResList>
-    <passPart :dialogState="dialogState"/>
+    <passPart :dialogState="dialogState" />
   </div>
 </template>
 
@@ -24,11 +24,11 @@ export default {
   data() {
     return {
       checkList: {},
-      dialogState:{
+      dialogState: {
         show: false,
         row: {}
       },
-      query:{
+      query: {
         pageSize: 30,
         pageNumber: 1
       }
@@ -38,9 +38,9 @@ export default {
     DataResList,
     passPart
   },
-   computed: {
+  computed: {
     ...mapGetters(['token'])
-   },
+  },
   mounted() {
     this.initData()
   },
@@ -51,17 +51,34 @@ export default {
         this.checkList = res.data
       }
     },
-    refreshData(params){
+    refreshData(params) {
       this.query = params
       this.initData()
     },
     //部分通过
-    passSection(row){
+    passSection(row) {
       this.dialogState.row = row
       this.dialogState.show = true
     },
+    noPass(row) {
+      this.$ajax
+        .post(this.$api.gygxCheckNoPass, {
+          id: row.id,
+          gygcid: row.gygcid,
+          jgryid: row.jgryid,
+          jyryid: this.token,
+          bomid: row.bomid,
+          bfjs: 0,
+          serial: row.serial
+        })
+        .then(res => {
+          if (res.errno == 0) {
+            this.$message.success('全部打回成功！')
+            this.initData()
+          }
+        })
+    },
     changeRadio(row) {
-     
       this.$ajax
         .post(this.$api.gygxCheckPassAll, {
           id: row.id,
@@ -74,7 +91,7 @@ export default {
         })
         .then(res => {
           if (res.errno == 0) {
-            this.$message.success('全部通过成功！')
+            this.$message.success('操作成功！')
             this.initData()
           }
         })

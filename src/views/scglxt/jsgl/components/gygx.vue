@@ -176,6 +176,7 @@ export default {
     onSave() {
       let datas = this.gygxList.map((item, index) => {
         item.serial = index
+        item.ssdd = this.row.SSDD
         delete item.sblxList
         return item
       })

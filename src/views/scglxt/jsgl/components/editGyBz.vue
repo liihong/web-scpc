@@ -162,7 +162,7 @@ export default {
       }
       this.gygxList.push({
         id: this.$util.getUUId(),
-        ssbz: this.bzid,
+        ssbz: this.dialogState.row.id,
         gynr: item.value.nodeValue,
         gymc: item.name.nodeValue,
         edgs: 0,
@@ -179,7 +179,7 @@ export default {
       this.$nextTick(() => {
         this.$ajax
           .get(this.$api.getGyByBzId, {
-            bzid: this.bzid
+            bzid: this.dialogState.row.id
           })
           .then(res => {
             if (res.errno == 0) {

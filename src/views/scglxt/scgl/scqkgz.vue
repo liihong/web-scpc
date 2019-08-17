@@ -128,7 +128,6 @@ export default {
           if (res.errno == 0) {
             row.bomList = res.data
             this.tableData = res.data
-            console.log(this.clList)
           }
         })
     },

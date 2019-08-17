@@ -37,7 +37,7 @@ module.exports = class extends think.Model {
     }
 
     //获取查询对象
-    async getWhereObj(query,queryKey, tableId) {
+    async getWhereObj(query,queryColumn ,queryKey, tableId) {
         const _this = this
         let displayColumn = await this.model('resource_table_column').getColumnList(tableId);
         let queryColumns = [],
@@ -64,8 +64,9 @@ module.exports = class extends think.Model {
                         })
                         break;
                     case '2': // 有外键关系,需要翻译
-                    case '4': //字段数据
                         pArr.push(_this.getData(queryColumns, item, queryKey))
+                        break;
+                    case '4': //字段数据
                         break;
                     default:
                         queryColumns.push({
@@ -78,7 +79,7 @@ module.exports = class extends think.Model {
             }
 
         })
-        if (queryColumns.length > 0) {
+        // if (queryColumns.length > 0) {
             if (pArr.length > 0) {
                 await Promise.all(pArr).then(async () => {
                     let complex = {
@@ -105,9 +106,9 @@ module.exports = class extends think.Model {
                 }
             })
             whereObj._complex = complex
-        } else {
-            whereObj[`${queryColumn}`] = ['like', `%${queryKey}%`]
-        }
+        // } else {
+        //     whereObj[`${queryColumn}`] = ['like', `%${queryKey}%`]
+        // }
        return whereObj
     }
 

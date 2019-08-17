@@ -82,7 +82,7 @@ module.exports = class extends Base {
     }
     // 根据配置查询某表的数据
     async queryTableDataAction() {
-        try {
+        // try {
             const _this = this
             let tableId = this.get('tableId')
             let pageSize = this.get('pageSize')
@@ -130,7 +130,7 @@ module.exports = class extends Base {
                 whereObj[key] = ['=', `${query[key]}`]
             }
             if (!!queryKey) {
-                whereObj = await this.model('tableData').getWhereObj(query,queryKey, tableId)
+                whereObj = await this.model('tableData').getWhereObj(query,queryColumn,queryKey, tableId)
             }
             if (order && order.length > 0) {
                 data = await this.model(table.table_name)
@@ -140,9 +140,9 @@ module.exports = class extends Base {
                     .field(displayColumnArr.join(',')).page(pageNumber, pageSize).where(table.where_sql).where(whereObj).order(table.orderby_sql).countSelect();
             }
             return this.success(data)
-        } catch (err) {
-            return this.fail(err)
-        }
+        // } catch (err) {
+        //     return this.fail(err)
+        // }
     }
     getData(queryColumns, item, queryKey) {
         const vm = this

@@ -58,7 +58,7 @@
     <!--工具条-->
     <el-col :span="24" class="pagination">
       <!-- <el-button v-if="!noEdit" type="danger" @click="batchRemove" :disabled="this.sels.length===0">批量删除</el-button> -->
-      <el-pagination background @current-change="handleCurrentChange" :current-page="queryParams.pageNumber" :page-sizes="[30, 60, 100, 150]" :page-size="queryParams.pageSize" layout="total, sizes, prev, pager, next, jumper" :total="total">
+      <el-pagination background @current-change="handleCurrentChange" :current-page="queryParams.pageNumber" :page-sizes="[30, 60, 100, 150]" :page-size="queryParams.pageSize" layout="total, sizes, prev, pager, next, jumper" :total="total" @size-change="sizeChange">
       </el-pagination>
     </el-col>
     <resEdit @initData="getResList" @saveAfter="saveAfter" :dialogState="dialogState" />
@@ -252,6 +252,10 @@ export default {
       this.queryParams.pageNumber = val
       this.getResList()
     },
+    sizeChange(val) {
+      this.queryParams.pageSize = val
+      this.getResList()
+    },
     selsChange: function(sels) {
       this.sels = sels
       this.$emit('selectChange', sels)
@@ -318,7 +322,11 @@ export default {
       deep: true,
       handler() {
         let columns = this.resRows.map(item => {
-          return item.COLUMN_NAME
+          if(item.ISQUERY == '1')
+            return item.COLUMN_NAME
+        })
+        columns = columns.filter(item=>{
+          return item != undefined
         })
         this.queryParams.queryColumn = columns.join(',')
         this.getResList()

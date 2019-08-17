@@ -117,7 +117,6 @@ service.postBolb = function(url, param) {
     return axios({
       url: url,
       method: 'POST',
-      processData: false,
       params: param,
       headers:{
         'Content-Type': 'multipart/form-data'

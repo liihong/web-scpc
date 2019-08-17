@@ -61,7 +61,7 @@
     <!--工具条-->
     <el-col :span="24" class="pagination">
       <!-- <el-button v-if="!noEdit" type="danger" @click="batchRemove" :disabled="this.sels.length===0">批量删除</el-button> -->
-      <el-pagination background @current-change="handleCurrentChange" :current-page="queryParams.pageNumber" :page-sizes="[30, 60, 100, 150]" :page-size="queryParams.pageSize" layout="total, sizes, prev, pager, next, jumper" :total="tableData.count">
+      <el-pagination background @current-change="handleCurrentChange" :current-page="queryParams.pageNumber" :page-sizes="[30, 60, 100, 150]" :page-size="queryParams.pageSize" layout="total, sizes, prev, pager, next, jumper" :total="tableData.count" @size-change="sizeChange">
       </el-pagination>
     </el-col>
     <resEdit @saveAfter="saveAfter" :dialogState="dialogState" />
@@ -248,6 +248,9 @@ export default {
     handleCurrentChange(val) {
       this.queryParams.pageNumber = val
     },
+    sizeChange(val) {
+      this.queryParams.pageSize = val
+    },
     selsChange: function(sels) {
       this.sels = sels
       this.$emit('selectChange', sels)
@@ -287,8 +290,8 @@ export default {
     }
   },
   mounted() {
-    var offsetHeight = window.innerHeight
-    this.tableHeight = offsetHeight - 220
+    // var offsetHeight = window.innerHeight
+    // this.tableHeight = offsetHeight - 220
     if (this.query != undefined) {
       this.queryParams.query = this.query
     }

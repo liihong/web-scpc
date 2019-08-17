@@ -213,7 +213,7 @@ module.exports = class extends Base {
             currentPage: pageNumber,
             data: data,
             pageSize: pageSize,
-            totalPages: (count[0].count +pageSize - 1) / pageSize
+            totalPages: (count[0].count + pageSize - 1) / pageSize
         }
         return this.success(info)
     }
@@ -340,5 +340,47 @@ module.exports = class extends Base {
 
         } else { //报废
         }
+    }
+
+    //检验全部打回
+    //打回第一步：先生成打回记录
+    //打回第三步：修改加工工艺的返工次数
+     //打回第二步：删掉已加工的加工记录
+    async gygxCheckNoPassAction() {
+        let {
+            id,
+            gygcid,
+            jyryid,
+            sjzt,
+            dhjs,
+            dhyy,
+            jgjs,
+            yjgjs
+        } = this.post()
+
+
+        let jgglData = await this.model('scglxt_t_jggl').where({
+            id: id
+        }).field('jgryid,jgsl jgjs,jyryid,jgkssj,jgjssj,jysj,sbid,gygcid,id jgglid').find()
+
+         //生成打回记录
+         let tmpLogData = jgglData
+         tmpLogData.id = util.getUUId()
+         tmpLogData.sjzt = sjzt
+         tmpLogData.dhjs = dhjs
+         tmpLogData.dhyy = dhyy
+
+         await this.model('scglxt_t_jggl_tmp').add(tmpLogData)
+
+         let gygcUpdate = {
+            yjgjs: yjgjs - bfjs + jgjs,
+            bfjs: bfjs
+        }
+
+         await this.model('scglxt_t_gygc').where({
+            gygcid: gygcid
+        }).update(gygcUpdate)
+
+        let data = await this.model('scglxt_t_jggl').where({id: id}).delete()
     }
 };

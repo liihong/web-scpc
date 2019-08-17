@@ -10,7 +10,7 @@
         <el-button type="primary" @click="handlerUpload">上传当前图纸到服务器</el-button>
       </span>
     </div>
-    <el-upload ref="upload" :on-change="chooseFile" :file-list="tzList" action="/api/util/upload" multiple list-type="picture-card" :auto-upload="false">
+    <el-upload ref="upload" :data="params" :on-change="chooseFile" :file-list="tzList" :action="$api.uploadDrawing" multiple list-type="picture-card" :auto-upload="false">
       <i slot="default" class="el-icon-plus"></i>
       <div slot="file" slot-scope="{file}">
         <img class="el-upload-list__item-thumbnail" :src="file.url" alt="">
@@ -42,7 +42,8 @@ export default {
       tzList: [],
       dialogImageUrl: '',
       dialogVisible: false,
-      disabled: false
+      disabled: false,
+      params: {}
     }
   },
   computed: {
@@ -66,14 +67,17 @@ export default {
     },
     //上传图纸
     async handlerUpload() {
-      // this.$refs.upload.submit()
-      let params = new FormData()
-      console.log(this.row.ID)
-      params.append('ssdd',this.row.ID)
-      params.append('file',this.tzList)
+      this.params.ssdd = this.row.ID
+      this.$refs.upload.submit()
+      // let params = new FormData()
 
-      let res  =  await this.$ajax.postBolb('/api' + this.$api.uploadDrawing,params)
-      console.log(res)
+      // params.append('ssdd', this.row.ID)
+      // params.append('file', this.tzList)
+      // let res = await this.$ajax.post(
+      //   this.$api.uploadDrawing,
+      //   params
+      // )
+      // console.log(res)
     },
     // 获取图纸信息
     getTzData() {
