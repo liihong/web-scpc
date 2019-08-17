@@ -133,10 +133,14 @@ export default {
     getBFB(dqjd = 0, zgs = 0) {
       let ddzgs = zgs || 0
       let yjggs = dqjd || 0
-      if (ddzgs == 0) {
+      if (yjggs*1 == 0) {
         return 0
       }
-      let bfb = yjggs / ddzgs * 100
+      if (ddzgs*1 == 0) {
+        return 0
+      }
+      let bfb = (yjggs / ddzgs) * 100
+
       return Math.ceil(bfb)
     }
   }

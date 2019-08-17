@@ -1,9 +1,11 @@
 <template>
   <ResList tableId='010407' :query="this.$route.query" noEdit ref="zjryjy">
-    <el-table-column slot="operate" fixed="left" label="操作" min-width="200" align="center">
+    <el-table-column slot="operate" fixed="left" label="操作" min-width="170" align="center">
       <template slot-scope="scope">
-        <el-radio @change="pass(scope.row)" class="radio" :label="1">通过并入库</el-radio>
-        <el-radio @change="passSection(scope.row)" class="radio" :label="2">不通过</el-radio>
+        <el-button-group>
+        <el-button type="primary" @click="pass(scope.row)" class="radio" :label="1">通过并入库</el-button>
+        <el-button type="danger" @click="passSection(scope.row)" class="radio" :label="2">不通过</el-button>
+        </el-button-group>
       </template>
     </el-table-column>
     <template slot="XMNAME" slot-scope="scope">

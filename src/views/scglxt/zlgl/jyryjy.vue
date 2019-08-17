@@ -1,13 +1,13 @@
 <template>
   <div class="ddgl">
     <DataResList @refreshData="refreshData" :tableData="checkList" tableId='010403' noEdit>
-      <el-table-column slot="operate" fixed="left" label="操作" min-width="300" align="center">
+      <el-table-column slot="operate" fixed="left" label="操作" min-width="250" align="center">
         <template slot-scope="scope">
-          <el-radio-group v-model="scope.row.SFJY" class="radioGroup">
-            <el-radio @change="changeRadio(scope.row)" class="radio" :label="1">全部通过</el-radio>
-            <el-radio @change="passSection(scope.row)" class="radio" :label="2">部分通过</el-radio>
-            <el-radio @change="noPass(scope.row)" class="radio" :label="3">全部返工</el-radio>
-          </el-radio-group>
+         <el-button-group>
+            <el-button type="primary"  @click="changeRadio(scope.row)" class="radio" :label="1">全部通过</el-button>
+            <el-button type="warning"  @click="passSection(scope.row)" class="radio" :label="2">部分通过</el-button>
+            <el-button type="danger"  @click="noPass(scope.row)" class="radio" :label="3">全部返工</el-button>
+          </el-button-group>
         </template>
       </el-table-column>
     </DataResList>
@@ -26,6 +26,7 @@ export default {
       checkList: {},
       dialogState: {
         show: false,
+        type: 'part',
         row: {}
       },
       query: {
@@ -57,44 +58,34 @@ export default {
     },
     //部分通过
     passSection(row) {
+      this.dialogState.type = 'part'
       this.dialogState.row = row
       this.dialogState.show = true
     },
     noPass(row) {
-      this.$ajax
-        .post(this.$api.gygxCheckNoPass, {
-          id: row.id,
-          gygcid: row.gygcid,
-          jgryid: row.jgryid,
-          jyryid: this.token,
-          bomid: row.bomid,
-          bfjs: 0,
-          serial: row.serial
-        })
-        .then(res => {
-          if (res.errno == 0) {
-            this.$message.success('全部打回成功！')
-            this.initData()
-          }
-        })
+      this.dialogState.row = row
+      this.dialogState.show = true
+      this.dialogState.type = 'noPass'
     },
     changeRadio(row) {
-      this.$ajax
-        .post(this.$api.gygxCheckPassAll, {
-          id: row.id,
-          gygcid: row.gygcid,
-          jgryid: row.jgryid,
-          jyryid: this.token,
-          bomid: row.bomid,
-          bfjs: 0,
-          serial: row.serial
-        })
-        .then(res => {
-          if (res.errno == 0) {
-            this.$message.success('操作成功！')
-            this.initData()
-          }
-        })
+      this.$message.confirm('是否确定全部检验通过', () => {
+        this.$ajax
+          .post(this.$api.gygxCheckPassAll, {
+            id: row.id,
+            gygcid: row.gygcid,
+            jgryid: row.jgryid,
+            jyryid: this.token,
+            bomid: row.bomid,
+            bfjs: 0,
+            serial: row.serial
+          })
+          .then(res => {
+            if (res.errno == 0) {
+              this.$message.success('操作成功！')
+              this.initData()
+            }
+          })
+      })
     }
   }
 }

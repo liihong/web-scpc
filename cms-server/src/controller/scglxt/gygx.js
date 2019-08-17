@@ -296,6 +296,7 @@ module.exports = class extends Base {
     async gygxCheckPassPartAction() {
         let {
             id,
+            bomid,
             gygcid,
             jyryid,
             sjzt,
@@ -311,15 +312,15 @@ module.exports = class extends Base {
             jyryid: jyryid
         }
         let gygcUpdate = {
-            yjgjs: yjgjs - bfjs + jgjs,
-            bfjs: bfjs
+            yjgjs: yjgjs - dhjs + jgjs,
+            bfjs: dhjs
         }
         let jgglData = await this.model('scglxt_t_jggl').where({
             id: id
-        }).field('jgryid,jgsl jgjs,jyryid,jgkssj,jgjssj,jysj,sbid,gygcid,id jgglid').find()
+        }).field('jgryid,jgjs,jyryid,jgkssj,jgjssj,jysj,sbid,gygcid,id jgglid').find()
 
         await this.model('scglxt_t_gygc').where({
-            gygcid: gygcid
+            id: gygcid
         }).update(gygcUpdate)
 
         //生成打回记录
@@ -328,18 +329,50 @@ module.exports = class extends Base {
         tmpLogData.sjzt = sjzt
         tmpLogData.dhjs = dhjs
         tmpLogData.dhyy = dhyy
+        tmpLogData.jyryid = jyryid
+        tmpLogData.jysj = util.getNowTime()
 
         await this.model('scglxt_t_jggl_tmp').add(tmpLogData)
 
+        let data = {}
         //返工
         if (sjzt == '2201') {
             gygcUpdate.fgcs = "(select count(*) from scglxt_t_jggl_tmp where jgglid='" + jgglId + " and sjzt='2201')+1"
-            await this.model('scglxt_t_jggl').where({
+            data = await this.model('scglxt_t_jggl').where({
                 id: id
             }).update(jgglUpdate)
 
-        } else { //报废
+        } else { //报废，重新生成BOM从头开始加工
+            let bomid = util.getUUId()
+            let bomData = await this.model('scglxt_t_bom').where({id: bomid}).find()
+            bomData.id = bomid
+            bomData.zddmc = bomData.zddmc + '_报废单'
+            bomData.zddzt = '0501'
+            bomData.jgsl = dhjs
+            bomData.clzt = null
+            bomData.rksj = null
+            bomData.cksj = null
+            bomData.blkssj = null
+            bomData.bljssj = null
+
+            await this.model('scglxt_t_bom').add(bomData)
+
+            let gygxDatas = await this.model('scglxt_t_gygc').where({bomid: bomid}).select()
+
+            if(gygxDatas.length > 0) {
+                gygxDatas.map(item=>{
+                    item.id = util.getUUId()
+                    item.bomid = bomid
+                    item.kjgjs = 0
+                    item.yjgjs = 0
+                    item.sjjs = 0
+                    return item
+                })
+                data = await this.model('scglxt_t_gygc').addMany(gygxDatas)
+            }
         }
+
+        return this.success(data)
     }
 
     //检验全部打回
@@ -351,36 +384,42 @@ module.exports = class extends Base {
             id,
             gygcid,
             jyryid,
-            sjzt,
             dhjs,
             dhyy,
             jgjs,
             yjgjs
         } = this.post()
 
-
         let jgglData = await this.model('scglxt_t_jggl').where({
             id: id
-        }).field('jgryid,jgsl jgjs,jyryid,jgkssj,jgjssj,jysj,sbid,gygcid,id jgglid').find()
+        }).field('jgryid,jgjs,jyryid,jgkssj,jgjssj,jysj,sbid,gygcid,id jgglid').find()
 
          //生成打回记录
          let tmpLogData = jgglData
          tmpLogData.id = util.getUUId()
-         tmpLogData.sjzt = sjzt
+         tmpLogData.sjzt = '2201'
          tmpLogData.dhjs = dhjs
          tmpLogData.dhyy = dhyy
+         tmpLogData.jyryid = jyryid
+         tmpLogData.jysj = util.getNowTime()
 
          await this.model('scglxt_t_jggl_tmp').add(tmpLogData)
 
+         let count = await this.model('scglxt_t_jggl_tmp').where({jgglId: id}).count()
+         console.log(count)
+         
          let gygcUpdate = {
-            yjgjs: yjgjs - bfjs + jgjs,
-            bfjs: bfjs
+            bfjs: dhjs,
+            sjjs: 0,
+            fgcs: count
         }
 
          await this.model('scglxt_t_gygc').where({
-            gygcid: gygcid
+            id: gygcid
         }).update(gygcUpdate)
 
         let data = await this.model('scglxt_t_jggl').where({id: id}).delete()
+
+        return this.success(data)
     }
 };
