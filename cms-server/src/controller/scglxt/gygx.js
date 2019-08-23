@@ -308,7 +308,7 @@ module.exports = class extends Base {
 
         let jgglUpdate = {
             sfjy: '1',
-            jysj: 'now()',
+            jysj: util.getNowTime(),
             jyryid: jyryid
         }
         let gygcUpdate = {
@@ -337,7 +337,7 @@ module.exports = class extends Base {
         let data = {}
         //返工
         if (sjzt == '2201') {
-            gygcUpdate.fgcs = "(select count(*) from scglxt_t_jggl_tmp where jgglid='" + jgglId + " and sjzt='2201')+1"
+            gygcUpdate.fgcs = "(select count(*) from scglxt_t_jggl_tmp where jgglid='" + id + " and sjzt='2201')+1"
             data = await this.model('scglxt_t_jggl').where({
                 id: id
             }).update(jgglUpdate)

@@ -75,7 +75,7 @@ export default {
     endWork(row) {
       this.overState.gyid = row.ID
       this.overState.worker = row.CZRYID
-      this.overState.kjgjs = row.KJGJS
+      this.overState.kjgjs = (row.KJGJS + row.SJJS)*1
       this.overState.show = true
     }
   }

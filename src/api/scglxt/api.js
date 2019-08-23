@@ -3,6 +3,9 @@ let api = {
     // 首页统计
     getStatistics: 'scglxt/statistics',
     
+    getSblxPc: 'scglxt/statistics/getSblxPc',
+    getGygxPc: 'scglxt/statistics/getGygxPc',
+    
     //数据字典操作
     getSjzdById: 'scglxt/sjzd/getSjzdById',
     getBzList: 'scglxt/sjzd/getBzList',

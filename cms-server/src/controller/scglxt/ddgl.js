@@ -98,8 +98,11 @@ module.exports = class extends Base {
     // 根据不同条件查询订单数据
     async getDdListByWhereAction() {
         let where = this.post('where')
-        let sql = `select ID,XMNAME,DDLEVEL,(SELECT NAME FROM (SELECT id,mc NAME FROM scglxt_tyzd WHERE xh LIKE '04__') tras WHERE tras.id=DDLEVEL) DDLEVEL_TEXT,STARTTIME,ENDTIME from scglxt_t_dd where 1=1 and (` + where + `) ORDER BY DDLEVEL,SJCJSJ`
-        let data = await this.model().query(sql)
+        let pageSize = this.post('pageSize')
+        let pageNumber = this.post('pageNumber')
+        // let sql = `select ID,XMNAME,DDLEVEL,(SELECT NAME FROM (SELECT id,mc NAME FROM scglxt_tyzd WHERE xh LIKE '04__') tras WHERE tras.id=DDLEVEL) DDLEVEL_TEXT,STARTTIME,ENDTIME from scglxt_t_dd where 1=1 and (` + where + `) ORDER BY DDLEVEL,SJCJSJ`
+        let data = await this.model(ddModel).field("ID,XMNAME,DDLEVEL,(SELECT NAME FROM (SELECT id,mc NAME FROM scglxt_tyzd WHERE xh LIKE '04__') tras WHERE tras.id=DDLEVEL) DDLEVEL_TEXT,STARTTIME,ENDTIME").where(where).order('DDLEVEL,SJCJSJ').page(pageNumber, pageSize).countSelect()
+        // let data = await this.model().query(sql)
         return this.success(data)
     }
     //导出BOM

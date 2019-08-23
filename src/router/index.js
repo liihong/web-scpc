@@ -18,40 +18,42 @@ import Layout from '../views/layout/Layout'
     icon: 'svg-name'             the icon show in the sidebar,
   }
 **/
-export const constantRouterMap = [
-  { path: '/login', component: () => import('@/views/login/index'), hidden: true },
-  { path: '/404', component: () => import('@/views/404'), hidden: true },
-
-  {
-    path: '/',
-    component: Layout,
-    redirect: '/dashboard',
-    hidden: true,
-    children: [{
-      path: 'dashboard',
-      name: 'dashboard',
-      meta: { title: '工作台', icon: 'component' },
-      component: () => import('@/views/dashboard/index')
-    }
-    ,{
-      path: '/resMgr/resEdit',
-      name: 'resEdit',
-      meta: { title: '新增资源', icon: 'component' },
-      component: () => import('@/views/resMgr/ResEdit.vue')
-    },
-    {
-      path: '/bjd',
-      name: 'bjd',
-      meta: { title: '报价单', icon: 'component' },
-      component: () => import('@/views/scglxt/xsgl/components/bjdList.vue')
-    }
-  ]
+export const constantRouterMap = [{
+    path: '/login',
+    component: () =>
+      import ('@/views/login/index'),
+    hidden: true
   },
-  // { path: '*', redirect: '/404', hidden: true }
+  {
+    path: '/404',
+    component: () =>
+      import ('@/views/404'),
+    hidden: true
+  },
+  // {
+    // path: '/',
+    // component: Layout,
+    // redirect: '/dashboard',
+    // hidden: true,
+    // children: [
+      // {
+      //   path: '/',
+      //   name: 'dashboard',
+      //   meta: {
+      //     title: '工作台',
+      //     icon: 'component'
+      //   },
+      //   component: () =>
+      //     import ('@/views/dashboard/index')
+      // },
+  //   ]
+  // }
 ]
 
 export default new Router({
   mode: 'history', //后端支持可开
-  scrollBehavior: () => ({ y: 0 }),
+  scrollBehavior: () => ({
+    y: 0
+  }),
   routes: constantRouterMap
 })
