@@ -29,7 +29,6 @@
     </el-upload>
   </el-dialog>
 </template>
-
 <script>
 export default {
   props: {
@@ -57,18 +56,6 @@ export default {
     },
     handleRemove(file) {
       console.log(file)
-    },
-    handlePictureCardPreview(file) {
-      this.dialogImageUrl = file.url
-      this.dialogVisible = true
-    },
-    handleDownload(file) {
-      console.log(file)
-    },
-    //上传图纸
-    async handlerUpload() {
-      this.params.ssdd = this.row.ID
-      this.$refs.upload.submit()
       // let params = new FormData()
 
       // params.append('ssdd', this.row.ID)
@@ -78,6 +65,19 @@ export default {
       //   params
       // )
       // console.log(res)
+    },
+    handlePictureCardPreview(file) {
+      this.dialogImageUrl = file.url
+      this.dialogVisible = true
+    },
+    handleDownload(file) {
+      window.location.href = file.url
+    },
+    //上传图纸
+    async handlerUpload() {
+      this.params.ssdd = this.row.ID
+      this.$refs.upload.submit()
+      
     },
     // 获取图纸信息
     getTzData() {

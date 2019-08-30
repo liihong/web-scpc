@@ -5,6 +5,7 @@ const Base = require('../base.js');
 let ddModel = 'scglxt_t_dd'
 import util from '../../../utils/util'
 import exportXls from '../../../utils/exportXls'
+import config from '../../config/config.js';
 const fs = require('fs');
 const path = require('path');
 const xlsx = require('xlsx-style');
@@ -169,31 +170,42 @@ module.exports = class extends Base {
 
     // 上传订单图纸
     async uploadDrawingAction() {
-        let themefile = this.file('file');
+        // let themefile = this.file('file');
         let ssdd = this.post('ssdd');
-        let filepath = themefile.path; //为防止上传的时候因文件名重复而覆盖同名已上传文件，path是MD5方式产生的随机名称
-        let uploadpath = think.ROOT_PATH + '/../public/upload/' + ssdd + '/';
+        // let filepath = themefile.path; //为防止上传的时候因文件名重复而覆盖同名已上传文件，path是MD5方式产生的随机名称
+        // let uploadpath = think.ROOT_PATH + '/../public/upload/' + ssdd + '/';
         // let uploadpath = '/upload/';
 
-        if (!think.isExist(uploadpath))
-            think.mkdir(uploadpath); //创建该目录
-        // //提取出用 ‘/' 隔开的path的最后一部分。
+        if (!think.isEmpty(this.file('file'))) {
+            //进行压缩等处理
+            let file = think.extend({}, this.file('file'));
 
-        let newFileName = uploadpath + path.basename(filepath);
-        let form = new formidable.IncomingForm();
-        form.uploadDir = "tmp";
-        //将上传的文件（路径为filepath的文件）移动到第二个参数所在的路径，并改为第二个参数的文件名。
-        console.log(newFileName)
-        console.log(filepath)
-        var readStream = fs.createReadStream(filepath);
-        var writeStream = fs.createWriteStream(newFileName);
-        await rename(filepath, newFileName);
-        themefile.path = newFileName;
+            //保存文件的路径
+            let savepath = think.ROOT_PATH + '/../upload/ddtz/' + ssdd + '/';
+            // let savepath = think.ROOT_PATH + '/../public/upload/' + ssdd + '/';
+            think.mkdir(savepath);//创建该目录
+            let filepath = file.path; //文件路径
+            let filename = file.name; //文件名
+            let suffix = filename.substr(filename.lastIndexOf('.') + 1); //文件后缀
+            let newfilename = Math.random().toString(36).substr(2) + '.' + suffix;
 
-        // 读取压缩文件信息存数据库
-
-        let zip = new JSZip();
-
-        this.success(themefile);
+            //读文件
+            let datas = fs.readFileSync(filepath);
+            //写文件
+            fs.writeFileSync(savepath + newfilename, datas);
+            let newpath = savepath + newfilename;
+            file.path = newpath
+            
+            let tzData = {
+                id: util.getUUId(),
+                ssdd: ssdd,
+                tzlx:suffix,
+                tzmc:newfilename,
+                tzdz: file.path,
+                url: 'upload/ddtz/'+ ssdd+'/' + newfilename
+            }
+            let data = this.model('scglxt_t_dd_tz').add(tzData)
+            return this.success(file)
+        }
     }
 };

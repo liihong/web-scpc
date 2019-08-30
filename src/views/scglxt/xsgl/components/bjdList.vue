@@ -1,7 +1,6 @@
 <template>
   <el-dialog title="合同报价单" :visible.sync="dialogState.show" width="80%">
-
-    <ResList ref="bjdList" tableId='0110' :query="dialogState.query" @selectChange="selectChange" noEdit noAdd>
+    <ResList ref="bjdList" tableId='0110' :query="dialogState.query" @selectChange="selectChange" noAdd>
       <span v-show="noBom" style="margin:0 10px;" slot="toolBar">
         <span style="color:#48b884;">请打钩选择想要生成BOM的零件信息</span>
         <el-button type="primary" @click="autoBOM">生成BOM</el-button>
@@ -9,7 +8,6 @@
     </ResList>
   </el-dialog>
 </template>
-
 <script>
 export default {
   props: {
