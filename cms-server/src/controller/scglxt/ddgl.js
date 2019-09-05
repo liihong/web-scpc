@@ -187,25 +187,35 @@ module.exports = class extends Base {
             let filepath = file.path; //文件路径
             let filename = file.name; //文件名
             let suffix = filename.substr(filename.lastIndexOf('.') + 1); //文件后缀
-            let newfilename = Math.random().toString(36).substr(2) + '.' + suffix;
+            // let newfilename = Math.random().toString(36).substr(2) + '.' + suffix;
 
             //读文件
             let datas = fs.readFileSync(filepath);
             //写文件
-            fs.writeFileSync(savepath + newfilename, datas);
-            let newpath = savepath + newfilename;
+            fs.writeFileSync(savepath + filename, datas);
+            let newpath = savepath + filename;
             file.path = newpath
             
             let tzData = {
                 id: util.getUUId(),
                 ssdd: ssdd,
                 tzlx:suffix,
-                tzmc:newfilename,
+                tzmc: filename,
                 tzdz: file.path,
-                url: 'upload/ddtz/'+ ssdd+'/' + newfilename
+                url: 'upload/ddtz/'+ ssdd+'/' + filename
             }
             let data = this.model('scglxt_t_dd_tz').add(tzData)
             return this.success(file)
         }
+    }
+
+    //删除上传图纸信息
+    async deleteDdTzAction() {
+        let ssdd = this.post('ssdd')
+        let id = this.post('id')
+
+        let data = this.model('scglxt_t_dd_tz').where({id: id}).delete()
+
+        return this.success(data)
     }
 };

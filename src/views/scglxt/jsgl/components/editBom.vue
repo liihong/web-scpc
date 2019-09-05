@@ -3,8 +3,8 @@
     <el-dialog append-to-body :modal=false width="50%" size="small" :title="optionList[optionType] + 'BOM'" :visible.sync="dialogState.show" :close-on-click-modal="false">
       <el-form class="form" :rules="rules" ref="rulesForm" :model="formData" label-width="120px">
         <el-col :span="12">
-          <el-form-item prop="ZDDMC" label="子订单名称">
-            <el-input v-model="formData.ZDDMC" placeholder="子订单名称"></el-input>
+          <el-form-item prop="ZDDMC" label="零件名称">
+            <el-input v-model="formData.ZDDMC" placeholder="零件名称"></el-input>
           </el-form-item>
         </el-col>
         <el-col :span="12">
@@ -90,7 +90,18 @@
         </el-col>
         <el-col :span="12">
           <el-form-item prop="DDTZ" label="选择图纸">
-            <el-input v-model="formData.DDTZ" placeholder="选择图纸"></el-input>
+            <!-- <el-input v-model="formData.DDTZ" placeholder="选择图纸"></el-input> -->
+            <!-- <el-radio-group v-model="formData.DDTZ">
+              <el-radio v-for="(item,i) in dropDownListData['tz']" :key="i" :label="item.id">{{item.tzmc}}</el-radio>
+            </el-radio-group> -->
+            <el-select v-model="formData.DDTZ" placeholder="请选择">
+              <el-option v-for="(item,i) in dropDownListData['tz']" :key="i" :label="item.tzmc" :value="item.id">
+                <span style="float: left">{{ item.tzmc }}</span>
+                <span @click="showImage(item)" style="float: right; color: #8492a6; font-size: 13px">
+                  <i class="el-icon-zoom-in"></i>
+                </span>
+              </el-option>
+            </el-select>
           </el-form-item>
         </el-col>
         <!-- <el-col :span="24">
@@ -176,8 +187,17 @@ export default {
     )
     this.getSjzdData('clmc', 'SELECT id,clmc name,cldj,mi FROM scglxt_t_cl')
     this.getSjzdData('zj', 'SELECT id zjid,zjmc,zjdj FROM scglxt_t_zj')
+    this.getSjzdData(
+      'tz',
+      "SELECT url id,tzmc FROM scglxt_t_dd_tz where ssdd = '" +
+        this.formData.SSDD +
+        "'"
+    )
   },
   methods: {
+    showImage(file) {
+      window.open(file.id, '_blank'); 
+    },
     onSave() {
       let params = {}
       this.calculateVolume() //再次计算一次体积确定不会出错
@@ -374,6 +394,14 @@ export default {
           }
         }
       }
+    },
+    'formData.SSDD'() {
+      this.getSjzdData(
+        'tz',
+        "SELECT url id,tzmc FROM scglxt_t_dd_tz where ssdd = '" +
+          this.formData.SSDD +
+          "'"
+      )
     }
   }
 }

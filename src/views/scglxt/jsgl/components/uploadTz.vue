@@ -10,11 +10,12 @@
         <el-button type="primary" @click="handlerUpload">上传当前图纸到服务器</el-button>
       </span>
     </div>
-    <el-upload ref="upload" :data="params" :on-change="chooseFile" :file-list="tzList" :action="$api.uploadDrawing" multiple list-type="picture-card" :auto-upload="false">
+    <el-upload ref="upload" :data="params" :on-change="chooseFile" :file-list="tzList" :action="$api.uploadDrawing" multiple list-type="picture-card"  :on-success="handleSuccess" :auto-upload="false">
       <i slot="default" class="el-icon-plus"></i>
       <div slot="file" slot-scope="{file}">
         <img class="el-upload-list__item-thumbnail" :src="file.url" alt="">
         <span class="el-upload-list__item-actions">
+          <div>{{file.tzmc}}</div>
           <span class="el-upload-list__item-preview" @click="handlePictureCardPreview(file)">
             <i class="el-icon-zoom-in"></i>
           </span>
@@ -55,20 +56,20 @@ export default {
       this.tzList = fileList
     },
     handleRemove(file) {
-      console.log(file)
-      // let params = new FormData()
-
-      // params.append('ssdd', this.row.ID)
-      // params.append('file', this.tzList)
-      // let res = await this.$ajax.post(
-      //   this.$api.uploadDrawing,
-      //   params
-      // )
-      // console.log(res)
+      this.$message.confirmDelete(async () => {
+        let res = await this.$ajax.post(this.$api.deleteDdTz, { id: file.id })
+        if (res.errno == 0) {
+          this.$message.deleteSuccess()
+          this.getTzData()
+        } else {
+          this.$message.deleteError(res.data.errmsg)
+        }
+      })
     },
     handlePictureCardPreview(file) {
       this.dialogImageUrl = file.url
       this.dialogVisible = true
+      window.open(file.url, '_blank'); 
     },
     handleDownload(file) {
       window.location.href = file.url
@@ -77,7 +78,9 @@ export default {
     async handlerUpload() {
       this.params.ssdd = this.row.ID
       this.$refs.upload.submit()
-      
+    },
+    handleSuccess(){
+        this.$message.success('图纸上传成功')
     },
     // 获取图纸信息
     getTzData() {

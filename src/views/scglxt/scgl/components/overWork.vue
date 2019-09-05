@@ -1,6 +1,6 @@
 <template>
     <div class="selectPerson">
-        <el-dialog title="结束工作" :visible.sync="dialogState.show" width="30%">
+        <el-dialog v-if="dialogState.show" title="结束工作" :visible.sync="dialogState.show" width="30%">
             <el-form style="text-align:center;">
                 <el-form-item label="选择设备">
                     <el-select v-model="activeSb" placeholder="请选择">
@@ -37,6 +37,7 @@ export default {
   },
   mounted() {
     this.initData()
+    console.log(this.dialogState)
   },
   methods: {
     initData() {
@@ -53,6 +54,8 @@ export default {
       })
     },
     overWork() {
+      console.log(this.dialogState)
+      
       if(this.jgjs > this.dialogState.kjgjs) {
         this.$message({
           message: '完成件数不能大于可加工件数！',
@@ -60,20 +63,20 @@ export default {
         })
         return
       }
-      this.$ajax
-        .post(this.$api.overWork, {
-          worker: this.dialogState.worker,
-          gyid: this.dialogState.gyid,
-          jgjs: this.jgjs,
-          sbid: this.activeSb
-        })
-        .then(res => {
-          if (res.errno == 0) {
-            this.$message.success('结束加工,操作成功！')
-            this.dialogState.show = false
-            this.$parent.$refs.jgList.getResList()
-          }
-        })
+      // this.$ajax
+      //   .post(this.$api.overWork, {
+      //     worker: this.dialogState.worker,
+      //     gyid: this.dialogState.gyid,
+      //     jgjs: this.jgjs,
+      //     sbid: this.activeSb
+      //   })
+      //   .then(res => {
+      //     if (res.errno == 0) {
+      //       this.$message.success('结束加工,操作成功！')
+      //       this.dialogState.show = false
+      //       this.$parent.$refs.jgList.getResList()
+      //     }
+      //   })
     }
   }
 }

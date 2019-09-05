@@ -1,11 +1,22 @@
 import request from '@/utils/request'
 let services = {}
-// 获取用户列表
-services.getList = function() {
+// 获取资源树型数据
+services.getTreeList = function() {
   return request({
-    url: '/resource',
+    url: '/resource/getTreeList',
     method: 'get'
   })
+}
+services.getResByRoleId = function(form) {
+  return request({
+    url: '/resource/getResByRoleId',
+    method: 'get',
+    params: form 
+  })
+}
+
+services.saveRoleRes = function(form) {
+  return request.post('/resource/saveRoleRes',form)
 }
 // 修改资源
 services.updateRes = function(form) {

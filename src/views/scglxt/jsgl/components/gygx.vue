@@ -4,12 +4,12 @@
       <span v-if="type == 'edit'">
         当前订单：
         <span style="color:#42b983">{{row.SSDD_TEXT}} </span>
-        子订单名称：
-        <span style="color:#42b983"> {{row.ZDDMC}}</span>
+        零件名称：
+         <a :href="row.DDTZ" target="_blank"><span style="color:#42b983"> {{row.ZDDMC}}</span></a>
       </span>
       <span v-else>
-        子订单名称：
-        <span style="color:#42b983">{{row.BOMID_TEXT}}</span>
+        零件名称：
+        <a :href="row.DDTZ" target="_blank"><span style="color:#42b983">{{row.BOMID_TEXT}}</span></a>
       </span>
     </div>
     <el-row>

@@ -37,7 +37,7 @@ module.exports = class extends think.Model {
     }
 
     //获取查询对象
-    async getWhereObj(query,queryColumn ,queryKey, tableId) {
+    async getWhereObj(query, queryColumn, queryKey, tableId) {
         const _this = this
         let displayColumn = await this.model('resource_table_column').getColumnList(tableId);
         let queryColumns = [],
@@ -79,22 +79,24 @@ module.exports = class extends think.Model {
             }
 
         })
-        // if (queryColumns.length > 0) {
-            if (pArr.length > 0) {
-                await Promise.all(pArr).then(async () => {
-                    let complex = {
-                        _logic: 'or'
+        if (pArr.length > 0) {
+            await Promise.all(pArr).then(async () => {
+                let complex = {
+                    _logic: 'or'
+                }
+                queryColumns.map(item => {
+                    if (item.type) {
+                        complex[`${item.key}`] = ['in', `${item.value}`]
+                    } else {
+                        complex[`${item.key}`] = ['like', `%${item.value}%`]
                     }
-                    queryColumns.map(item => {
-                        if (item.type) {
-                            complex[`${item.key}`] = ['in', `${item.value}`]
-                        } else {
-                            complex[`${item.key}`] = ['like', `%${item.value}%`]
-                        }
-                    })
-                    whereObj._complex = complex
                 })
-            }
+                if(queryColumns.length > 0) {
+                    whereObj._complex = complex
+                }
+            })
+        }
+        if (queryColumns.length > 0) {
             let complex = {
                 _logic: 'or'
             }
@@ -106,10 +108,12 @@ module.exports = class extends think.Model {
                 }
             })
             whereObj._complex = complex
-        // } else {
-        //     whereObj[`${queryColumn}`] = ['like', `%${queryKey}%`]
-        // }
-       return whereObj
+        } else {
+            if(queryColumn != ''){
+                whereObj[`CONCAT(${queryColumn})`] = ['like', `%${queryKey}%`]
+            }
+        }
+        return whereObj
     }
 
     executePromise(arr) {
@@ -120,10 +124,14 @@ module.exports = class extends think.Model {
         return new Promise(async resolve => {
             let wjData = await this.query(`(SELECT id FROM (${item.TYPESQL}) tras WHERE tras.name like '%${queryKey}%')`)
             if (wjData.length > 0) {
+                let value = []
+                wjData.map(item=>{
+                    value.push(item.id)
+                })
                 queryColumns.push({
                     type: true,
                     key: item.COLUMN_NAME,
-                    value: wjData[0].id
+                    value: value.join(',')
                 })
             }
             resolve()

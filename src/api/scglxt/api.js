@@ -29,7 +29,7 @@ let api = {
     getNewDDbh: 'scglxt/ddgl/getNewDDbh',
     getDdListByWhere: 'scglxt/ddgl/getDdListByWhere',
     uploadDrawing: '/api/scglxt/ddgl/uploadDrawing',
-
+    deleteDdTz: 'scglxt/ddgl/deleteDdTz',
     //bom表操作
     addBomData: 'scglxt/bom/addBom',
     addBomMany: 'scglxt/bom/addBomMany',
