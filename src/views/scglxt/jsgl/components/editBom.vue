@@ -1,6 +1,6 @@
 <template>
   <div class="resEdit">
-    <el-dialog append-to-body :modal=false width="50%" size="small" :title="optionList[optionType] + 'BOM'" :visible.sync="dialogState.show" :close-on-click-modal="false">
+    <el-dialog append-to-body :modal=false width="65%" size="small" :title="optionList[optionType] + 'BOM'" :visible.sync="dialogState.show" :close-on-click-modal="false">
       <el-form class="form" :rules="rules" ref="rulesForm" :model="formData" label-width="120px">
         <el-col :span="12">
           <el-form-item prop="ZDDMC" label="零件名称">
@@ -311,6 +311,10 @@ export default {
               this.volume.l = dx[0]
               this.volume.w = dx[1]
               this.volume.h = dx[2]
+            } else{
+              let dx = this.formData.CLDX.split('*')
+              this.volume.d = dx[0].slice(1,dx[0].length)
+              this.volume.h = dx[1]
             }
           }
         })

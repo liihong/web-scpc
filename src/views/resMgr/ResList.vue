@@ -38,7 +38,7 @@
           </el-button-group>
         </template>
       </el-table-column>
-      <el-table-column sortable="custom" v-if="row.PROPERTY_TYPE != '10'" align="center" v-for="(row,index) in resRows" :key="index" :prop="row.COLUMN_NAME" :fixed="(row.IS_FROZEN == 1?'left':false)" :label="row.COLUMN_CNAME" :min-width="(row.COLUMNLENGTH != '')?row.COLUMNLENGTH:150">
+      <el-table-column :sortable="row.IS_SORT == '1' ? 'custom' : false" v-if="row.PROPERTY_TYPE != '10'" align="center" v-for="(row,index) in resRows" :key="index" :prop="row.COLUMN_NAME" :fixed="(row.IS_FROZEN == 1?'left':false)" :label="row.COLUMN_CNAME" :min-width="(row.COLUMNLENGTH != '')?row.COLUMNLENGTH:150">
         <template slot-scope="scope">
           <span v-if="row.PROPERTY_TYPE == '2'">
             <slot :name="row.COLUMN_NAME" v-bind:row="scope.row">

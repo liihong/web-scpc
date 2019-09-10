@@ -9,27 +9,33 @@
                     </el-select>
                 </el-form-item>
                 <el-form-item label="完成件数：">
-                    <el-input-number v-model="jgjs" :min="1" label="描述文字"></el-input-number><br/>
+                    <el-input-number @focus.stop="showInput" v-model="jgjs" label="完成件数"></el-input-number><br/>
+                  <!-- <el-input @click.stop="null" @focus.stop="showInput" v-model="jgjs"></el-input> -->
                 </el-form-item>
                 <el-form-item>
-                    <el-button @click="overWork" class="namesBtn" type="primary">完成加工</el-button>
+                    <el-button width="100%" size="medium" @click.stop="overWork" class="namesBtn" type="primary">完成加工</el-button>
                 </el-form-item>
             </el-form>
+            <number-keyboard v-model="isShowAmountKeyboard" @delete="jgjs ? (jgjs = jgjs.substring(0, jgjs.length - 1)) : ''" @keyDown="withdrawAmountInput"></number-keyboard>
         </el-dialog>
     </div>
 </template>
 
 <script>
 import { mapGetters } from 'vuex'
-
+import  NumberKeyboard from '@/components/Keyboard/number-keyboard.vue'
 export default {
+  components:{
+    NumberKeyboard
+  },
   props: ['dialogState'],
   data() {
     return {
       activeSb: '',
       sbList: [],
       peopleList: [],
-      jgjs: 0
+      jgjs: 0,
+      isShowAmountKeyboard: false
     }
   },
   computed: {
@@ -37,9 +43,15 @@ export default {
   },
   mounted() {
     this.initData()
-    console.log(this.dialogState)
+    this.isShowAmountKeyboard = false
   },
   methods: {
+    showInput(){
+      this.isShowAmountKeyboard = !this.isShowAmountKeyboard
+    },
+    withdrawAmountInput(val){
+      this.jgjs = this.jgjs + '' + val + ''
+    },
     initData() {
       this.$ajax.post(this.$api.getSbList).then(res => {
         if (res.errno == 0) {
@@ -54,7 +66,6 @@ export default {
       })
     },
     overWork() {
-      console.log(this.dialogState)
       
       if(this.jgjs > this.dialogState.kjgjs) {
         this.$message({
@@ -63,20 +74,20 @@ export default {
         })
         return
       }
-      // this.$ajax
-      //   .post(this.$api.overWork, {
-      //     worker: this.dialogState.worker,
-      //     gyid: this.dialogState.gyid,
-      //     jgjs: this.jgjs,
-      //     sbid: this.activeSb
-      //   })
-      //   .then(res => {
-      //     if (res.errno == 0) {
-      //       this.$message.success('结束加工,操作成功！')
-      //       this.dialogState.show = false
-      //       this.$parent.$refs.jgList.getResList()
-      //     }
-      //   })
+      this.$ajax
+        .post(this.$api.overWork, {
+          worker: this.dialogState.worker,
+          gyid: this.dialogState.gyid,
+          jgjs: this.jgjs,
+          sbid: this.activeSb
+        })
+        .then(res => {
+          if (res.errno == 0) {
+            this.$message.success('结束加工,操作成功！')
+            this.dialogState.show = false
+            this.$parent.$refs.jgList.getResList()
+          }
+        })
     }
   }
 }

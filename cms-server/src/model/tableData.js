@@ -47,7 +47,9 @@ module.exports = class extends think.Model {
         let pArr = [],
             temp = {}
         if (query && query != '{}' && JSON.stringify(query) != '{}') {
-            query = JSON.parse(query)
+            // query = JSON.parse(query)
+            console.log(query)
+            
             let key = Object.keys(query)[0]
             whereObj[key] = ['=', `${query[key]}`]
         }

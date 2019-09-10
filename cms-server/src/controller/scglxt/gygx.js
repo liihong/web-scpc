@@ -163,9 +163,15 @@ module.exports = class extends Base {
     async getCheckListAction() {
         let pageNumber = this.post('pageNumber')
         let pageSize = this.post('pageSize')
+        let queryKey = this.post('queryKey')
         let curPage = (pageNumber - 1) * pageSize
-        let sql = `SELECT jggl.id, dd.xmname DDMC,
-        bom.zddmc BOMID, bom.zddjb ZDDJB, bom.bmcl BMCL, tz.tzlx, tz.url tzurl, jggy.gymc GYNR,gygc.kjgjs KJGJS,gygc.YJGJS,
+        let where  = '1=1' 
+
+        if(!!queryKey){
+            where = "ddmc like '%"+queryKey+"%' or ljmc like '%"+queryKey+"%' or czry like '%"+queryKey+"%'"
+        }
+        let sql = `SELECT * from (SELECT jggl.id, dd.xmname DDMC,
+        bom.zddmc LJMC, bom.zddjb ZDDJB, bom.bmcl BMCL, tz.tzlx, tz.url tzurl, jggy.gymc GYNR,gygc.kjgjs KJGJS,gygc.YJGJS,
         ry.rymc CZRY,jggl.jgryid, sb.sbmc SBID, jggl.jgjs SJJS, gygc.bomid,gygc.id gygcid, date_format( dd.endtime, '%Y-%m-%d' ) ddjssj,
         gygc.serial  FROM
             scglxt_t_gygc gygc,
@@ -185,9 +191,9 @@ module.exports = class extends Base {
         AND jggl.sfjy = '0' 
         AND jggl.jgjs IS NOT NULL 
     ORDER BY
-        jgkssj  limit ` + curPage + `,` + pageSize + `;`
+        jgkssj) t where (`+where+`)  limit ` + curPage + `,` + pageSize + `;`
 
-        let countSql = `SELECT count(*) count  FROM
+        let countSql = `SELECT count(*) count  FROM (select gygc.id,dd.xmname ddmc, bom.zddmc ljmc,ry.rymc czry from 
                         scglxt_t_gygc gygc,
                         scglxt_t_bom bom
                         LEFT JOIN scglxt_t_dd_tz tz ON bom.ddtz LIKE CONCAT( tz.tzmc, "%" ),
@@ -205,7 +211,7 @@ module.exports = class extends Base {
                     AND jggl.sfjy = '0'
                     AND jggl.jgjs IS NOT NULL
                 ORDER BY
-                    jgkssj `
+                    jgkssj ) t where (`+where+`)`
         let data = await this.model().query(sql)
         let count = await this.model().query(countSql)
         let info = {

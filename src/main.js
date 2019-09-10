@@ -4,7 +4,9 @@ import router from './router'
 import store from './store'
 import ElementUI from 'element-ui'
 import '@/styles/element-ui.scss'
-import '@/styles/index.scss' // global cs
+import '@/styles/index.scss' // global css
+import '@/styles/reset.css' // global cs
+
 import message from '@/utils/message'
 import * as util from '@/utils'
 

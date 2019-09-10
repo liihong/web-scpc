@@ -1,0 +1,77 @@
+ /*
+KISSY CSS Reset
+理念：
+1. reset 的目的不是清除浏览器的默认样式，这仅是部分工作。清除和重置是紧密不可分的。
+2. reset 的目的不是让默认样式在所有浏览器下一致，而是减少默认样式有可能带来的问题。
+3. reset 期望提供一套普适通用的基础样式。但没有银弹，推荐根据具体需求，裁剪和修改后再使用。
+特色：1. 适应中文；2. 基于最新主流浏览器。
+ */
+ body, h1, h2, h3, h4, h5, h6, hr, p, blockquote, dl, dt, dd, ul, ol, li, pre, form, fieldset, legend, button, input, textarea, th, td { margin:0; padding:0; }
+ body, button, input, select, textarea {
+   font:14px/1.5 "Microsoft YaHei","微软雅黑","Helvetica Neue",Helvetica,"PingFang SC","Hiragino Sans GB",Arial,sans-serif,tahoma, arial, \5b8b\4f53;
+ }
+ h1, h2, h3, h4, h5, h6{ font-size:100%; font-weight: normal;}
+ strong,b,th{font-weight:normal;}
+ address, cite, dfn, em, var,i { font-style:normal; }
+ code, kbd, pre, samp { font-family:couriernew, courier, monospace; }
+ small{ font-size:14px; }
+ ul, ol { list-style:none; }
+ a { text-decoration:none; color: #65A5EE;}
+ a:hover { text-decoration:none; }
+ sup { vertical-align:text-top; }
+ sub{ vertical-align:text-bottom; }
+ legend { color:#000; }
+ fieldset, img { border:0; }
+ input,button,select,textarea{outline:none; background: none;}
+ button, input, select, textarea { font-size:100%; -webkit-appearance: none;border:0}
+ table { border-collapse:collapse; border-spacing:0; }
+ blockquote, q {
+   quotes: none;
+ }
+ div{box-sizing:border-box;}
+ blockquote:before, blockquote:after,
+ q:before, q:after {
+   content: none;
+ }
+ input:-webkit-autofill, textarea:-webkit-autofill, select:-webkit-autofill {
+   -webkit-box-shadow: 0 0 0px 100px #123174 inset;
+   background: rgba(250, 255, 189,0) none;
+   color: #FFFFFF;
+   border: 0 !important;
+ }
+ input::-webkit-search-cancel-button {
+   display: none;
+ }
+ :focus {outline: none;}
+html{
+  height: 100%;
+}
+ body {
+   -webkit-font-smoothing: antialiased;
+   -moz-osx-font-smoothing: grayscale;
+   margin: 0;
+   padding: 0;
+   height: 100%;
+   color: #222;
+   position:relative;
+   box-sizing:border-box;
+   /*阻止默认事件*/
+   -webkit-user-select: none;
+   -khtml-user-select: none;
+   -moz-user-select: none;
+   -ms-user-select: none;
+ }
+
+ body:before {
+   content: ' ';
+   position: fixed;
+   display: -webkit-box;
+   top: 0;
+   left: 0;
+   height: 100%;
+   width: 100%;
+   z-index: -9999;
+ }
+ .pointer{
+  cursor:pointer
+ }
