@@ -1,6 +1,6 @@
 <template>
   <div class="resEdit">
-    <el-dialog append-to-body :modal=false width="50%" size="small" :title="optionType == 'add' ? '新增组件' : '编辑组件'" :visible.sync="dialogState.show" :close-on-click-modal="false">
+    <el-dialog append-to-body :modal=false width="50%" size="small" :title="optionType == 'add' ? '新增组件' : optionType == 'copy'? '复制组件' :'编辑组件'" :visible.sync="dialogState.show" :close-on-click-modal="false">
       <el-form class="form" :rules="rules" ref="rulesForm" :model="formData" label-width="120px">
         <el-col :span="12">
           <el-form-item prop="ssdd" label="所属订单">
@@ -52,7 +52,7 @@
         </el-col>
         <el-col :span="24">
           <el-form-item prop="JGJ" label="选择加工件">
-              <i style="font-size:18px;" class="el-icon-circle-plus" @click="addJgj"></i>
+            <i style="font-size:18px;" class="el-icon-circle-plus" @click="addJgj"></i>
             <div v-for="(el,i) in selJgjList" :key="i">
               <el-select @change="((val)=>{changeJgj(val, i)})" filterable v-model="el.bomid" placeholder="加工件">
                 <el-option v-for="(item,key) in dropDownListData['jgj']" :key="key" :label="item.zddmc" :value="item.bomid">
@@ -200,17 +200,30 @@ export default {
               if (res && res.errno == 0) {
                 this.$message.editSuccess()
                 this.dialogState.show = false
-                this.$parent.$refs.initData()
+                this.$parent.getData()
               } else {
                 this.$message.editError(res.errmsg)
               }
             })
+          } else if (this.optionType == 'copy') {
+            //复制
+              this.$ajax
+                .post(this.$api.copyZjById, params)
+                .then(res => {
+                  if (res && res.errno == 0) {
+                    this.$message.success('复制成功！')
+                    this.dialogState.show = false
+                    this.$parent.getData()
+                  } else {
+                    this.$message.error(res.data.errmsg)
+                  }
+                })
           } else {
             this.$ajax.post(this.$api.addZj, params).then(res => {
               if (res.errno == 0) {
                 this.$message.addSuccess()
                 this.dialogState.show = false
-                this.$parent.$refs.zjgl.getResList()
+                this.$parent.getData()
               } else {
                 this.$message.addError(res.errmsg)
               }
@@ -292,7 +305,7 @@ export default {
           }
         }
       }
-    },
+    }
     // formData: {
     //   deep: true,
     //   handler(oldVal, newVal) {

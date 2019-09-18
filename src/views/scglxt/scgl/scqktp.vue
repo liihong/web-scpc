@@ -2,56 +2,15 @@
   <div class="zjgl">
     <!--工具条-->
     <el-col :span="24" class="toolbar">
-      <el-form :inline="true">
-        <el-col :span="4">
-        </el-col>
-        <el-col :span="20">
-          <el-form-item>
-            <el-button size="mini" @click="handleAdd" type="primary" icon="el-icon-circle-plus">新增</el-button>
-          </el-form-item>
-        </el-col>
-      </el-form>
+     哈哈
     </el-col>
-    <el-table class="el-table" @expand-change="expandChange" :data="ddList" stripe border style="width: 100%;">
-      <el-table-column fixed="left" label="操作" min-width="50" align="center">
-        <template slot-scope="scope">
-          <el-button-group size="mini">
-            <el-button size="mini" type="primary" @click="exportZj(scope.row)">导出</el-button>
-            <!-- <el-button size="mini" type="primary" @click="editBomRow(scope.row)">编辑</el-button> -->
-            <!-- <el-button size="mini" type="danger" @click="handleDelete(scope.row)">删除</el-button> -->
-          </el-button-group>
-        </template>
-      </el-table-column>
-      <el-table-column type="expand">
-        <template slot-scope="props">
-          <el-table stripe ref="bomTable" :data="props.row.bomList">
-              <el-table-column :align="el.align ? el.align : 'center'" v-for="(el,index) in zjColumns" :key="index" :prop="el.id" :label="el.name" :min-width="(el.length != '')?el.length:150">
-                <template slot-scope="scope">
-                <div v-if="el.id == 'ddjd'" v-html="scope.row[el.id]"></div>
-                <el-date-picker style="width:150px;" v-else-if="el.id == 'endtime'" size="mini" v-model="scope.row[el.id]" type="date" placeholder="选择结束日期">
-                </el-date-picker>
-                <span v-else>{{scope.row[el.id]}}</span>
-              </template>
-              </el-table-column>
-          </el-table>
-        </template>
-        </el-table-column>
-        <el-table-column v-for="(el,index) in columnDatas" :key="index" :prop="el.id" align="center" :fixed="(el.frozen == 1?'left':false)" :label="el.name" :min-width="(el.length != '')?el.length:150">
-          <template slot-scope="scope">
-            <el-tag v-if="el.id == 'DDLEVEL'" effect='dark' :type="scope.row.DDLEVEL == '0402' ? 'warning' : scope.row.DDLEVEL == '0403' ? '' : 'danger'">{{scope.row.DDLEVEL_TEXT}}</el-tag>
-            <span v-else>{{scope.row[el.id]}}</span>
-          </template>
-        </el-table-column>
-    </el-table>
   </div>
 </template>
 
 <script>
-import ResTreeList from '@/views/resMgr/ResTreeList'
 export default {
   name: 'scqktp',
   components: {
-    ResTreeList
   },
   data() {
     return {
@@ -117,7 +76,7 @@ export default {
     }
   },
   mounted() {
-    this.initData()
+    // this.initData()
   },
   methods: {
     async initData() {

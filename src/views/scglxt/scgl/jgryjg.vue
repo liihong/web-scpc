@@ -1,21 +1,24 @@
 <template>
-    <div>
-        <div class="toolBar">
-            <el-col :span="4">
-                <el-input size="small" v-model="searchValue" placeholder="模糊查询"></el-input>
-            </el-col>
-        </div>
-        <div class="data-list">
-            <el-card class="box-card">
-                <div slot="header" class="clearfix">
-                    <span>卡片名称</span>
-                </div>
-                <div v-for="o in 4" :key="o" class="text item">
-                    {{'列表内容 ' + o }}
-                </div>
-            </el-card>
-        </div>
-    </div>
+  <div class="jgryjg">
+    <ResList tableId='010401' :query="query" noEdit noAdd ref="jgList">
+      <el-table-column slot="operate" fixed="left" label="操作" min-width="80" align="center">
+        <template slot-scope="scope">
+          <el-button v-if="!scope.row.CZRYID" size="mini" type="primary" @click="beginWork(scope.row)">开始</el-button>
+          <el-button v-if="scope.row.CZRYID" size="mini" type="warning" @click="endWork(scope.row)">结束</el-button>
+        </template>
+      </el-table-column>
+      <template slot="BOMID" slot-scope="scope">
+        <span class="spanText" @click="gybpClick(scope.row)">{{scope.row.BOMID_TEXT}}</span>
+      </template>
+       <template slot="GYNR" slot-scope="scope">
+       <span :style="{color:scope.row.CZRYID? 'red': ''}"> {{scope.row.GYNR_TEXT}}</span>
+          <i  v-if="scope.row.CZRYID" class="ingIcon"> <svg-icon icon-class="ing" /></i>
+      </template>
+    </ResList>
+    <gybp :dialogState="dialogState" ref="gygx" />
+    <selectPerson :dialogState="personState" />
+    <overWork :dialogState="overState" />
+  </div>
 </template>
 
 <script>
@@ -24,7 +27,9 @@ import selectPerson from './components/selectPerson'
 import overWork from './components/overWork'
 
 import { mapGetters } from 'vuex'
+
 export default {
+  name: 'jgryjg',
   components: {
     gybp,
     selectPerson,
@@ -32,7 +37,19 @@ export default {
   },
   data() {
     return {
-      searchValue: ''
+      dialogState: {
+        row: {},
+        type: 'read',
+        show: false
+      },
+      personState: {
+        show: false,
+        gyid: ''
+      },
+      overState: {
+        show: false,
+        gyid: ''
+      }
     }
   },
   computed: {
@@ -42,9 +59,33 @@ export default {
         return { gynr: this.fzgy }
       }
     }
+  },
+  methods: {
+    //显示工艺编排信息
+    gybpClick(row) {
+      this.dialogState.show = true
+      this.dialogState.row = row
+    },
+    // 开始加工
+    beginWork(row) {
+      this.personState.gyid = row.ID
+      this.personState.show = true
+    },
+    // 结束加工
+    endWork(row) {
+      this.overState.gyid = row.ID
+      this.overState.worker = row.CZRYID
+      this.overState.kjgjs = (row.DJGJS)*1
+      this.overState.show = true
+    }
   }
 }
 </script>
-
 <style>
+.ingIcon{
+      position: absolute;
+    right: 0;
+    top: 0;
+    font-size: 42px;
+}
 </style>

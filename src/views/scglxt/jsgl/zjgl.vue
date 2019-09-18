@@ -28,6 +28,7 @@
             <el-table-column fixed="left" label="操作" min-width="110" align="center">
               <template slot-scope="scope">
                 <el-button-group size="mini">
+                  <el-button size="mini" type="warning" @click="copyZj(scope.row)">复制</el-button>
                   <el-button size="mini" type="primary" @click="editBomRow(scope.row)">编辑</el-button>
                   <el-button size="mini" type="danger" @click="handleDelete(scope.row)">删除</el-button>
                 </el-button-group>
@@ -117,14 +118,14 @@ export default {
       this.activeRow = row
       this.getData(row)
     },
-    getData(row) {
+    getData() {
       this.$ajax
         .get(this.$api.getZJListBySSDd, {
-          ssdd: row.ID
+          ssdd: this.activeRow.ID
         })
         .then(res => {
           if (res.errno == 0) {
-            row.bomList = res.data
+            this.activeRow.bomList = res.data
           }
         })
       this.getConfig()
@@ -157,6 +158,15 @@ export default {
       this.dialogState.formData = row
       this.dialogState.show = true
       this.$refs.editZj.getFormData(row.id)
+    },
+    copyZj(row){
+      this.dialogState.type = 'copy'
+      this.dialogState.id = row.id
+      this.dialogState.formData = row
+      this.dialogState.show = true
+      this.$refs.editZj.getFormData(row.id)
+
+      
     },
     // 删除组件的同时，要把组件和标准件的关系同时删除
     handleDelete(row) {

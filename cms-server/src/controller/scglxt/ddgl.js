@@ -52,18 +52,36 @@ module.exports = class extends Base {
         data.ckdate = null
         data.ckzt = null
         delete data.sjcjsj
-        console.log(data)
+        
         let addData = await this.model(ddModel).add(data)
 
         let bomList = await this.model('scglxt_t_bom').where({
             ssdd: id
         }).select()
+        let gygcList = await this.model('scglxt_t_gygc').where({ssdd: id}).select()
+        
         if (bomList.length > 0) {
             bomList.map(item => {
-                item.id = util.getUUId()
+                var newBOMId = util.getUUId()
+                gygcList.map(el=>{
+                    if(item.id == el.bomid){
+                        el.id = util.getUUId()
+                        el.kjgjs = 0
+                        el.yjgjs = 0
+                        el.sjjs = 0
+                        el.bfjs = 0
+                        el.ssdd = newId
+                        el.bomid = newBOMId
+                        return el
+                    }
+                })
+                item.id = newBOMId
                 item.clzt = 0
                 item.zddmc = item.zddmc + '_copy'
                 item.zddzt = '0501'
+                item.sjcjsj = util.getNowTime()
+                item.blkssj = null
+                item.bljssj = null
                 item.cksj = null
                 item.rksj = null
                 item.ssdd = newId
@@ -73,7 +91,9 @@ module.exports = class extends Base {
         await this.model('scglxt_t_bom').addMany(bomList, {
             pk: 'ID'
         });
-
+        await this.model('scglxt_t_gygc').addMany(gygcList, {
+            pk: 'ID'
+        });
         return this.success(addData)
     }
 
@@ -88,6 +108,14 @@ module.exports = class extends Base {
                 ddId += item['id'] + ','
             })
         }
+        ddId = ddId.substring(0,ddId.length-1)
+        let deleteJggl = await this.model('scglxt_t_jggl').where(
+            `gygcid in (select id from scglxt_t_gygc where ssdd in (`+ddId+`))`
+        ).delete()
+        let deleteGygc = await this.model('scglxt_t_gygc').where({
+            ssdd: ['in', ddId]
+        }).delete()
+
         let deleteBom = await this.model('scglxt_t_bom').where({
             ssdd: ['in', ddId]
         }).delete()

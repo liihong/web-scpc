@@ -5,6 +5,7 @@ let api = {
     
     getSblxPc: 'scglxt/statistics/getSblxPc',
     getGygxPc: 'scglxt/statistics/getGygxPc',
+    getGygsPc: 'scglxt/statistics/getGygsPc',
     
     //数据字典操作
     getSjzdById: 'scglxt/sjzd/getSjzdById',
@@ -35,6 +36,7 @@ let api = {
     addBomMany: 'scglxt/bom/addBomMany',
     editBomData: 'scglxt/bom/editBom',
     copyBomData: 'scglxt/bom/copyBom',
+    deleteBOM: 'scglxt/bom/deleteBOM',
     updateBLZT: 'scglxt/bom/updateBLZT',
     getBLlist: 'scglxt/bom/getBLlist',
     getZjByBomId: 'scglxt/bom/getZjByBomId',
@@ -47,6 +49,7 @@ let api = {
     //组件操作
     addZj: 'scglxt/zj/addZj',
     editZj: 'scglxt/zj/editZj',
+    copyZjById: 'scglxt/zj/copyZjById',
     getBzjByZjId: 'scglxt/zj/getBzjByZjId',
     deleteZjById: 'scglxt/zj/deleteZjById',
     getZJTreeList: 'scglxt/zj/getZJTreeList',

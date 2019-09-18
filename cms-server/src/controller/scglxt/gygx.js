@@ -412,7 +412,6 @@ module.exports = class extends Base {
          await this.model('scglxt_t_jggl_tmp').add(tmpLogData)
 
          let count = await this.model('scglxt_t_jggl_tmp').where({jgglId: id}).count()
-         console.log(count)
          
          let gygcUpdate = {
             bfjs: dhjs,

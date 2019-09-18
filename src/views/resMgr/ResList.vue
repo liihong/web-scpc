@@ -352,7 +352,7 @@ export default {
   }
 }
 </script>
-<style scoped>
+<style>
 .toolbar {
   text-align: right;
 }
@@ -362,5 +362,8 @@ export default {
 .pagination {
   padding: 10px;
   text-align: right;
+}
+.el-table--striped .el-table__body tr.el-table__row--striped td{
+  background: #f5f4f4;
 }
 </style>

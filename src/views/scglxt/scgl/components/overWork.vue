@@ -16,7 +16,7 @@
                     <el-button width="100%" size="medium" @click.stop="overWork" class="namesBtn" type="primary">完成加工</el-button>
                 </el-form-item>
             </el-form>
-            <number-keyboard v-model="isShowAmountKeyboard" @delete="jgjs ? (jgjs = jgjs.substring(0, jgjs.length - 1)) : ''" @keyDown="withdrawAmountInput"></number-keyboard>
+            <number-keyboard v-model="isShowAmountKeyboard" @delete="deleteJGjs" @keyDown="withdrawAmountInput"></number-keyboard>
         </el-dialog>
     </div>
 </template>
@@ -42,15 +42,21 @@ export default {
     ...mapGetters(['roles'])
   },
   mounted() {
+    this.jgjs = this.dialogState.kjgjs
     this.initData()
     this.isShowAmountKeyboard = false
   },
   methods: {
     showInput(){
-      this.isShowAmountKeyboard = !this.isShowAmountKeyboard
+      this.isShowAmountKeyboard = true
     },
     withdrawAmountInput(val){
       this.jgjs = this.jgjs + '' + val + ''
+    },
+    deleteJGjs() {
+      let temp = this.jgjs.toString()
+      temp = temp.substring(0,temp.length-1)
+      this.jgjs = temp
     },
     initData() {
       this.$ajax.post(this.$api.getSbList).then(res => {
@@ -66,7 +72,13 @@ export default {
       })
     },
     overWork() {
-      
+      if(this.jgjs == 0) {
+         this.$message({
+          message: '完成件数不能为0！',
+          type: 'warning'
+        })
+        return
+      }
       if(this.jgjs > this.dialogState.kjgjs) {
         this.$message({
           message: '完成件数不能大于可加工件数！',

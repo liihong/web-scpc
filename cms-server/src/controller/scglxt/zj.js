@@ -4,6 +4,7 @@
  */
 const Base = require('../base.js');
 let zjModel = 'scglxt_t_zj'
+import util from '../../../utils/util'
 module.exports = class extends Base {
 
     /**
@@ -78,6 +79,33 @@ module.exports = class extends Base {
         return this.success(data)
     }
 
+    //复制组件
+    async copyZjByIdAction(){
+        let zj = this.post('form')
+        zj.id = util.getUUId()
+        zj.sjcjsj = util.getNowTime()
+
+        let bomData = this.post('jgj')
+        bomData.map(item=>{
+            item.id = util.getUUId()
+            item.zjid = zj.id
+            return item
+        })
+
+        let bzjData = this.post('bzj')
+        bzjData.map(item=>{
+            item.id = util.getUUId()
+            item.zjid = zj.id
+            item.sjcjsj = util.getNowTime()
+            return item
+        })
+
+        let data = await this.model(zjModel).add(zj)
+
+        await this.model('scglxt_t_bom_zj').addMany(bomData)
+        await this.model('scglxt_t_bzj_zj').addMany(bzjData)
+        return this.success(data)
+    }
     //获取组件树型数据
     async getZJTreeListAction(){
         let sql = `SELECT DISTINCT dd.ID,XMNAME,DDLEVEL,(SELECT NAME FROM (SELECT id,mc NAME FROM scglxt_tyzd WHERE xh LIKE '04__') tras WHERE tras.id=DDLEVEL) DDLEVEL_TEXT,STARTTIME,ENDTIME,dd.sjcjsj FROM scglxt_t_dd dd,scglxt_t_zj zj where dd.id = zj.ssdd  ORDER BY dd.sjcjsj desc`

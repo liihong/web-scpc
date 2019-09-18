@@ -3,6 +3,7 @@
  */
 const Base = require('../base.js');
 let bomModel = 'scglxt_t_bom'
+let gyModel = 'scglxt_t_gygc'
 import util from '../../../utils/util'
 
 module.exports = class extends Base {
@@ -24,6 +25,29 @@ module.exports = class extends Base {
             pk: 'ID'
         });
         return this.success(data)
+    }
+
+    //删除
+    async deleteBOMAction() {
+        let id = this.post('id')
+        let whereObj = {}
+        let complex = {
+            _logic: 'or'
+        }
+        complex['gygcid'] = ['in', `select id from scglxt_t_gygc where bomid='` + id + `'`]
+        whereObj._complex = complex
+        let deleteGx = await this.model('scglxt_t_jggl').where(
+            `gygcid in (select id from scglxt_t_gygc where bomid='` + id + `')`
+        ).delete()
+        let deleteGy = await this.model(gyModel).where({
+            bomid: id
+        }).delete()
+
+        let deleteData = await this.model('scglxt_t_bom').where({
+            id: id
+        }).delete()
+
+        return this.success(deleteData)
     }
 
     //获取设备类型
@@ -113,6 +137,11 @@ module.exports = class extends Base {
             gyList.map(item => {
                 item.id = util.getUUId()
                 item.bomid = form.id
+                item.kjgjs=0
+                item.yjgjs=0
+                item.sjjs=0
+                item.bfjs=0
+                item.ssdd=form.ssdd
                 return item
             })
 
@@ -207,10 +236,12 @@ module.exports = class extends Base {
     }
 
     //BOM单终检通过
-    async BOMFinallyCheckAction(){
+    async BOMFinallyCheckAction() {
         let id = this.post('id')
 
-        let data = await this.model(bomModel).where({id: id}).update({
+        let data = await this.model(bomModel).where({
+            id: id
+        }).update({
             zddzt: '0504'
         })
 
@@ -218,10 +249,12 @@ module.exports = class extends Base {
     }
 
     //BOM单入库
-    async BOMInStoreAction(){
+    async BOMInStoreAction() {
         let id = this.post('id')
 
-        let data = await this.model(bomModel).where({id: id}).update({
+        let data = await this.model(bomModel).where({
+            id: id
+        }).update({
             zddzt: '0505',
             rksj: util.getNowTime()
         })
@@ -230,31 +263,38 @@ module.exports = class extends Base {
     }
 
     //BOM单出库
-    async BOMOutStoreAction(){
+    async BOMOutStoreAction() {
         let id = this.post('id')
 
-        let data = await this.model(bomModel).where({id: id}).update({
+        let data = await this.model(bomModel).where({
+            id: id
+        }).update({
             zddzt: '0506',
             cksj: util.getNowTime()
         })
 
-        let bomData = await this.model(bomModel).where({id: id}).find()
+        let bomData = await this.model(bomModel).where({
+            id: id
+        }).find()
 
 
-        let allBom = await this.model(bomModel).where({ssdd: bomData.ssdd,zddzt:['!=', '0506']}).select()
+        let allBom = await this.model(bomModel).where({
+            ssdd: bomData.ssdd,
+            zddzt: ['!=', '0506']
+        }).select()
         //如果该订单下所有BOM都完成了就更新订单状态为完成
-        if(allBom.length == 0){
-            let sql = `update scglxt_t_dd set ckzt='完成',ckdate=DATE_FORMAT(NOW(), '%Y-%m-%d %H:%i:%s') where id=(select ssdd from scglxt_t_bom where id='`+id+`')`
+        if (allBom.length == 0) {
+            let sql = `update scglxt_t_dd set ckzt='完成',ckdate=DATE_FORMAT(NOW(), '%Y-%m-%d %H:%i:%s') where id=(select ssdd from scglxt_t_bom where id='` + id + `')`
             let ddData = await this.model().execute(sql)
         }
-       
+
         return this.success(data)
     }
 
     //bom 进度
-    async BOMSpeedProgressAction(){
+    async BOMSpeedProgressAction() {
         let ddid = this.post('ssdd')
-        let sql = `SELECT t.id,dd.xmname ddmc,zd2.mc zddztmc,zddmc,zddjb,date_format(dd.endtime,'%Y-%m-%d') ddendtime,zd.mc zddjbmc,clxz,bmcl,t.jgsl,date_format(t.starttime,'%Y-%m-%d') starttime,date_format(t.endtime,'%Y-%m-%d') endtime,gs,fun_dqgygc1 (t.id) ddjd FROM scglxt_t_bom t,scglxt_t_dd dd,scglxt_tyzd zd,scglxt_tyzd zd2 WHERE t.SSDD=dd.id AND t.zddjb=zd.id AND zd.id LIKE '04%' AND t.zddzt=zd2.ID AND zd2.xh LIKE '05__' AND t.zddzt not in ('0504','0505','0506') and dd.id ='`+ ddid +`' ORDER BY dd.endtime,zddjb`
+        let sql = `SELECT t.id,dd.xmname ddmc,zd2.mc zddztmc,zddmc,zddjb,date_format(dd.endtime,'%Y-%m-%d') ddendtime,zd.mc zddjbmc,clxz,bmcl,t.jgsl,date_format(t.starttime,'%Y-%m-%d') starttime,date_format(t.endtime,'%Y-%m-%d') endtime,gs,fun_dqgygc1 (t.id) ddjd FROM scglxt_t_bom t,scglxt_t_dd dd,scglxt_tyzd zd,scglxt_tyzd zd2 WHERE t.SSDD=dd.id AND t.zddjb=zd.id AND zd.id LIKE '04%' AND t.zddzt=zd2.ID AND zd2.xh LIKE '05__' AND t.zddzt not in ('0504','0505','0506') and dd.id ='` + ddid + `' ORDER BY dd.endtime,zddjb`
         let data = await this.model().query(sql)
         return this.success(data)
     }

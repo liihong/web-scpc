@@ -10,7 +10,7 @@
             <el-button size="mini" type="primary" @click="setJGgy(scope.row)">工艺</el-button>
             <el-button size="mini" type="primary" @click="copyBomRow(scope.row)">复制</el-button>
             <el-button size="mini" type="primary" @click="editBomRow(scope.row)">编辑</el-button>
-            <el-button size="mini" type="danger" @click="$refs.resList.handleDelete(scope.row)">删除</el-button>
+            <el-button size="mini" type="danger" @click="handleDelete(scope.row)">删除</el-button>
           </el-button-group>
         </template>
       </el-table-column>
@@ -93,6 +93,22 @@ export default {
       this.bomForm.id = this.$util.getUUId()
       this.bomForm.show = true
     },
+    handleDelete(row) {
+      this.$message.confirm('删除BOM并删除该BOM下所有工艺?', () => {
+        this.$ajax
+          .post(this.$api.deleteBOM, {
+            id: row['ID']
+          })
+          .then(res => {
+            if (res && res.data == 1) {
+              this.$message.deleteSuccess('删除BOM信息成功！')
+              this.$refs.resList.getResList()
+            } else {
+              this.$message.deleteError(res.data.errmsg)
+            }
+          })
+      })
+    },
     // 编辑
     editBomRow(row) {
       this.bomForm.type = 'edit'
@@ -101,7 +117,6 @@ export default {
       this.bomForm.show = true
     },
     copyBomRow(row) {
-      console.log(row)
       this.bomForm.type = 'copy'
       this.bomForm.id = row.ID
       this.bomForm.formData = row
