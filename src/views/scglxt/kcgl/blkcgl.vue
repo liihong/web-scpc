@@ -127,7 +127,7 @@ export default {
     this.getSjzdData()
   },
   methods: {
-    selectChange(sel, row) {
+    selectChange(sel) {
       this.selBomList = sel
     },
     bomClick(row) {
@@ -138,14 +138,14 @@ export default {
       this.activeRow = row
       this.initData(row)
     },
-    initData(row) {
+    initData() {
       this.$ajax
         .get(this.$api.getBLlist, {
-          clid: row.ID
+          clid: this.activeRow.ID
         })
         .then(res => {
           if (res.errno == 0) {
-            row.bomList = res.data
+            this.activeRow.bomList = res.data
           }
         })
       this.getConfig()

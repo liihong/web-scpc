@@ -1,5 +1,8 @@
 <template>
-  <ResList tableId='010408' :query="this.$route.query" noEdit ref="zjryjy">
+  <ResList tableId='010408' :query="this.$route.query"  @selectChange="getChecks" noEdit noAdd ref="zjryjy">
+     <el-form-item slot="toolBar">
+      <el-button type="primary" icon="el-icon-s-unfold" @click="passMany" class="radio" :label="1">批量通过</el-button>
+    </el-form-item>
     <el-table-column slot="operate" fixed="left" label="操作" min-width="200" align="center">
       <template slot-scope="scope">
         <el-button-group>
@@ -11,15 +14,23 @@
     <template slot="XMNAME" slot-scope="scope">
       <router-link style="color:#48b884;" :to="{path: 'bomgl', query: {SSDD: scope.row.ID, SSHT: scope.row.SSHT}}">{{scope.row.XMNAME}}</router-link>
     </template>
-    <template slot="DDLEVEL" slot-scope="scope">
-      <el-tag effect='dark' :type="scope.row.DDLEVEL == '0402' ? 'warning' : scope.row.DDLEVEL == '0403' ? '' : 'danger'">{{scope.row.DDLEVEL_TEXT}}</el-tag>
+    <template slot="ZDDJB" slot-scope="scope">
+      <el-tag effect='dark' :type="scope.row.ZDDJB == '0402' ? 'warning' : scope.row.ZDDJB == '0403' ? '' : 'danger'">{{scope.row.ZDDJB_TEXT}}</el-tag>
     </template>
   </ResList>
 </template>
 
 <script>
 export default {
-methods: {
+  data() {
+    return {
+      selectRows: []
+    }
+  },
+  methods: {
+    getChecks(sel) {
+      this.selectRows = sel
+    },
     //终检通过
     pass(row) {
       this.$ajax
@@ -32,6 +43,25 @@ methods: {
             this.$refs.zjryjy.getResList()
           }
         })
+    },
+    passMany() {
+      const vm = this
+      this.$message.confirm('是否确定', () => {
+        let arr = []
+        this.selectRows.map(item => {
+          arr.push(item.ID)
+        })
+        if (arr.length > 0) {
+          this.$ajax
+            .post(this.$api.BOMInStore, {
+              id: arr.join(',')
+            })
+            .then(function() {
+              vm.$message.success('批量入库成功！')
+              vm.$refs.zjryjy.getResList()
+            })
+        }
+      })
     }
   }
 }

@@ -34,7 +34,7 @@
         </el-col>
         <el-col :span="12">
           <el-form-item prop="XMLXR" label="项目联系人">
-            <el-input readonly v-model="formData.XMLXR" placeholder="项目联系人"></el-input>
+            <el-input  v-model="formData.XMLXR" placeholder="项目联系人"></el-input>
           </el-form-item>
         </el-col>
         <el-col :span="12">
@@ -145,6 +145,7 @@ export default {
           }
         })
       }
+      this.$parent.$refs.ddList.getResList()
     },
     onCancel() {
       this.dialogState.show = false

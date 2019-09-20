@@ -42,7 +42,6 @@ export default {
             // starttime: null,
             // endtime: '',
             gs: 0,
-            clzt: 0,
             ddtz: item.TH,
             ssdd: this.dialogState.query.SSDD || '',
             zddzt: '0501', //默认是未开始状态

@@ -35,7 +35,8 @@ export default {
         this.$ajax
           .post(this.$api.updateBLZT, {
             id: row.ID,
-            clzt: row.CLZT
+            clzt: row.CLZT,
+            cgry: this.$store.getters.token
           })
           .then(res => {
             if (res.errno == 0) {

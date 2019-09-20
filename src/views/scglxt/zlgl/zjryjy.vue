@@ -1,25 +1,36 @@
 <template>
-  <ResList tableId='010407' :query="this.$route.query" noEdit ref="zjryjy">
+  <ResList tableId='010407' :query="this.$route.query" noEdit noAdd @selectChange="getChecks" ref="zjryjy">
+    <el-form-item slot="toolBar">
+      <el-button type="primary" icon="el-icon-s-unfold" @click="passMany" class="radio" :label="1">批量通过</el-button>
+    </el-form-item>
     <el-table-column slot="operate" fixed="left" label="操作" min-width="170" align="center">
       <template slot-scope="scope">
         <el-button-group>
-        <el-button type="primary" @click="pass(scope.row)" class="radio" :label="1">通过并入库</el-button>
-        <el-button type="danger" @click="passSection(scope.row)" class="radio" :label="2">不通过</el-button>
+          <el-button type="primary" @click="pass(scope.row)" class="radio" :label="1">通过并入库</el-button>
+          <el-button type="danger" @click="passSection(scope.row)" class="radio" :label="2">不通过</el-button>
         </el-button-group>
       </template>
     </el-table-column>
     <template slot="XMNAME" slot-scope="scope">
       <router-link style="color:#48b884;" :to="{path: 'bomgl', query: {SSDD: scope.row.ID, SSHT: scope.row.SSHT}}">{{scope.row.XMNAME}}</router-link>
     </template>
-    <template slot="DDLEVEL" slot-scope="scope">
-      <el-tag effect='dark' :type="scope.row.DDLEVEL == '0402' ? 'warning' : scope.row.DDLEVEL == '0403' ? '' : 'danger'">{{scope.row.DDLEVEL_TEXT}}</el-tag>
+    <template slot="ZDDJB" slot-scope="scope">
+      <el-tag effect='dark' :type="scope.row.ZDDJB == '0402' ? 'warning' : scope.row.ZDDJB == '0403' ? '' : 'danger'">{{scope.row.ZDDJB_TEXT}}</el-tag>
     </template>
   </ResList>
 </template>
 
 <script>
 export default {
+  data() {
+    return {
+      selectRows: []
+    }
+  },
   methods: {
+    getChecks(sel) {
+      this.selectRows = sel
+    },
     //终检通过
     pass(row) {
       this.$ajax
@@ -32,6 +43,25 @@ export default {
             this.$refs.zjryjy.getResList()
           }
         })
+    },
+    passMany() {
+      const vm = this
+      this.$message.confirm('是否确定检验通过当前选中行', () => {
+        let arr = []
+        this.selectRows.map(item => {
+          arr.push(item.ID)
+        })
+        if (arr.length > 0) {
+          this.$ajax
+            .post(this.$api.BOMFinallyCheck, {
+              id: arr.join(',')
+            })
+            .then(function() {
+              vm.$message.success('批量操作成功！')
+              vm.$refs.zjryjy.getResList()
+            })
+        }
+      })
     }
   }
 }

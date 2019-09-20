@@ -1,12 +1,15 @@
 <template>
   <div class="ddgl">
-    <DataResList @refreshData="refreshData" :tableData="checkList" tableId='010403' noEdit>
+    <DataResList @refreshData="refreshData" @selectChange="getChecks" :tableData="checkList" tableId='010403' noEdit noAdd>
+      <el-form-item slot="toolBar">
+        <el-button type="primary" icon="el-icon-s-unfold" @click="passMany" class="radio" :label="1">批量通过</el-button>
+      </el-form-item>
       <el-table-column slot="operate" fixed="left" label="操作" min-width="250" align="center">
         <template slot-scope="scope">
-         <el-button-group>
-            <el-button type="primary"  @click="changeRadio(scope.row)" class="radio" :label="1">全部通过</el-button>
-            <el-button type="warning"  @click="passSection(scope.row)" class="radio" :label="2">部分通过</el-button>
-            <el-button type="danger"  @click="noPass(scope.row)" class="radio" :label="3">全部返工</el-button>
+          <el-button-group>
+            <el-button type="primary" @click="changeRadio(scope.row)" class="radio" :label="1">全部通过</el-button>
+            <el-button type="warning" @click="passSection(scope.row)" class="radio" :label="2">部分通过</el-button>
+            <el-button type="danger" @click="noPass(scope.row)" class="radio" :label="3">全部返工</el-button>
           </el-button-group>
         </template>
       </el-table-column>
@@ -29,6 +32,7 @@ export default {
         type: 'part',
         row: {}
       },
+      selectRows: [],
       query: {
         pageSize: 30,
         pageNumber: 1
@@ -55,6 +59,34 @@ export default {
     refreshData(params) {
       this.query = params
       this.initData()
+    },
+    getChecks(sel) {
+      this.selectRows = sel
+    },
+    passMany() {
+      const vm = this
+      this.$message.confirm('是否确定检验通过当前选中行', () => {
+        let arr = []
+        this.selectRows.map(item => {
+          arr.push(
+            this.$ajax.post(this.$api.gygxCheckPassAll, {
+              id: item.id,
+              gygcid: item.gygcid,
+              jgryid: item.jgryid,
+              jyryid: this.token,
+              bomid: item.bomid,
+              bfjs: 0,
+              serial: item.serial
+            })
+          )
+        })
+        if (arr.length > 0) {
+          Promise.all(arr).then(function() {
+             vm.$message.success('批量操作成功！')
+             vm.initData()
+          })
+        }
+      })
     },
     //部分通过
     passSection(row) {

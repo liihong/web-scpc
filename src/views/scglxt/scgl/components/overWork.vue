@@ -42,8 +42,6 @@ export default {
     ...mapGetters(['roles'])
   },
   mounted() {
-    this.jgjs = this.dialogState.kjgjs
-    this.initData()
     this.isShowAmountKeyboard = false
   },
   methods: {
@@ -61,8 +59,8 @@ export default {
     initData() {
       this.$ajax.post(this.$api.getSbList).then(res => {
         if (res.errno == 0) {
-          this.sbList = res.data
-          this.sbList = this.sbList.filter(item => {
+          let arr = res.data
+          this.sbList = arr.filter(item => {
             return (item.BZID == this.roles[0])
           })
           if(this.sbList.length>0) {
@@ -72,7 +70,15 @@ export default {
       })
     },
     overWork() {
-      if(this.jgjs == 0) {
+
+      if(this.jgjs ==undefined || this.jgjs ==null) {
+         this.$message({
+          message: '完成件数不能为空！',
+          type: 'warning'
+        })
+        return
+      }
+      if(!!this.jgjs && this.jgjs == 0) {
          this.$message({
           message: '完成件数不能为0！',
           type: 'warning'
@@ -100,6 +106,14 @@ export default {
             this.$parent.$refs.jgList.getResList()
           }
         })
+    }
+  },
+  watch:{
+    'dialogState.show'() {
+      if(this.dialogState.show){
+        this.jgjs = this.dialogState.kjgjs
+        this.initData()
+      }
     }
   }
 }

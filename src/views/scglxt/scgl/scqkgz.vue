@@ -1,91 +1,31 @@
 <template>
-  <div class="scqkgz">
-    <el-row>
-      <el-col :span="12">
-        <el-card>
-          <bar-echarts :option="option" class="echarts-container"></bar-echarts>
-        </el-card>
-      </el-col>
-      <el-col :span="12">
-        <el-card>
-          <bar-echarts :option="option" class="echarts-container"></bar-echarts>
-        </el-card>
-      </el-col>
-      <el-row>
-        <el-col :span="4">
-          <el-input size="small" v-model="query.queryKey" placeholder="模糊查询"></el-input>
-        </el-col>
-      </el-row>
-      <el-col :span="24">
-        <el-card class="card">
-          <div slot="header" class="clearfix" v-for="ddInfo in clList" :key="ddInfo.ID">
-            <span class="xmTitle">{{ddInfo.XMNAME}}</span>
-            <span class="xmTime">{{ddInfo.STARTTIME}} ~ {{ddInfo.ENDTIME}}</span>
-            <el-tag v-if="ddInfo.DDLEVEL == '0401'" type="danger">{{ddInfo.DDLEVEL_TEXT}}</el-tag>
-          </div>
-        </el-card>
-      </el-col>
-    </el-row>
+  <div class="blkcgl">
+    <el-table class="el-table" @expand-change="initData" :data="clList" v-loading="listLoading" stripe border :max-height="tableHeight" style="width: 100%;">
+      <el-table-column type="expand">
+        <template slot-scope="props">
+          <el-table ref="bomTable" @selection-change="selectChange" @row-click="bomClick" :data="tableData">
+            <el-table-column align="center" v-for="(row,index) in blColumns" :key="index" :prop="row.id"  :label="row.name">
+            </el-table-column>
+          </el-table>
+        </template>
+      </el-table-column>
+      <el-table-column v-for="(el,index) in columnDatas" :key="index" :prop="el.id" align="center" :fixed="(el.frozen == 1?'left':false)" :label="el.name" :min-width="(el.length != '')?el.length:150">
+        <template slot-scope="scope">
+          <el-tag v-if="el.id == 'DDLEVEL'" effect='dark' :type="scope.row.DDLEVEL == '0402' ? 'warning' : scope.row.DDLEVEL == '0403' ? '' : 'danger'">{{scope.row.DDLEVEL_TEXT}}</el-tag>
+           <span v-else>{{scope.row[el.id]}}</span>
+        </template>
+      </el-table-column>
+    </el-table>
   </div>
 </template>
 
 <script>
-import barEcharts from '@/components/Echarts/barEcharts'
-
 export default {
   name: 'blkcgl',
   components: {
-    barEcharts
   },
   data() {
     return {
-      option: {
-        title: {
-          text: '工时汇总(单位：小时)',
-          left: '50%'
-        },
-        grid: {
-          top: 25,
-          bottom: 20
-        },
-        tooltip: {
-          show: true,
-          trigger: 'axis',
-          axisPointer: {
-            type: 'line',
-            textStyle: {
-              color: '#fff'
-            }
-          }
-        },
-        barGap: 0,
-        xAxis: [
-          {
-            data: []
-          }
-        ],
-        series: [
-          {
-            name: '排产工时',
-            type: 'bar',
-            stack: '总量 ',
-            itemStyle: {
-              normal: {
-                label: {
-                  show: true,
-                  position: 'top',
-                  formatter: '{b}\n{c}'
-                },
-                barBorderRadius: 5
-              },
-              emphasis: {
-                barBorderRadius: 5
-              }
-            },
-            data: []
-          }
-        ]
-      },
       tableHeight: 800,
       activeRow: {},
       listLoading: false,
@@ -109,12 +49,11 @@ export default {
           name: '结束时间'
         }
       ],
-      blColumns: [
-        {
+      blColumns: [{
           id: 'zddmc',
           name: '零件名称'
         },
-        {
+         {
           id: 'starttime',
           name: '开始时间'
         },
@@ -157,8 +96,7 @@ export default {
         {
           id: '热处理',
           name: '热处理'
-        }
-      ],
+        }],
       clList: [],
       tableData: [],
       query: {
@@ -198,29 +136,28 @@ export default {
           }
         })
     },
-
+    
     // 获取数据字典数据
     getSjzdData() {
-      this.$ajax.get(this.$api.getGygsPc).then(res => {
-        if (res.errno == 0) {
-          let xAxis = [],
-            datas = []
-          res.data.map(item => {
-            xAxis.push(item.gymc)
-            datas.push(item.zgs)
-          })
-          this.option.xAxis[0].data = xAxis
-          this.option.series[0].data = datas
-        }
-      })
+      // this.$ajax
+      //   .get(this.$api.getDropDownListData, {
+      //     typesql:
+      //       // "select ID,CLMC,CLDJ,CLSL,MI CLMD from  scglxt_t_cl where id in (select zddcz from scglxt_t_bom where (clzt IS NULL or clzt=0 or clzt =2) AND cldx!='')"
+      //       "select ID,XMNAME,DDLEVEL,(SELECT NAME FROM (SELECT id,mc NAME FROM scglxt_tyzd WHERE xh LIKE '04__') tras WHERE tras.id=DDLEVEL) DDLEVEL_TEXT,STARTTIME,ENDTIME from scglxt_t_dd where id in (select ssdd from scglxt_t_bom where  (clzt IS NULL or clzt=0 or clzt =2) AND cldx!=''  ) ORDER BY DDLEVEL,STARTTIME"
+      //   })
+      //   .then(res => {
+      //     if (res.errno == 0) {
+      //       this.clList = res.data
+      //     }
+      //   })
 
-      this.$ajax.post(this.$api.getDdListByWhere, this.query).then(res => {
+        this.$ajax.post(this.$api.getDdListByWhere, this.query).then(res => {
         if (res.errno == 0) {
           this.clList = res.data.data
           this.query.total = res.data.count
         }
       })
-    }
+    },
   }
 }
 </script>
@@ -231,19 +168,5 @@ export default {
 .radio {
   margin-left: 0 !important;
   margin-right: 0 !important;
-}
-.echarts-container {
-  width: 100%;
-  height: 300px;
-}
-.card{
-  .xmTitle{
-    font-size: 24px;
-    font-weight: 500;
-  }
-  .xmTime{
-color:#666666;
-margin-left:20px;
-  }
 }
 </style>

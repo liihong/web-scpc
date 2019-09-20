@@ -60,15 +60,20 @@ export default {
   mounted() {},
   methods: {
     onSave() {
-      let params = {}
-      let data = this.$refs['rulesForm'].model
-      params.form = {}
-      Object.keys(data).map(item => {
-        params.form[item.toLowerCase()] = data[item]
-      })
       this.$refs['rulesForm'].validate(valid => {
         if (valid) {
-          console.log(验证通过)
+          this.$ajax
+        .post(this.$api.updateBLZT, {
+          id: this.dialogState.row.ID,
+          clzt: '0',
+          cgyj: this.formData.CGSJ
+        })
+        .then(res => {
+          if (res.errno == 0) {
+            this.$message.success('更新备料状态成功！')
+            this.$parent.initData()
+          }
+        })
         }
       })
     },
@@ -79,7 +84,13 @@ export default {
   watch: {
     dialogState: {
       deep: true,
-      handler() {}
+      handler() {
+        if(this.dialogState.show) {
+          if(this.dialogState.row.CGSJ !='') {
+            this.formData.CGSJ = this.dialogState.row.CGSJ
+          }
+        }
+      }
     }
   }
 }
@@ -89,7 +100,7 @@ export default {
   .line {
     margin: 10px;
     .spanText {
-      margin: 0 10px;
+      margin: 0 20px;
     }
   }
 }

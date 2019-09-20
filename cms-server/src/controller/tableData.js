@@ -134,13 +134,12 @@ module.exports = class extends Base {
             }
             // { _complex: { _logic: 'or', BOMID: [ 'in', '20190506090311111' ] } }
             //{ _complex: { _logic: 'or' } }
-            console.log(whereObj)
             if (order && order.length > 0) {
                 data = await this.model(table.table_name)
-                    .field(displayColumnArr.join(',')).page(pageNumber, pageSize).where(table.where_sql).where(whereObj).order(order).countSelect();
+                    .field(displayColumnArr.join(',')).page(pageNumber, pageSize).where(table.where_sql).where(whereObj).order(order).alias('t').countSelect();
             } else {
                 data = await this.model(table.table_name)
-                    .field(displayColumnArr.join(',')).page(pageNumber, pageSize).where(table.where_sql).where(whereObj).order(table.orderby_sql).countSelect();
+                    .field(displayColumnArr.join(',')).page(pageNumber, pageSize).where(table.where_sql).where(whereObj).order(table.orderby_sql).alias('t').countSelect();
             }
             return this.success(data)
         // } catch (err) {

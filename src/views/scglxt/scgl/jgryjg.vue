@@ -10,9 +10,14 @@
       <template slot="BOMID" slot-scope="scope">
         <span class="spanText" @click="gybpClick(scope.row)">{{scope.row.BOMID_TEXT}}</span>
       </template>
-       <template slot="GYNR" slot-scope="scope">
-       <span :style="{color:scope.row.CZRYID? 'red': ''}"> {{scope.row.GYNR_TEXT}}</span>
-          <i  v-if="scope.row.CZRYID" class="ingIcon"> <svg-icon icon-class="ing" /></i>
+      <template slot="GYNR" slot-scope="scope">
+        <a v-if="!!scope.row.DDTZ" :href="scope.row.DDTZ" target="_blank">
+          <span :style="{color:scope.row.CZRYID? 'red': ''}"> {{scope.row.GYNR_TEXT}}</span>
+        </a>
+        <span v-else :style="{color:scope.row.CZRYID? 'red': ''}"> {{scope.row.GYNR_TEXT}}</span>
+        <i v-if="scope.row.CZRYID" class="ingIcon">
+          <svg-icon icon-class="ing" />
+        </i>
       </template>
     </ResList>
     <gybp :dialogState="dialogState" ref="gygx" />
@@ -75,17 +80,17 @@ export default {
     endWork(row) {
       this.overState.gyid = row.ID
       this.overState.worker = row.CZRYID
-      this.overState.kjgjs = (row.DJGJS)*1
+      this.overState.kjgjs = row.DJGJS * 1
       this.overState.show = true
     }
   }
 }
 </script>
 <style>
-.ingIcon{
-      position: absolute;
-    right: 0;
-    top: 0;
-    font-size: 42px;
+.ingIcon {
+  position: absolute;
+  right: 0;
+  top: 0;
+  font-size: 42px;
 }
 </style>

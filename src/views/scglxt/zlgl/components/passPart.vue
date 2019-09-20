@@ -60,7 +60,7 @@ export default {
     }
   },
   methods: {
-    passPart(row) {
+    passPart() {
       if(this.params.dhjs > this.row.SJJS){
         this.$message.warning('打回件数不能大于送检件数')
         return
@@ -73,7 +73,7 @@ export default {
           this.params.bomid = this.row.bomid
           this.params.jgjs = this.row.SJJS
           this.params.yjgjs = this.row.YJGJS
-          if ((this.dialogState.type = 'part')) {
+          if (this.dialogState.type == 'part') {
             this.$ajax
               .post(this.$api.gygxCheckPassPart, this.params)
               .then(res => {
@@ -104,6 +104,7 @@ export default {
       handler() {
         if (this.dialogState.show) {
           this.params.dhjs = this.dialogState.row.SJJS
+          console.log(this.dialogState)
         }
       }
     }

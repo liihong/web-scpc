@@ -21,7 +21,7 @@
     </el-col>
 
     <!--列表-->
-    <el-table ref="elTable" highlight-current-row stripe @sort-change="tableSort" @selection-change="selsChange" @row-click="rowClick" :data="resDatas" v-loading="listLoading" header-cell-class-name="table_th"  border :max-height="tableHeight" style="width: 100%;">
+    <el-table ref="elTable" highlight-current-row stripe @sort-change="tableSort" @selection-change="selsChange" @row-click="rowClick" :data="resDatas" v-loading="listLoading" header-cell-class-name="table_th" border :max-height="tableHeight" style="width: 100%;">
       <el-table-column fixed="left" type="selection" width="25" align="center">
       </el-table-column>
       <el-table-column fixed="left" type="index" width="30" align="center">
@@ -302,11 +302,36 @@ export default {
         this.queryParams.order = ''
       }
       this.getResList()
+    },
+    mergeTableRow(data, merge) {
+      if (!merge || merge.length === 0) {
+        return data
+      }
+      merge.forEach(m => {
+        const mList = {}
+        data = data.map((v, index) => {
+          const rowVal = v[m]
+          if (mList[rowVal]) {
+            mList[rowVal]++
+            data[index - (mList[rowVal] - 1)][m + '-span'].rowspan++
+            v[m + '-span'] = {
+              rowspan: 0,
+              colspan: 0
+            }
+          } else {
+            mList[rowVal] = 1
+            v[m + '-span'] = {
+              rowspan: 1,
+              colspan: 1
+            }
+          }
+          return v
+        })
+      })
+      return data
     }
   },
   mounted() {
-    // var offsetHeight = window.innerHeight
-    // this.tableHeight = offsetHeight - 150
     if (this.query != undefined) {
       this.queryParams.query = this.query
     }
@@ -322,10 +347,9 @@ export default {
       deep: true,
       handler() {
         let columns = this.resRows.map(item => {
-          if(item.ISQUERY == '1')
-            return item.COLUMN_NAME
+          if (item.ISQUERY == '1') return item.COLUMN_NAME
         })
-        columns = columns.filter(item=>{
+        columns = columns.filter(item => {
           return item != undefined
         })
         this.queryParams.queryColumn = columns.join(',')
@@ -363,7 +387,7 @@ export default {
   padding: 10px;
   text-align: right;
 }
-.el-table--striped .el-table__body tr.el-table__row--striped td{
+.el-table--striped .el-table__body tr.el-table__row--striped td {
   background: #f5f4f4;
 }
 </style>

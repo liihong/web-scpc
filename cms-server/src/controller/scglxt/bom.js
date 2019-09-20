@@ -125,7 +125,7 @@ module.exports = class extends Base {
         }).getField('ddlevel', true)
         form.zddjb = zddjb
         form.zddzt = '0501'
-        form.clzt = '0'
+        form.clzt = null
         form.id = util.getUUId()
 
         let data = await this.model(bomModel).add(form)
@@ -165,7 +165,7 @@ module.exports = class extends Base {
         let clid = this.get('clid')
         // let cldata = await this.model().query("select ID,'' SSDD,'' SSDD_TEXT,ID ZDDCZ,CLMC ZDDCZ_TEXT,'' ZDDMC,'' ZDDJB from scglxt_t_cl where id in (select zddcz from scglxt_t_bom where (clzt IS NULL or clzt=0 or clzt =2) AND cldx!='')")
         // let cldata = await this.model().query("select ID,CLMC,CLDJ,CLSL,MI CLMD from  scglxt_t_cl where id in (select zddcz from scglxt_t_bom where (clzt IS NULL or clzt=0 or clzt =2) AND cldx!='')")
-        let blList = await this.model().query("SELECT BLJS,CLDX,CLJE,CLTJ,CLZL,ID,JGSL,SSDD,(SELECT NAME FROM (SELECT id,xmname NAME FROM scglxt_t_dd) tras WHERE tras.id=SSDD) SSDD_TEXT,ZDDCZ,(SELECT NAME FROM (SELECT id,clmc NAME FROM scglxt_t_cl) tras WHERE tras.id=ZDDCZ) ZDDCZ_TEXT,ZDDMC,CKSJ,CLZT,ZDDJB FROM `SCGLXT_T_BOM` WHERE ( (clzt IS NULL or clzt=0 or clzt =2) AND cldx!='' ) And ssdd= '" + clid + "' ORDER BY zddcz,zddjb ")
+        let blList = await this.model().query("SELECT BLJS,CLDX,CLJE,CGSJ,CLTJ,CLZL,ID,JGSL,SSDD,(SELECT NAME FROM (SELECT id,xmname NAME FROM scglxt_t_dd) tras WHERE tras.id=SSDD) SSDD_TEXT,ZDDCZ,(SELECT NAME FROM (SELECT id,clmc NAME FROM scglxt_t_cl) tras WHERE tras.id=ZDDCZ) ZDDCZ_TEXT,ZDDMC,CKSJ,CLZT,ZDDJB FROM `SCGLXT_T_BOM` WHERE ( (clzt IS NULL or clzt=0 or clzt =2) AND cldx!='' ) And ssdd= '" + clid + "' ORDER BY zddcz,zddjb ")
         // cldata.map(item=>{
         //     let children = []
         //     blList.map(el=>{
@@ -183,16 +183,26 @@ module.exports = class extends Base {
     async updateBLZTAction() {
         let {
             id,
-            clzt
+            clzt,
+            cgyj,
+            cgry
         } = this.post()
         let data = await this.model(bomModel).where({
             id: ['in', id]
         }).update({
             clzt: clzt,
-            bljssj: util.getNowTime()
+            bljssj: util.getNowTime(),
+            cgsj: cgyj,
+            cgry: cgry ==undefined ? '' : cgry
         })
-        let updateSql = `UPDATE scglxt_t_gygc gygc SET kjgjs= (SELECT bom.jgsl FROM  scglxt_t_bom bom  WHERE  bom.id = gygc.bomid)
-        WHERE gygc.bomid = '` + id + `' AND gygc.serial = '0'`
+        let updateSql = ''
+        if(cgyj != undefined && cgyj != null && cgyj != '' ) {
+            return this.success(data)
+        } else{
+            updateSql = `UPDATE scglxt_t_gygc gygc SET kjgjs= (SELECT bom.jgsl FROM  scglxt_t_bom bom  WHERE  bom.id = gygc.bomid)
+            WHERE gygc.bomid = '` + id + `' AND gygc.serial = '0'`
+        }
+        
 
         //如果是同时更新多条
         if (id.indexOf(',') != '-1') {
@@ -203,8 +213,6 @@ module.exports = class extends Base {
                 await this.model().execute(updateSql)
             })
         } else {
-            // let update = await this.model
-
             await this.model().execute(updateSql)
         }
         return this.success(data)
@@ -240,7 +248,7 @@ module.exports = class extends Base {
         let id = this.post('id')
 
         let data = await this.model(bomModel).where({
-            id: id
+            id: ['in',id]
         }).update({
             zddzt: '0504'
         })
@@ -253,7 +261,7 @@ module.exports = class extends Base {
         let id = this.post('id')
 
         let data = await this.model(bomModel).where({
-            id: id
+            id: ['in',id]
         }).update({
             zddzt: '0505',
             rksj: util.getNowTime()
@@ -267,15 +275,15 @@ module.exports = class extends Base {
         let id = this.post('id')
 
         let data = await this.model(bomModel).where({
-            id: id
+            id: ['in',id]
         }).update({
             zddzt: '0506',
             cksj: util.getNowTime()
         })
 
         let bomData = await this.model(bomModel).where({
-            id: id
-        }).find()
+            id: ['in',id]
+        }).select()
 
 
         let allBom = await this.model(bomModel).where({

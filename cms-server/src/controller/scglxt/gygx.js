@@ -152,8 +152,7 @@ module.exports = class extends Base {
         let bomData = await this.model('scglxt_t_gygc').where({
             id: gyid
         }).update({
-            sjjs: jgjs,
-            czryid: ''
+            sjjs: jgjs
         })
 
         return this.success(bomData)
