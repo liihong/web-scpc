@@ -14,6 +14,16 @@ const rename = think.promisify(fs.rename, fs);
 
 module.exports = class extends Base {
 
+    //获取进行中的订单
+    async getWorkingDDListAction() {
+        
+        let pageSize = this.post('pageSize')
+        let pageNumber = this.post('pageNumber')
+
+        let data = await this.model(ddModel).field("ID,XMNAME,DDLEVEL,(SELECT NAME FROM (SELECT id,mc NAME FROM scglxt_tyzd WHERE xh LIKE '04__') tras WHERE tras.id=DDLEVEL) DDLEVEL_TEXT,STARTTIME,ENDTIME").where('ckzt is null').order('DDLEVEL,SJCJSJ').page(pageNumber, pageSize).countSelect()
+
+        return this.success(data)
+    }
     //根据订单表数据，生成新的订单编号
     async getNewDDbhAction() {
         let count = await this.model('scglxt_t_dd').query(`SELECT SUBSTRING_INDEX(xmname,'-',-1) AS count FROM scglxt_t_dd order by sjcjsj desc limit 1`)
@@ -52,19 +62,21 @@ module.exports = class extends Base {
         data.ckdate = null
         data.ckzt = null
         delete data.sjcjsj
-        
+
         let addData = await this.model(ddModel).add(data)
 
         let bomList = await this.model('scglxt_t_bom').where({
             ssdd: id
         }).select()
-        let gygcList = await this.model('scglxt_t_gygc').where({ssdd: id}).select()
-        
+        let gygcList = await this.model('scglxt_t_gygc').where({
+            ssdd: id
+        }).select()
+
         if (bomList.length > 0) {
             bomList.map(item => {
                 var newBOMId = util.getUUId()
-                gygcList.map(el=>{
-                    if(item.id == el.bomid){
+                gygcList.map(el => {
+                    if (item.id == el.bomid) {
                         el.id = util.getUUId()
                         el.kjgjs = 0
                         el.yjgjs = 0
@@ -108,9 +120,9 @@ module.exports = class extends Base {
                 ddId += item['id'] + ','
             })
         }
-        ddId = ddId.substring(0,ddId.length-1)
+        ddId = ddId.substring(0, ddId.length - 1)
         let deleteJggl = await this.model('scglxt_t_jggl').where(
-            `gygcid in (select id from scglxt_t_gygc where ssdd in (`+ddId+`))`
+            `gygcid in (select id from scglxt_t_gygc where ssdd in (` + ddId + `))`
         ).delete()
         let deleteGygc = await this.model('scglxt_t_gygc').where({
             ssdd: ['in', ddId]
@@ -211,7 +223,7 @@ module.exports = class extends Base {
             //保存文件的路径
             let savepath = think.ROOT_PATH + '/../upload/ddtz/' + ssdd + '/';
             // let savepath = think.ROOT_PATH + '/../public/upload/' + ssdd + '/';
-            think.mkdir(savepath);//创建该目录
+            think.mkdir(savepath); //创建该目录
             let filepath = file.path; //文件路径
             let filename = file.name; //文件名
             let suffix = filename.substr(filename.lastIndexOf('.') + 1); //文件后缀
@@ -223,14 +235,14 @@ module.exports = class extends Base {
             fs.writeFileSync(savepath + filename, datas);
             let newpath = savepath + filename;
             file.path = newpath
-            
+
             let tzData = {
                 id: util.getUUId(),
                 ssdd: ssdd,
-                tzlx:suffix,
+                tzlx: suffix,
                 tzmc: filename,
                 tzdz: file.path,
-                url: 'upload/ddtz/'+ ssdd+'/' + filename
+                url: 'upload/ddtz/' + ssdd + '/' + filename
             }
             let data = this.model('scglxt_t_dd_tz').add(tzData)
             return this.success(file)
@@ -242,7 +254,9 @@ module.exports = class extends Base {
         let ssdd = this.post('ssdd')
         let id = this.post('id')
 
-        let data = this.model('scglxt_t_dd_tz').where({id: id}).delete()
+        let data = this.model('scglxt_t_dd_tz').where({
+            id: id
+        }).delete()
 
         return this.success(data)
     }

@@ -16,11 +16,21 @@ $--color-primary: #42b983;
 }
 
 // 修改table样式
-.el-table th{
+.el-table .table_th{
   text-align: center;
   padding:5px 0 !important;
   background: rgba(98, 98, 99, 0.14) !important;
   background-clip: padding-box;
+}
+.el-table .header-style{
+  font-size: 18px;
+  color:#00D5FF;
+  background-color: #234a66;
+}
+.el-table .el-table__footer td{
+  font-size: 18px;
+  color:#00D5FF;
+  background-color: #234a66;
 }
 .el-table .cell{
   overflow: inherit !important;

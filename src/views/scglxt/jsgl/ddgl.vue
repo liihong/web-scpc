@@ -8,7 +8,7 @@
             <el-button @click="exportDD(scope.row.ID)" size="mini" type="primary">导出</el-button>
             <el-button @click="uploadTZ(scope.row)" size="mini" type="primary">图纸</el-button>
             <el-button size="mini" type="primary" @click="copyRow(scope.row)">复制</el-button>
-            <el-button size="mini" type="primary" @click="$refs.ddList.handleEdit(scope.row)">编辑</el-button>
+            <el-button size="mini" type="primary" @click="handleEdit(scope.row)">编辑</el-button>
             <el-button size="mini" type="primary" @click="handleDelete(scope.row)">删除</el-button>
           </el-button-group>
         </template>
@@ -67,6 +67,12 @@ export default {
       this.ddForm.type = 'add'
       this.ddForm.id = this.$util.getUUId()
       this.ddForm.show = true
+    },
+    handleEdit(row) {
+      this.ddForm.type = 'edit'
+      this.ddForm.id = row.ID
+      this.ddForm.show = true
+      this.ddForm.formData = row
     },
     //复制订单
     copyRow(row) {

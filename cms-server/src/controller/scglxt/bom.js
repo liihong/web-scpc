@@ -302,7 +302,7 @@ module.exports = class extends Base {
     //bom 进度
     async BOMSpeedProgressAction() {
         let ddid = this.post('ssdd')
-        let sql = `SELECT t.id,dd.xmname ddmc,zd2.mc zddztmc,zddmc,zddjb,date_format(dd.endtime,'%Y-%m-%d') ddendtime,zd.mc zddjbmc,clxz,bmcl,t.jgsl,date_format(t.starttime,'%Y-%m-%d') starttime,date_format(t.endtime,'%Y-%m-%d') endtime,gs,fun_dqgygc1 (t.id) ddjd FROM scglxt_t_bom t,scglxt_t_dd dd,scglxt_tyzd zd,scglxt_tyzd zd2 WHERE t.SSDD=dd.id AND t.zddjb=zd.id AND zd.id LIKE '04%' AND t.zddzt=zd2.ID AND zd2.xh LIKE '05__' AND t.zddzt not in ('0504','0505','0506') and dd.id ='` + ddid + `' ORDER BY dd.endtime,zddjb`
+        let sql = `SELECT t.id,dd.xmname ddmc,zd2.mc zddztmc,zddmc,zddjb,date_format(dd.endtime,'%Y-%m-%d') ddendtime,zd.mc zddjbmc,clxz,bmcl,t.jgsl,date_format(t.starttime,'%Y-%m-%d') starttime,date_format(t.endtime,'%Y-%m-%d') endtime,gs,fun_dqgygc1 (t.id) ddjd FROM scglxt_t_bom t,scglxt_t_dd dd,scglxt_tyzd zd,scglxt_tyzd zd2 WHERE t.SSDD=dd.id AND t.zddjb=zd.id AND zd.id LIKE '04%' AND t.zddzt=zd2.ID AND zd2.xh LIKE '05__' and dd.id ='` + ddid + `' ORDER BY dd.endtime,zddjb`
         let data = await this.model().query(sql)
         return this.success(data)
     }

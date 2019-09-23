@@ -117,6 +117,7 @@ export default {
       let params = {}
       let data = this.$refs['rulesForm'].model
       params.tableId = this.tableId
+      params.sjcjry = this.$store.getters.token
       params.form = {}
       Object.keys(data).map(item => {
         params.form[item.toLowerCase()] = data[item]

@@ -2,15 +2,7 @@
   <div class="zjgl">
     <!--工具条-->
     <el-col :span="24" class="toolbar">
-      <el-form :inline="true">
-        <el-col :span="4">
-        </el-col>
-        <el-col :span="20">
-          <el-form-item>
-            <el-button size="mini" @click="handleAdd" type="primary" icon="el-icon-circle-plus">新增</el-button>
-          </el-form-item>
-        </el-col>
-      </el-form>
+        <el-button size="mini" @click="lookDDWorking" type="primary">订单生产实时看板</el-button>
     </el-col>
     <el-table class="el-table" @expand-change="expandChange" :data="ddList" stripe border style="width: 100%;">
       <el-table-column fixed="left" label="操作" min-width="50" align="center">
@@ -113,7 +105,11 @@ export default {
           id: 'ENDTIME',
           name: '结束时间'
         }
-      ]
+      ],
+      query:{
+        pageSize: 30,
+        pageNumber: 1
+      }
     }
   },
   mounted() {
@@ -121,9 +117,9 @@ export default {
   },
   methods: {
     async initData() {
-      let res = await this.$ajax.get(this.$api.getZJTreeList)
+      let res = await this.$ajax.post(this.$api.getWorkingDDList, this.query)
       if (res.errno == 0) {
-        this.ddList = res.data.map(item=>{
+        this.ddList = res.data.data.map(item=>{
           item.bomList = []
           return item
         })
@@ -179,27 +175,9 @@ export default {
           })
       })
     },
-    exportZj(row) {
-      let params = {
-        id: row.ID
-      }
-      this.$ajax.getBolb(this.$api.exportDdByZj, params).then(res => {
-        if (res.data) {
-          let url = URL.createObjectURL(res.data)
-          let fileName = res.headers['content-disposition'].split('=')[1]
-          fileName = decodeURI(fileName)
-          let link = document.createElement('a')
-          link.style.display = 'none'
-          link.href = url
-          link.setAttribute('id', 'downloadLink')
-          link.setAttribute('download', fileName)
-          document.body.appendChild(link)
-          link.click()
-          // 删除添加的a链接
-          let objLink = document.getElementById('downloadLink')
-          document.body.removeChild(objLink)
-        }
-      })
+    //查看订单实时看板
+    lookDDWorking(){
+      window.open('/dd-working')
     }
   },
   watch:{
@@ -208,3 +186,8 @@ export default {
   }
 }
 </script>
+<style>
+.toolbar{
+  margin-bottom: 15px;
+}
+</style>

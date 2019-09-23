@@ -6,6 +6,7 @@ let api = {
     getSblxPc: 'scglxt/statistics/getSblxPc',
     getGygxPc: 'scglxt/statistics/getGygxPc',
     getGygsPc: 'scglxt/statistics/getGygsPc',
+    getDDWorkSpeed: 'scglxt/statistics/getDDWorkSpeed',//获取订单动态工时
     
     //数据字典操作
     getSjzdById: 'scglxt/sjzd/getSjzdById',
@@ -29,6 +30,7 @@ let api = {
     exportDdBOM: '/api/scglxt/ddgl/exportDdBOM',
     getNewDDbh: 'scglxt/ddgl/getNewDDbh',
     getDdListByWhere: 'scglxt/ddgl/getDdListByWhere',
+    getWorkingDDList: 'scglxt/ddgl/getWorkingDDList',
     uploadDrawing: '/api/scglxt/ddgl/uploadDrawing',
     deleteDdTz: 'scglxt/ddgl/deleteDdTz',
     //bom表操作

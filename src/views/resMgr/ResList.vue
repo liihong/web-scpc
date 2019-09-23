@@ -3,12 +3,6 @@
     <!--工具条-->
     <el-col :span="24" class="toolbar">
       <el-form :inline="true">
-        <el-col :span="4">
-          <el-form-item>
-            <el-input size="small" v-model="queryParams.queryKey" placeholder="模糊查询"></el-input>
-          </el-form-item>
-        </el-col>
-        <el-col :span="20">
           <slot name="toolBar" />
           <el-form-item v-show="!noAdd">
             <el-button size="mini" @click="handleAdd" type="primary" icon="el-icon-circle-plus">新增</el-button>
@@ -16,12 +10,14 @@
           <el-form-item>
             <el-button size="mini" @click="handleExport" type="primary" icon="el-icon-download">导出</el-button>
           </el-form-item>
-        </el-col>
+          <el-form-item>
+            <el-input size="small" v-model="queryParams.queryKey" placeholder="模糊查询"></el-input>
+          </el-form-item>
       </el-form>
     </el-col>
 
     <!--列表-->
-    <el-table ref="elTable" highlight-current-row stripe @sort-change="tableSort" @selection-change="selsChange" @row-click="rowClick" :data="resDatas" v-loading="listLoading" header-cell-class-name="table_th" border :max-height="tableHeight" style="width: 100%;">
+    <el-table ref="elTable" :span-method='objectSpanMethod' highlight-current-row @sort-change="tableSort" @selection-change="selsChange" @row-click="rowClick" :data="resDatas" v-loading="listLoading" header-cell-class-name="table_th" border :max-height="tableHeight" style="width: 100%;">
       <el-table-column fixed="left" type="selection" width="25" align="center">
       </el-table-column>
       <el-table-column fixed="left" type="index" width="30" align="center">
@@ -161,7 +157,8 @@ export default {
     getResList: function() {
       this.$ajax.get(this.$api.queryTableData, this.queryParams).then(res => {
         if (res.data) {
-          this.resDatas = res.data.data
+          // 给table赋值，重新遍历新增rowSpan属性，checkRoom，appointmentTime为table里面需要合并的属性名称
+          this.resDatas = this.mergeTableRow(res.data.data, ['SSDD_TEXT', 'SSDD','BOMID','BOMID_TEXT'])
           this.total = parseInt(res.data.count)
           this.listLoading = false
         }
@@ -303,6 +300,12 @@ export default {
       }
       this.getResList()
     },
+    objectSpanMethod({ row, column}) {
+      const span = column['property'] + '-span'
+      if (row[span]) {
+        return row[span]
+      }
+    },
     mergeTableRow(data, merge) {
       if (!merge || merge.length === 0) {
         return data
@@ -378,7 +381,7 @@ export default {
 </script>
 <style>
 .toolbar {
-  text-align: right;
+  /* text-align: right; */
 }
 .el-form-item {
   margin-bottom: 0px;

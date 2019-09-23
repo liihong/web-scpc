@@ -30,6 +30,13 @@ export const constantRouterMap = [{
       import ('@/views/404'),
     hidden: true
   },
+
+  {
+    path: '/dd-working',
+    component: () =>
+      import ('@/views/scglxt/working/dd-working.vue'),
+    hidden: true
+  },
   // {
     // path: '/',
     // component: Layout,
