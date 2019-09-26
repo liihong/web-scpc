@@ -94,4 +94,23 @@ module.exports = class extends Base {
             return this.fail(2000, '菜单获取失败！', {})
         }
     }
+
+    // 修改密码
+    async updatePwdAction() {
+        try{
+            let {oldPassword,password} = this.post()
+            let token = this.header('token'); 
+            let data = await this.model('cms_user').where({token:token}).find()
+            if(data.password == oldPassword) {
+                return this.fail(1000, '原密码不一致', {})
+            }else{
+                await this.model('cms_user').where({token:token}).update({
+                    password: password
+                })
+            }
+
+        } catch (ex) {
+            return this.fail(2000, '密码修改失败！', {})
+        }
+    }
 };

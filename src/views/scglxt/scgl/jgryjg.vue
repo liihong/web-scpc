@@ -81,6 +81,7 @@ export default {
       this.overState.gyid = row.ID
       this.overState.worker = row.CZRYID
       this.overState.kjgjs = row.DJGJS * 1
+      this.overState.ddjs = row.JGSL
       this.overState.show = true
     }
   }

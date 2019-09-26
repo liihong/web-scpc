@@ -90,8 +90,12 @@ module.exports = class extends Base {
         return this.success(data)
     }
 
+    // 获取设备列表
     async getSbListAction() {
-        let data = await this.model('scglxt_t_sb').select()
+        let token = this.header('token')
+        let BzId = await this.model('cms_user').where({token: token}).getField('roles', true);
+        
+        let data = await this.model('scglxt_t_sb').where({BZID: BzId}).select()
         return this.success(data)
     }
 
@@ -136,7 +140,9 @@ module.exports = class extends Base {
             worker,
             gyid,
             sbid,
-            jgjs
+            jgjs,
+            ddjs,
+            kjgjs
         } = this.post()
 
         let jgjlData = {
@@ -144,16 +150,30 @@ module.exports = class extends Base {
             jgjs: jgjs,
             sbid: sbid
         }
+        // let jgglDatas = await this.model('scglxt_t_jggl').where({gygcid: gyid}).select()
+        //如果当前系统中已经有了一条加工记录，则更新该加工记录并新增一条加工记录
+        // if(jgglDatas.length>1){
+        //     let updateData = await this.model('scglxt_t_jggl').where({
+        //         gygcid: gyid,
+        //         jgryid: worker,
+        //         jgjssj: 'is null'
+        //     }).update(jgjlData)
+        // }else{
         let updateData = await this.model('scglxt_t_jggl').where({
             gygcid: gyid,
-            jgryid: worker
+            jgryid: worker,
+            jgjssj: null
         }).update(jgjlData)
 
         let bomData = await this.model('scglxt_t_gygc').where({
             id: gyid
         }).update({
-            sjjs: jgjs
+            sjjs: jgjs,
+            czryid: null
         })
+        // }
+        bomData.data = "操作成功！"
+
 
         return this.success(bomData)
     }
@@ -164,10 +184,10 @@ module.exports = class extends Base {
         let pageSize = this.post('pageSize')
         let queryKey = this.post('queryKey')
         let curPage = (pageNumber - 1) * pageSize
-        let where  = '1=1' 
+        let where = '1=1'
 
-        if(!!queryKey){
-            where = "ddmc like '%"+queryKey+"%' or ljmc like '%"+queryKey+"%' or czry like '%"+queryKey+"%'"
+        if (!!queryKey) {
+            where = "ddmc like '%" + queryKey + "%' or ljmc like '%" + queryKey + "%' or czry like '%" + queryKey + "%'"
         }
         let sql = `SELECT * from (SELECT jggl.id, dd.xmname DDMC,
         bom.zddmc LJMC, bom.zddjb ZDDJB, bom.bmcl BMCL, tz.tzlx, tz.url tzurl, jggy.gymc GYNR,gygc.kjgjs KJGJS,gygc.YJGJS,
@@ -190,7 +210,7 @@ module.exports = class extends Base {
         AND jggl.sfjy = '0' 
         AND jggl.jgjs IS NOT NULL 
     ORDER BY
-        jgkssj) t where (`+where+`)  limit ` + curPage + `,` + pageSize + `;`
+        jgkssj) t where (` + where + `)  limit ` + curPage + `,` + pageSize + `;`
 
         let countSql = `SELECT count(*) count  FROM (select gygc.id,dd.xmname ddmc, bom.zddmc ljmc,ry.rymc czry from 
                         scglxt_t_gygc gygc,
@@ -210,7 +230,7 @@ module.exports = class extends Base {
                     AND jggl.sfjy = '0'
                     AND jggl.jgjs IS NOT NULL
                 ORDER BY
-                    jgkssj ) t where (`+where+`)`
+                    jgkssj ) t where (` + where + `)`
         let data = await this.model().query(sql)
         let count = await this.model().query(countSql)
         let info = {
@@ -349,7 +369,9 @@ module.exports = class extends Base {
 
         } else { //报废，重新生成BOM从头开始加工
             let bomid = util.getUUId()
-            let bomData = await this.model('scglxt_t_bom').where({id: bomid}).find()
+            let bomData = await this.model('scglxt_t_bom').where({
+                id: bomid
+            }).find()
             bomData.id = bomid
             bomData.zddmc = bomData.zddmc + '_报废单'
             bomData.zddzt = '0501'
@@ -362,10 +384,12 @@ module.exports = class extends Base {
 
             await this.model('scglxt_t_bom').add(bomData)
 
-            let gygxDatas = await this.model('scglxt_t_gygc').where({bomid: bomid}).select()
+            let gygxDatas = await this.model('scglxt_t_gygc').where({
+                bomid: bomid
+            }).select()
 
-            if(gygxDatas.length > 0) {
-                gygxDatas.map(item=>{
+            if (gygxDatas.length > 0) {
+                gygxDatas.map(item => {
                     item.id = util.getUUId()
                     item.bomid = bomid
                     item.kjgjs = 0
@@ -383,7 +407,7 @@ module.exports = class extends Base {
     //检验全部打回
     //打回第一步：先生成打回记录
     //打回第三步：修改加工工艺的返工次数
-     //打回第二步：删掉已加工的加工记录
+    //打回第二步：删掉已加工的加工记录
     async gygxCheckNoPassAction() {
         let {
             id,
@@ -399,30 +423,34 @@ module.exports = class extends Base {
             id: id
         }).field('jgryid,jgjs,jyryid,jgkssj,jgjssj,jysj,sbid,gygcid,id jgglid').find()
 
-         //生成打回记录
-         let tmpLogData = jgglData
-         tmpLogData.id = util.getUUId()
-         tmpLogData.sjzt = '2201'
-         tmpLogData.dhjs = dhjs
-         tmpLogData.dhyy = dhyy
-         tmpLogData.jyryid = jyryid
-         tmpLogData.jysj = util.getNowTime()
+        //生成打回记录
+        let tmpLogData = jgglData
+        tmpLogData.id = util.getUUId()
+        tmpLogData.sjzt = '2201'
+        tmpLogData.dhjs = dhjs
+        tmpLogData.dhyy = dhyy
+        tmpLogData.jyryid = jyryid
+        tmpLogData.jysj = util.getNowTime()
 
-         await this.model('scglxt_t_jggl_tmp').add(tmpLogData)
+        await this.model('scglxt_t_jggl_tmp').add(tmpLogData)
 
-         let count = await this.model('scglxt_t_jggl_tmp').where({jgglId: id}).count()
-         
-         let gygcUpdate = {
+        let count = await this.model('scglxt_t_jggl_tmp').where({
+            jgglId: id
+        }).count()
+
+        let gygcUpdate = {
             bfjs: dhjs,
             sjjs: 0,
             fgcs: count
         }
 
-         await this.model('scglxt_t_gygc').where({
+        await this.model('scglxt_t_gygc').where({
             id: gygcid
         }).update(gygcUpdate)
 
-        let data = await this.model('scglxt_t_jggl').where({id: id}).delete()
+        let data = await this.model('scglxt_t_jggl').where({
+            id: id
+        }).delete()
 
         return this.success(data)
     }

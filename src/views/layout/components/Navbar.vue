@@ -1,51 +1,76 @@
 <template>
-  <el-menu class="navbar" mode="horizontal">
-    <hamburger :toggle-click="toggleSideBar" :is-active="sidebar.opened" class="hamburger-container"/>
-    <breadcrumb />
-    <el-dropdown class="avatar-container" trigger="click">
-      <div class="avatar-wrapper">
-        {{name}},{{roleNames[0]}}
-        <img :src="avatar+'?imageView2/1/w/80/h/80'" class="user-avatar">
-        <i class="el-icon-caret-bottom"/>
-      </div>
-      <el-dropdown-menu slot="dropdown" class="user-dropdown">
-        <router-link class="inlineBlock" to="/">
+  <div>
+    <el-menu class="navbar" mode="horizontal">
+      <hamburger :toggle-click="toggleSideBar" :is-active="sidebar.opened" class="hamburger-container" />
+      <breadcrumb />
+      <el-dropdown class="avatar-container" trigger="click">
+        <div class="avatar-wrapper">
+          {{name}},{{roleNames[0]}}
+          <img :src="avatar+'?imageView2/1/w/80/h/80'" class="user-avatar">
+          <i class="el-icon-caret-bottom" />
+        </div>
+        <el-dropdown-menu slot="dropdown" class="user-dropdown">
           <el-dropdown-item>
-            设置
+            <span @click="isShow = true">修改密码</span>
           </el-dropdown-item>
-        </router-link>
-        <el-dropdown-item divided>
-          <span style="display:block;" @click="logout">退出</span>
-        </el-dropdown-item>
-      </el-dropdown-menu>
-    </el-dropdown>
-  </el-menu>
+          <el-dropdown-item divided>
+            <span style="display:block;" @click="logout">退出</span>
+          </el-dropdown-item>
+        </el-dropdown-menu>
+      </el-dropdown>
+    </el-menu>
+    <el-dialog title="修改密码" :visible.sync="isShow" width="30%">
+      <el-form :model="form">
+        <el-form-item label="原密码">
+          <el-input v-model="form.oldPassword" type="password" autocomplete="off"></el-input>
+        </el-form-item>
+        <el-form-item label="新密码">
+          <el-input v-model="form.password" type="password" autocomplete="off"></el-input>
+        </el-form-item>
+        <el-form-item label="再次输入密码">
+          <el-input v-model="form.newPassword" type="password" autocomplete="off"></el-input>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="isShow = false">取 消</el-button>
+        <el-button type="primary" @click="updatePwd">确 定</el-button>
+      </div>
+    </el-dialog>
+  </div>
 </template>
 
 <script>
 import { mapGetters } from 'vuex'
 import Breadcrumb from '@/components/Breadcrumb'
 import Hamburger from '@/components/Hamburger'
+import services from '@/api/user.js'
 export default {
   components: {
     Breadcrumb,
     Hamburger
   },
-  data(){
+  data() {
     return {
+      isShow: false,
+      form:{}
     }
   },
   computed: {
-    ...mapGetters([
-      'sidebar',
-      'avatar',
-      'name',
-      'roleNames'
-    ])
+    ...mapGetters(['sidebar', 'avatar', 'name', 'roleNames'])
   },
   methods: {
     toggleSideBar() {
       this.$store.dispatch('ToggleSideBar')
+    },
+    async updatePwd() {
+      let res = await services.updatePwd()
+      if (res.errno == 0) {
+        this.isShow = false
+        this.$message({
+          message: '密码修改成功',
+          type: 'success'
+        })
+      }
     },
     logout() {
       this.$store.dispatch('LogOut').then(() => {

@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "excel-export": "^0.5.1",
+    "koa-cors": "0.0.16",
     "think-cache": "^1.0.0",
     "think-cache-file": "^1.0.8",
     "think-logger3": "^1.0.0",

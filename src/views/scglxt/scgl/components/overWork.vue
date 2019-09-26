@@ -96,6 +96,8 @@ export default {
         .post(this.$api.overWork, {
           worker: this.dialogState.worker,
           gyid: this.dialogState.gyid,
+          ddjs: this.dialogState.ddjs,
+          kjgjs: this.dialogState.kjgjs,
           jgjs: this.jgjs,
           sbid: this.activeSb
         })

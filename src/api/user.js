@@ -24,4 +24,13 @@ services.addUser = function(token) {
   })
 }
 
+  // 添加用户
+services.updatePwd = function(token) {
+  return request({
+    url: '/user/updatePwd',
+    method: 'post',
+    params: { token }
+  })
+}
+
 export default services
