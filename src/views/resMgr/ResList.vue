@@ -342,6 +342,9 @@ export default {
     this.getResList()
   },
   activated(){
+    if (this.query != undefined) {
+      this.queryParams.query = this.query
+    }
     this.getConfig()
      this.getResList()
   },
@@ -370,16 +373,16 @@ export default {
         }
       }
     },
-    // query: {
-    //   deep: true,
-    //   handler() {
-    //     if (this.query != undefined) {
-    //       this.queryParams.query = this.query
-    //     }
-    //     this.getResList()
-    //     console.log('333')
-    //   }
-    // }
+    query: {
+      deep: true,
+      handler() {
+        if (this.query != undefined) {
+          this.queryParams.query = this.query
+        }
+        this.getResList()
+        console.log('333')
+      }
+    }
   }
 }
 </script>

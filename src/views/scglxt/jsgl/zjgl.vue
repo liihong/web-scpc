@@ -3,16 +3,25 @@
     <!--工具条-->
     <el-col :span="24" class="toolbar">
       <el-form :inline="true">
-        <el-col :span="4">
-        </el-col>
-        <el-col :span="20">
+          <el-col :span="2">
           <el-form-item>
             <el-button size="mini" @click="handleAdd" type="primary" icon="el-icon-circle-plus">新增</el-button>
           </el-form-item>
         </el-col>
+       <el-col :span="4">
+          <el-form-item>
+            <el-input size="small" @change="initData" v-model="queryParams.queryKey" placeholder="模糊查询"></el-input>
+          </el-form-item>
+        </el-col>
+      
       </el-form>
     </el-col>
     <el-table class="el-table" @expand-change="expandChange" :data="ddList" stripe border style="width: 100%;">
+       <el-table-column fixed="left" type="index" width="30" align="center">
+        <template slot-scope="scope">
+          <span>{{scope.$index+(queryParams.pageNumber - 1) * queryParams.pageSize + 1}} </span>
+        </template>
+      </el-table-column>
       <el-table-column fixed="left" label="操作" min-width="50" align="center">
         <template slot-scope="scope">
           <el-button-group size="mini">
@@ -56,6 +65,12 @@
         </template>
       </el-table-column>
     </el-table>
+     <!--工具条-->
+    <el-col :span="24" class="pagination">
+      <!-- <el-button v-if="!noEdit" type="danger" @click="batchRemove" :disabled="this.sels.length===0">批量删除</el-button> -->
+      <el-pagination background @current-change="handleCurrentChange" :current-page="queryParams.pageNumber" :page-sizes="[30, 60, 100, 150]" :page-size="queryParams.pageSize" layout="total, sizes, prev, pager, next, jumper" :total="queryParams.count" @size-change="sizeChange">
+      </el-pagination>
+    </el-col>
     <editZj ref="editZj" :dialogState="dialogState" />
   </div>
 </template>
@@ -100,7 +115,12 @@ export default {
           id: 'ENDTIME',
           name: '结束时间'
         }
-      ]
+      ],
+      queryParams:{
+        pageSize:30,
+        pageNumber:1,
+        count:0
+      }
     }
   },
   mounted() {
@@ -108,9 +128,10 @@ export default {
   },
   methods: {
     async initData() {
-      let res = await this.$ajax.get(this.$api.getZJTreeList)
+      let res = await this.$ajax.get(this.$api.getZJTreeList, this.queryParams)
       if (res.errno == 0) {
-        this.ddList = res.data
+        this.ddList = res.data.data
+        this.queryParams.count = res.data.count
       }
     },
     // 展开执行
@@ -206,6 +227,14 @@ export default {
           document.body.removeChild(objLink)
         }
       })
+    },
+    handleCurrentChange(val) {
+      this.queryParams.pageNumber = val
+      this.initData()
+    },
+    sizeChange(val) {
+      this.queryParams.pageSize = val
+      this.initData()
     }
   }
 }
