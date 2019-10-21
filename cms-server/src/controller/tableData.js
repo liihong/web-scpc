@@ -17,8 +17,10 @@ module.exports = class extends Base {
             let table = await this.model('resource_table').getTableInfo(tableId)
             let fileds = await this.model('resource_table_column').getColumnList(tableId)
             fileds = fileds.map(item => {
-                return item.COLUMN_NAME
+                if(item.ATTRIBUTE_TYPE != '2')
+                    return item.COLUMN_NAME
             })
+            fileds = fileds.filter(item=>{return item!=undefined})
             const data = await this.model(table.table_name).field(fileds).where({
                 id: this.get('id')
             }).find()
@@ -83,65 +85,67 @@ module.exports = class extends Base {
     // 根据配置查询某表的数据
     async queryTableDataAction() {
         // try {
-            const _this = this
-            let tableId = this.get('tableId')
-            let pageSize = this.get('pageSize')
-            let pageNumber = this.get('pageNumber')
+        const _this = this
+        let tableId = this.get('tableId')
+        let pageSize = this.get('pageSize')
+        let pageNumber = this.get('pageNumber')
 
-            let queryColumn = this.get('queryColumn')
-            let queryKey = this.get('queryKey')
-            let order = this.get('order')
+        let queryColumn = this.get('queryColumn')
+        let queryKey = this.get('queryKey')
+        let order = this.get('order')
 
-            let table = await this.model('resource_table').getTableInfo(tableId);
-            let displayColumn = await this.model('resource_table_column').getColumnList(tableId);
-            let queryColumns = [],
-                displayColumnArr = []
-            let data = {};
+        let table = await this.model('resource_table').getTableInfo(tableId);
+        let displayColumn = await this.model('resource_table_column').getColumnList(tableId);
+        let queryColumns = [],
+            displayColumnArr = []
+        let data = {};
 
-            displayColumn.map(item => {
-                switch (item.PROPERTY_TYPE) {
-                    case '1': // 文本框形式不需要翻译
-                    case '3': // 日期
-                    case '5': // 日期时间
-                        displayColumnArr.push(item.COLUMN_NAME)
-                        break;
-                    case '2': // 有外键关系,需要翻译
-                        displayColumnArr.push(item.COLUMN_NAME);
-                        displayColumnArr.push(`(SELECT NAME FROM (${item.TYPESQL}) tras WHERE tras.id=${item.COLUMN_NAME}) ${item.COLUMN_NAME}_TEXT`)
-                        break;
-                    case '4': //字段数据
-                        displayColumnArr.push(`(${item.TYPESQL}) ${item.COLUMN_NAME}`)
-                        break;
-                    case '7': //自动填充
-                        displayColumnArr.push(`${item.TYPESQL} ${item.COLUMN_NAME}`);
-                        break;
-                    default:
-                        displayColumnArr.push(item.COLUMN_NAME)
-                        break;
-                }
-            })
-            let whereObj = {}
-            let query = this.get('query')
-            let pArr = [],
-                temp = {}
-            if (query && query != '{}' && JSON.stringify(query) != '{}') {
-                query = JSON.parse(query)
-                let key = Object.keys(query)[0]
-                whereObj[key] = ['=', `${query[key]}`]
+        displayColumn.map(item => {
+            switch (item.PROPERTY_TYPE) {
+                case '1': // 文本框形式不需要翻译
+                case '3': // 日期
+                case '5': // 日期时间
+                    displayColumnArr.push(item.COLUMN_NAME)
+                    break;
+                case '2': // 有外键关系,需要翻译
+                    displayColumnArr.push(item.COLUMN_NAME);
+                    displayColumnArr.push(`(SELECT NAME FROM (${item.TYPESQL}) tras WHERE tras.id=${item.COLUMN_NAME}) ${item.COLUMN_NAME}_TEXT`)
+                    break;
+                case '4': //字段数据
+                    displayColumnArr.push(`(${item.TYPESQL}) ${item.COLUMN_NAME}`)
+                    break;
+                case '7': //自动填充
+                    displayColumnArr.push(`${item.TYPESQL} ${item.COLUMN_NAME}`);
+                    break;
+                case '13': //附件字段的话，不在列表中查询
+                    break;
+                default:
+                    displayColumnArr.push(item.COLUMN_NAME)
+                    break;
             }
-            if (!!queryKey) {
-                whereObj = await this.model('tableData').getWhereObj(query,queryColumn,queryKey, tableId)
-            }
-            // { _complex: { _logic: 'or', BOMID: [ 'in', '20190506090311111' ] } }
-            //{ _complex: { _logic: 'or' } }
-            if (order && order.length > 0) {
-                data = await this.model(table.table_name)
-                    .field(displayColumnArr.join(',')).page(pageNumber, pageSize).where(table.where_sql).where(whereObj).order(order).alias('t').countSelect();
-            } else {
-                data = await this.model(table.table_name)
-                    .field(displayColumnArr.join(',')).page(pageNumber, pageSize).where(table.where_sql).where(whereObj).order(table.orderby_sql).alias('t').countSelect();
-            }
-            return this.success(data)
+        })
+        let whereObj = {}
+        let query = this.get('query')
+        let pArr = [],
+            temp = {}
+        if (query && query != '{}' && JSON.stringify(query) != '{}') {
+            query = JSON.parse(query)
+            let key = Object.keys(query)[0]
+            whereObj[key] = ['=', `${query[key]}`]
+        }
+        if (!!queryKey) {
+            whereObj = await this.model('tableData').getWhereObj(query, queryColumn, queryKey, tableId)
+        }
+        // { _complex: { _logic: 'or', BOMID: [ 'in', '20190506090311111' ] } }
+        //{ _complex: { _logic: 'or' } }
+        if (order && order.length > 0) {
+            data = await this.model(table.table_name)
+                .field(displayColumnArr.join(',')).page(pageNumber, pageSize).where(table.where_sql).where(whereObj).order(order).alias('t').countSelect();
+        } else {
+            data = await this.model(table.table_name)
+                .field(displayColumnArr.join(',')).page(pageNumber, pageSize).where(table.where_sql).where(whereObj).order(table.orderby_sql).alias('t').countSelect();
+        }
+        return this.success(data)
         // } catch (err) {
         //     return this.fail(err)
         // }

@@ -103,6 +103,7 @@ export default {
         zysx: '',
         bzgs: 0,
         zbgs: 0,
+        status: 0,
         sblxList: []
       }
     }

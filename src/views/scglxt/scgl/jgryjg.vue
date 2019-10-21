@@ -7,6 +7,11 @@
           <el-button v-if="scope.row.CZRYID" size="mini" type="warning" @click="endWork(scope.row)">结束</el-button>
         </template>
       </el-table-column>
+      <template slot="SSDD" slot-scope="scope">
+        <el-badge  v-show="!!scope.row.DDLEVEL" :value="scope.row.DDLEVEL == '0402' ? '重要' : scope.row.DDLEVEL == '0403' ? '' : '紧急'" class="item" :type="scope.row.DDLEVEL == '0402' ? 'warning' : scope.row.DDLEVEL == '0403' ? 'info' : 'danger'">
+          <span style="margin:0 5px;">{{scope.row.SSDD_TEXT}}</span>
+        </el-badge>
+      </template>
       <template slot="BOMID" slot-scope="scope">
         <span class="spanText" @click="gybpClick(scope.row)">{{scope.row.BOMID_TEXT}}</span>
       </template>

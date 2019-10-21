@@ -7,7 +7,7 @@ let api = {
     getGygxPc: 'scglxt/statistics/getGygxPc',
     getGygsPc: 'scglxt/statistics/getGygsPc',
     getDDWorkSpeed: 'scglxt/statistics/getDDWorkSpeed',//获取订单动态工时
-    
+    getPeopleHour: 'scglxt/statistics/getPeopleHour', //工人工时统计
     //数据字典操作
     getSjzdById: 'scglxt/sjzd/getSjzdById',
     getBzList: 'scglxt/sjzd/getBzList',
@@ -26,8 +26,11 @@ let api = {
     getDdTz: 'scglxt/ddgl/getDdTz',
     copyDd: 'scglxt/ddgl/copyDd',
     deleteDd: 'scglxt/ddgl/deleteDd',
+    
     exportDdByZj: '/api/scglxt/ddgl/exportDdByZj',
     exportDdBOM: '/api/scglxt/ddgl/exportDdBOM',
+    exportGRGSTJ: '/api/scglxt/ddgl/exportGRGSTJ',
+
     getNewDDbh: 'scglxt/ddgl/getNewDDbh',
     getDdListByWhere: 'scglxt/ddgl/getDdListByWhere',
     getWorkingDDList: 'scglxt/ddgl/getWorkingDDList',

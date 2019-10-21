@@ -53,4 +53,24 @@ module.exports = class extends Base {
             return this.fail(err)
         }
     }
+
+    async getForeingKeyListDataAction(){
+        try {
+            let tableId = this.get('tableId')
+            let column_name = this.get('column_name')
+            let query = this.get('query')
+            
+            let columnData = await this.model('resource_table_column').where({
+                table_id:tableId,
+                column_name: column_name
+            }).find()
+
+            let whereObj = {}
+            whereObj[columnData.FOREIGNKEY_TABLE_COLUMN] = query
+            let data = await this.model(columnData.FOREIGNKEY_TABLENAME).where(whereObj).select()
+            return this.success(data)
+        } catch (err) {
+            return this.fail(err)
+        }
+    }
 };

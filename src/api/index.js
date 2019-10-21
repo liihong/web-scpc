@@ -11,7 +11,7 @@ let api = {
     //资源呈现时表头信息
     getTableColumns: '/resTableColumn/getTableColumn',
     getDropDownListData: '/resTableColumn/getDropDownListData',
-   
+    getForeingKeyListData: '/resTableColumn/getForeingKeyListData',
   
     addTableRes: '/resTable/addTableRes',
     editTableRes: '/resTable/editTableRes',

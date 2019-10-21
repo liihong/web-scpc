@@ -16,7 +16,7 @@ module.exports = class extends Base {
 
     //获取进行中的订单
     async getWorkingDDListAction() {
-        
+
         let pageSize = this.post('pageSize')
         let pageNumber = this.post('pageNumber')
 
@@ -121,16 +121,19 @@ module.exports = class extends Base {
             })
         }
         ddId = ddId.substring(0, ddId.length - 1)
-        let deleteJggl = await this.model('scglxt_t_jggl').where(
-            `gygcid in (select id from scglxt_t_gygc where ssdd in (` + ddId + `))`
-        ).delete()
-        let deleteGygc = await this.model('scglxt_t_gygc').where({
-            ssdd: ['in', ddId]
-        }).delete()
-
-        let deleteBom = await this.model('scglxt_t_bom').where({
-            ssdd: ['in', ddId]
-        }).delete()
+        if(ddId!= ''){
+            let deleteJggl = await this.model('scglxt_t_jggl').where(
+                `gygcid in (select id from scglxt_t_gygc where ssdd in (` + ddId + `))`
+            ).delete()
+            let deleteGygc = await this.model('scglxt_t_gygc').where({
+                ssdd: ['in', ddId]
+            }).delete()
+    
+            let deleteBom = await this.model('scglxt_t_bom').where({
+                ssdd: ['in', ddId]
+            }).delete()
+        }
+        
         let deleteDd = await this.model(ddModel).where(where).delete()
 
         return this.success(deleteDd)
@@ -153,33 +156,25 @@ module.exports = class extends Base {
         let ddsql = `select ht.htbh,dd.xmname,zd.mc ddlevel, starttime,endtime from scglxt_t_dd dd,scglxt_t_ht ht,scglxt_tyzd zd where dd.ssht=ht.id and zd.xh = dd.ddlevel and dd.id = '` + ddid + `'`
         let infos = await this.model().query(ddsql)
 
-        let sql = `SELECT
-        ( @i := @i + 1 ) AS rownum,
-            zddmc,
-            t2.clmc,
-            concat_ws('    ',cldx,concat(bljs,'件')) cldx,
-            jgsl,
-            gxnr,
-            bmcl,
-            '' bz,
-            '' endtime
-            FROM
-        (select @i := 0) b,
-        scglxt_t_bom bom
-        LEFT JOIN scglxt_t_cl t2 ON bom.zddcz = t2.id 
-    WHERE
-        ssdd = '` + ddid + `' order by sjcjsj
+        let sql = `SELECT  (@rownum := @rownum + 1) AS rownum, bom.id, zddmc,  t2.clmc, cldx, jgsl, gxnr, bmcl, '' AS bz, '' endtime 
+        FROM (select @rownum := 0) t,scglxt_t_bom bom  LEFT JOIN scglxt_t_cl t2   ON bom.zddcz = t2.id  WHERE ssdd = '` + ddid + `' order by bom.sjcjsj
         `
-        let datas = await this.model().query(sql)
 
-        let _data = datas.map((item, i) => {
-            item.jhrq = ''
-            item.yjdhrq = ''
-            item.sjdhrq = ''
-            item.bz = ''
-            return item
-        })
-        exportXls.exportBOMXls(infos[0], datas, res)
+        let tjSql="SELECT gymc,CEIL(SUM(bzgs)/60) zgs FROM scglxt_t_gygc gc,`scglxt_t_jggy` gy WHERE gc.`gynr`=gy.id AND bomid IN (SELECT id FROM scglxt_t_bom WHERE ssdd='"+ddid+"') GROUP BY gymc";
+
+        let tjInfo = {
+            info: '工时合计：'
+        }
+        
+        let datas = await this.model().query(sql)
+        let tjData = await this.model().query(tjSql)
+        tjData.forEach(item => {
+            tjInfo.info += item.gymc + '(' + item.zgs+ ')' + '-'
+            tjInfo.zgs += parseInt(item.zgs)
+        });
+        tjInfo.info = tjInfo.info.substring(0,tjInfo.info.length -1) 
+        tjInfo.zgs = tjInfo.zgs.toString()
+        exportXls.exportBOMXls(infos[0], datas, tjInfo, res)
     }
     //导出组件
     async exportDdByZjAction() {
@@ -208,14 +203,32 @@ module.exports = class extends Base {
         exportXls.exportXls(infos[0], datas, res)
     }
 
+    //根据时间范围，导出对应的工人工时统计数据
+    async exportGRGSTJAction(){
+        let date = this.get('date');
+        let bzList = [{
+            id:'759007553955134000002',
+            name: '铣工班'
+        },{
+            id:'759007553955134000006',
+            name:'钳工班'
+        },{
+            id:'759007553955134000005',
+            name:'车工班'
+        },{
+            id:'759007553955134000001',
+            name:'线切割'
+        },{
+            id:'759007553955134000007',
+            name:'CNC班'
+        }]
+        console.log(date)
+    }
+
     // 上传订单图纸
     async uploadDrawingAction() {
-        // let themefile = this.file('file');
         let ssdd = this.post('ssdd');
-        // let filepath = themefile.path; //为防止上传的时候因文件名重复而覆盖同名已上传文件，path是MD5方式产生的随机名称
-        // let uploadpath = think.ROOT_PATH + '/../public/upload/' + ssdd + '/';
-        // let uploadpath = '/upload/';
-
+       
         if (!think.isEmpty(this.file('file'))) {
             //进行压缩等处理
             let file = think.extend({}, this.file('file'));
@@ -227,7 +240,6 @@ module.exports = class extends Base {
             let filepath = file.path; //文件路径
             let filename = file.name; //文件名
             let suffix = filename.substr(filename.lastIndexOf('.') + 1); //文件后缀
-            // let newfilename = Math.random().toString(36).substr(2) + '.' + suffix;
 
             //读文件
             let datas = fs.readFileSync(filepath);
@@ -244,7 +256,7 @@ module.exports = class extends Base {
                 tzdz: file.path,
                 url: 'upload/ddtz/' + ssdd + '/' + filename
             }
-            let data = this.model('scglxt_t_dd_tz').add(tzData)
+            let data = await this.model('scglxt_t_dd_tz').add(tzData)
             return this.success(file)
         }
     }
@@ -254,7 +266,7 @@ module.exports = class extends Base {
         let ssdd = this.post('ssdd')
         let id = this.post('id')
 
-        let data = this.model('scglxt_t_dd_tz').where({
+        let data = await this.model('scglxt_t_dd_tz').where({
             id: id
         }).delete()
 

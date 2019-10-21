@@ -46,6 +46,9 @@ export default {
   computed: {
     ...mapGetters(['token'])
   },
+  activated(){
+     this.initData()
+  },
   mounted() {
     this.initData()
   },

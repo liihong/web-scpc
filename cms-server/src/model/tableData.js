@@ -21,6 +21,8 @@ module.exports = class extends think.Model {
                 case '7': //自动填充
                     displayColumnArr.push(`${item.TYPESQL} ${item.COLUMN_NAME}`);
                     break;
+                case '13': //附件的话，外链表，单独查询
+                    break;
                 default:
                     displayColumnArr.push(item.COLUMN_NAME)
                     break;
@@ -49,7 +51,7 @@ module.exports = class extends think.Model {
         if (query && query != '{}' && JSON.stringify(query) != '{}') {
             // query = JSON.parse(query)
             console.log(query)
-            
+
             let key = Object.keys(query)[0]
             whereObj[key] = ['=', `${query[key]}`]
         }
@@ -69,6 +71,7 @@ module.exports = class extends think.Model {
                         pArr.push(_this.getData(queryColumns, item, queryKey))
                         break;
                     case '4': //字段数据
+                    case '13': //附件
                         break;
                     default:
                         queryColumns.push({
@@ -93,7 +96,7 @@ module.exports = class extends think.Model {
                         complex[`${item.key}`] = ['like', `%${item.value}%`]
                     }
                 })
-                if(queryColumns.length > 0) {
+                if (queryColumns.length > 0) {
                     whereObj._complex = complex
                 }
             })
@@ -111,7 +114,7 @@ module.exports = class extends think.Model {
             })
             whereObj._complex = complex
         } else {
-            if(queryColumn != ''){
+            if (queryColumn != '' && queryColumn) {
                 whereObj[`CONCAT(${queryColumn})`] = ['like', `%${queryKey}%`]
             }
         }
@@ -127,7 +130,7 @@ module.exports = class extends think.Model {
             let wjData = await this.query(`(SELECT id FROM (${item.TYPESQL}) tras WHERE tras.name like '%${queryKey}%')`)
             if (wjData.length > 0) {
                 let value = []
-                wjData.map(item=>{
+                wjData.map(item => {
                     value.push(item.id)
                 })
                 queryColumns.push({

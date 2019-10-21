@@ -3,13 +3,13 @@
     <!--工具条-->
     <el-col :span="24" class="toolbar">
       <el-form :inline="true">
-          <slot name="toolBar" />
           <el-form-item v-show="!noAdd">
             <el-button size="mini" @click="handleAdd" type="primary" icon="el-icon-circle-plus">新增</el-button>
           </el-form-item>
-          <el-form-item>
+          <el-form-item v-show="!noAdd">
             <el-button size="mini" @click="handleExport" type="primary" icon="el-icon-download">导出</el-button>
           </el-form-item>
+          <slot name="toolBar"></slot>
           <el-form-item>
             <el-input size="small" v-model="queryParams.queryKey" placeholder="模糊查询"></el-input>
           </el-form-item>
@@ -334,18 +334,21 @@ export default {
       return data
     }
   },
-  mounted() {
+  create() {
     if (this.query != undefined) {
       this.queryParams.query = this.query
     }
     this.getConfig()
     this.getResList()
   },
+  activated(){
+    this.getConfig()
+     this.getResList()
+  },
+  beforeRouteLeave(){
+    this.$destory()
+  },
   watch: {
-    tableId() {
-      this.getConfig()
-      this.getResList()
-    },
     queryParams: {
       deep: true,
       handler() {
@@ -367,15 +370,16 @@ export default {
         }
       }
     },
-    query: {
-      deep: true,
-      handler() {
-        if (this.query != undefined) {
-          this.queryParams.query = this.query
-        }
-        this.getResList()
-      }
-    }
+    // query: {
+    //   deep: true,
+    //   handler() {
+    //     if (this.query != undefined) {
+    //       this.queryParams.query = this.query
+    //     }
+    //     this.getResList()
+    //     console.log('333')
+    //   }
+    // }
   }
 }
 </script>

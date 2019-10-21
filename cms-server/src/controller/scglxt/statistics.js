@@ -53,6 +53,26 @@ module.exports = class extends Base {
         return this.success(data)
     }
 
+    // 根据时间范围返回工人工时统计
+    async getPeopleHourAction(){
+        let time = this.post('date')
+        let sql = `SELECT any_value(gygc.id) id,
+        any_value(gygc.ssdd) ssdd, any_value(xmname) ddmc, any_value(bomid) bomid,
+        any_value(zddmc) bommc, any_value(gynr) gynr,any_value(jgsl) jgsl,
+        any_value(czryid) czryid, any_value(ry.rymc) rymc, sum( gygc.edgs ) edgs
+    FROM scglxt_t_gygc gygc, scglxt_t_dd dd, scglxt_t_bom bom, scglxt_t_ry ry 
+    WHERE
+        gygc.ssdd = dd.id  AND gygc.bomid = bom.id 
+        AND gygc.czryid = ry.id  AND STATUS = 2  AND jssj BETWEEN "`+time.split(' ')[0]+` 00:00:00" 
+        AND "`+time.split(' ')[1]+`  23:59:59"    GROUP BY  edgs`
+        
+        let data = await this.model().query(sql)
+
+        data.map(item=>{
+            item[item.rymc] = item.edgs
+        })
+        return this.success(data)
+    }
     // 获取车间总工时排产
     async getGygsPcAction() {
         let sql = `SELECT gynr,gy.gymc,sum(zbgs+bzgs)/60 zgs FROM scglxt_t_gygc gc,scglxt_t_jggy gy WHERE gc.gynr=gy.id AND bomid IN (

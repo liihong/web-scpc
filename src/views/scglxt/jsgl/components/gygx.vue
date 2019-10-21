@@ -1,5 +1,5 @@
 <template>
-  <el-dialog title="工艺编排" :visible.sync="dialogState.show" width="70%">
+  <el-dialog title="工艺编排" :visible.sync="dialogState.show" width="80%">
     <div class="title">
       <span v-if="type == 'edit'">
         当前订单：
@@ -14,7 +14,7 @@
     </div>
     <el-row>
       <el-col v-show="type == 'edit'" :span="22">
-        <draggable class="list-group" v-model="jggyList" :options="{draggable:'.el-tag'}" :move="getdata" @end="drop" @update="datadragEnd">
+        <draggable class="list-group" v-model="jggyList" :options="{draggable:'.el-tag',filter: '.undraggable', sort: false}" :move="getdata" @end="drop" @update="datadragEnd">
           <el-tag class="elTag" v-for="(item,index) in jggyList" :value="item.id" :name="item.gymc" :key="index">{{item.gymc}}</el-tag>
         </draggable>
       </el-col>
@@ -30,17 +30,18 @@
       </el-col>
       <el-col :span="24">
         <el-table :data="gygxList" class="gygxTable" id="gygxTable" row-key="id">
-          <el-table-column v-if="type == 'edit'" property="gxnr" label="删除" min-width="50">
+          <el-table-column   min-width="20" align="center" v-if="type == 'edit'" property="gxnr" label="删除">
             <template slot-scope="scope">
               <el-button @click="deleteGy(scope.$index)" size="mini" type="danger" icon="el-icon-delete" circle></el-button>
             </template>
           </el-table-column>
-          <el-table-column class-name="gxnr" property="gxnr" label="工序" min-width="50">
+          <el-table-column width="30" type="index" align="center"></el-table-column>
+          <el-table-column class-name="gxnr"  align="center" property="gxnr" label="工序" min-width="40">
             <template slot-scope="scope">
               <span>{{scope.row['gymc']}}</span>
             </template>
           </el-table-column>
-          <el-table-column property="sbid" label="设备类型" min-width="100">
+          <el-table-column property="sbid" label="设备类型" min-width="70">
             <template slot-scope="scope">
               <el-select v-if="type == 'edit'" size="mini" v-model="scope.row['sbid']" placeholder="请选择">
                 <el-option v-for="item in scope.row['sblxList']" :key="item.id" :label="item.mc" :value="item.id">
@@ -49,25 +50,25 @@
               <span v-else>{{scope.row['sbmc']}}</span>
             </template>
           </el-table-column>
-          <el-table-column property="edgs" label="额定工时(分钟)" min-width="100">
+          <el-table-column property="edgs" label="额定工时(分钟)" min-width="70">
             <template slot-scope="scope">
               <el-input-number v-if="type == 'edit'" :controls=false size="mini" v-model="scope.row['edgs']" :min="0" label="额定工时"></el-input-number>
               <span v-else>{{scope.row['edgs']}}</span>
             </template>
           </el-table-column>
-          <el-table-column property="bzgs" label="总工时(分钟)" min-width="100">
+          <el-table-column property="bzgs" label="总工时(分钟)" min-width="70">
             <template slot-scope="scope">
               <el-input-number v-if="type == 'edit'" :controls=false size="mini" v-model="scope.row['bzgs']" :min="0" label="标准工时"></el-input-number>
               <span v-else>{{scope.row['bzgs']}}</span>
             </template>
           </el-table-column>
-          <el-table-column property="zbgs" label="准备工时" min-width="80">
+          <el-table-column property="zbgs" label="准备工时" min-width="70">
             <template slot-scope="scope">
               <el-input-number v-if="type == 'edit'" :controls=false size="mini" v-model="scope.row['zbgs']" :min="0" label="准备工时"></el-input-number>
               <span v-else>{{scope.row['zbgs']}}</span>
             </template>
           </el-table-column>
-          <el-table-column property="zysx" label="工艺内容" min-width="200">
+          <el-table-column property="zysx" label="工艺内容" min-width="250">
             <template slot-scope="scope">
               <el-input v-if="type == 'edit'" size="mini" type="textarea" :rows="2" v-model="scope.row['zysx']" placeholder="请输入内容"></el-input>
               <span v-else>{{scope.row['zysx']}}</span>
@@ -126,7 +127,11 @@ export default {
         zbgs: 0,
         sszj: '',
         fgcs: 0,
+        sfjy: 0,
+        status:null,
         czryid: null,
+        kssj:null,
+        jssj:null,
         sblxList: []
       }
     }
@@ -215,6 +220,7 @@ export default {
         gynr: item.value.nodeValue,
         gymc: item.name.nodeValue,
         bomid: this.row.ID,
+        ssdd:this.row.SSDD,
         edgs: 0,
         serial: this.gygxList.length,
         sbid: sblx[0].id || '',
@@ -225,9 +231,12 @@ export default {
         zysx: '',
         bzgs: 0,
         zbgs: 0,
-        sszj: '',
         fgcs: 0,
+        sfjy: 0,
         czryid: null,
+        status: null,
+        kssj:null,
+        jssj:null,
         sblxList: sblx || []
       })
     },

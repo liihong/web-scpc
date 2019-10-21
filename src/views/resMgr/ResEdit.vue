@@ -1,39 +1,49 @@
 <template>
   <div class="resEdit">
     <el-dialog append-to-body :modal=false :width="width" size="small" :title="optionType == 'add' ? '新增' : '编辑'" :visible.sync="dialogState.show" :close-on-click-modal="false">
-      <el-form class="form" :inline="true" ref="form" :model="formData" label-width="120px" size="small">
+      <el-form class="form" :inline="true" ref="form" :model="formData" label-width="120px"  label-position="right" size="small">
+        <el-row>
         <el-col :span="12" v-show="item.PROPERTY_TYPE !== '10'" v-for="(item,i) in columnData" :key="i" class="item">
-          <el-col :span="8" class="title">
+          <el-form-item :label="item.COLUMN_CNAME" style="width:100%">
+          <!-- <el-col :span="8" class="title">
             <span>{{item.COLUMN_CNAME}}</span>
           </el-col>
-          <el-col :span="16">
+          <el-col :span="16"> -->
             <!--主键-->
             <template v-if="item.PROPERTY_TYPE == '10'">
               <span v-show="false">{{formData[item.COLUMN_NAME]}}</span>
             </template>
-            <template v-else-if="item.PROPERTY_TYPE == '2'">
+            <template style="width:100%" v-else-if="item.PROPERTY_TYPE == '2'">
               <!--下拉选择-->
               <el-select @change="$emit('selectChange',formData)" style="width:100%" clearable filterable v-model="formData[item.COLUMN_NAME]">
                 <el-option v-for="(item,key) in dropDownListData[item.COLUMN_NAME]" :key="key" :label="item.NAME" :value="item.id"></el-option>
               </el-select>
             </template>
-            <template v-else-if="item.PROPERTY_TYPE == '4'">
+            <template  style="width:100%" v-else-if="item.PROPERTY_TYPE == '4'">
               <!--数据字典-->
               <el-select @change="$emit('selectChange',formData)" style="width:100%" v-model="formData[item.COLUMN_NAME.toLowerCase()]">
                 <el-option v-for="(item,key) in dropDownListData[item.COLUMN_NAME]" :key="key" :label="item.NAME" :value="item.id"></el-option>
               </el-select>
             </template>
 
-            <template v-else-if="item.PROPERTY_TYPE == '5'">
+            <template  style="width:100%" v-else-if="item.PROPERTY_TYPE == '5'">
               <!--日期-->
               <el-date-picker value-format="yyyy-MM-dd" style="width:100%" v-model="formData[item.COLUMN_NAME]" type="date" placeholder="选择日期">
               </el-date-picker>
             </template>
-            <template v-else>
-              <el-input width="320" v-model="formData[(item.COLUMN_NAME)]"></el-input>
+            <template  style="width:100%" v-else-if="item.PROPERTY_TYPE == '13'">
+              <!--附件上传-->
+              <el-upload class="upload-demo" :data="queryData" :on-preview="onPreview" show-file-list :auto-upload="false" ref="upload" action="/api/util/uploadFile" :file-list="dropDownListData[item.COLUMN_NAME]">
+                <el-button slot="trigger" size="small" type="primary">选取文件</el-button>
+              </el-upload>
             </template>
-          </el-col>
+            <template  style="width:100%" v-else>
+              <el-input prefix-icon="1el-icon-search" width="width:100%" v-model="formData[(item.COLUMN_NAME)]"></el-input>
+            </template>
+          <!-- </el-col> -->
+          </el-form-item>
         </el-col>
+        </el-row>
       </el-form>
       <el-col :span='24' :offset="9" class="footer">
         <el-button type="primary" @click="onSave">保存</el-button>
@@ -51,7 +61,9 @@ export default {
       columnData: [],
       formData: this.dialogState.formData,
       dropDownListData: {},
-      primaryKey: {}
+      primaryKey: {},
+      queryData: {},
+      isUpload: false
     }
   },
   computed: {
@@ -65,9 +77,9 @@ export default {
       return this.dialogState.id
     },
     width() {
-      if(this.columnData.length > 3) {
-        return '70%'
-      }else {
+      if (this.columnData.length > 3) {
+        return '60%'
+      } else {
         return '35%'
       }
     }
@@ -88,7 +100,11 @@ export default {
         this.$ajax.post(this.$api.editTableData, params).then(res => {
           if (res && res.data && res.data == 1) {
             this.$message.editSuccess()
-            this.$emit('saveAfter', params.form)
+            if (this.$refs['upload']) {
+              this.queryData.query = this.primaryKey['value']
+              this.$refs.upload[0].submit()
+            }
+            // this.$emit('saveAfter', params.form)
             this.dialogState.show = false
           } else {
             this.$message.editError(res.errmsg)
@@ -99,6 +115,10 @@ export default {
         this.$ajax.post(this.$api.addTableData, params).then(res => {
           if (res && res.errno == 0) {
             this.$message.addSuccess()
+            if (this.$refs['upload']) {
+              this.queryData.query = res.data['id']
+              this.$refs.upload[0].submit()
+            }
             this.$emit('saveAfter', res.data)
             this.dialogState.show = false
           } else {
@@ -106,6 +126,10 @@ export default {
           }
         })
       }
+    },
+    //点击已上传的附件使其直接下载
+    onPreview(file) {
+      window.open(file.url)
     },
     onCancel() {
       this.dialogState.show = false
@@ -133,6 +157,8 @@ export default {
         })
         .then(res => {
           this.formData = res.data
+          this.queryData.query = this.primaryKey['value']
+          this.getForeingKeyData()
         })
     },
     // 获取数据字典数据
@@ -144,6 +170,14 @@ export default {
         .then(res => {
           this.$set(this.dropDownListData, attr, res.data)
         })
+    },
+    // 根据tableId,column_name 获取配置返回外键表数据
+    getForeingKeyData(tableId, column_name) {
+      this.$ajax
+        .get(this.$api.getForeingKeyListData, this.queryData)
+        .then(res => {
+          this.$set(this.dropDownListData, column_name, res.data)
+        })
     }
   },
   watch: {
@@ -154,8 +188,18 @@ export default {
           const vm = this
           this.getConfig().then(() => {
             this.columnData.forEach(item => {
+              // 如果是字典字段需要翻译
               if (item.PROPERTY_TYPE == '2' || item.PROPERTY_TYPE == '4') {
                 vm.getSjzdData(item.COLUMN_NAME, item.TYPESQL)
+              }
+              // 如果是外表关联字段，则需要查询外表数据
+              if (item.PROPERTY_TYPE == '13') {
+                vm.isUpload = true
+                vm.queryData = {
+                  tableId: this.tableId,
+                  column_name: item.COLUMN_NAME,
+                  type: item.COLUMN_NAME
+                }
               }
               if (item.PROPERTY_TYPE == '10') {
                 this.primaryKey.name = item.COLUMN_NAME
@@ -165,9 +209,11 @@ export default {
           if (this.optionType == 'edit') {
             this.getFormData()
           } else {
-            this.$nextTick(()=>{
+            this.$nextTick(() => {
+
               this.$refs.form.resetFields()
               this.formData = {}
+              console.log(this.formData)
             })
           }
         }
@@ -194,10 +240,8 @@ export default {
     visibility: hidden;
   }
   .item {
-    width: 45%;
-    margin-top: 15px;
+    // width: 45%;
     display: flex;
-    justify-content: center;
     align-items: center;
     .title {
       text-align: right;

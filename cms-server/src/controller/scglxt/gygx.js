@@ -93,9 +93,13 @@ module.exports = class extends Base {
     // 获取设备列表
     async getSbListAction() {
         let token = this.header('token')
-        let BzId = await this.model('cms_user').where({token: token}).getField('roles', true);
-        
-        let data = await this.model('scglxt_t_sb').where({BZID: BzId}).select()
+        let BzId = await this.model('cms_user').where({
+            token: token
+        }).getField('roles', true);
+
+        let data = await this.model('scglxt_t_sb').where({
+            BZID: BzId
+        }).select()
         return this.success(data)
     }
 
@@ -111,7 +115,9 @@ module.exports = class extends Base {
         let upData = await this.model('scglxt_t_gygc').where({
             id: gyid
         }).update({
-            czryid: worker
+            czryid: worker,
+            status: 1,
+            kssj: util.getNowTime()
         })
         if (gyData.serial == 0) {
             let updateData = await this.model('scglxt_t_bom').where({
@@ -137,14 +143,15 @@ module.exports = class extends Base {
     // 1.更新工序已加工件数，更新使用设备，2.更新操作记录表 3.更新送检件数
     async overWorkAction() {
         let {
-            worker,
             gyid,
             sbid,
             jgjs,
             ddjs,
-            kjgjs
+            kjgjs,
+            worker
         } = this.post()
 
+        // let worker = this.header('token')
         let jgjlData = {
             jgjssj: util.getNowTime(),
             jgjs: jgjs,
@@ -159,6 +166,8 @@ module.exports = class extends Base {
         //         jgjssj: 'is null'
         //     }).update(jgjlData)
         // }else{
+
+
         let updateData = await this.model('scglxt_t_jggl').where({
             gygcid: gyid,
             jgryid: worker,
@@ -168,14 +177,38 @@ module.exports = class extends Base {
         let bomData = await this.model('scglxt_t_gygc').where({
             id: gyid
         }).update({
-            sjjs: jgjs,
-            czryid: null
+            sjjs: jgjs
         })
+
+
+        let gygcData = await this.model('scglxt_t_gygc').where({
+            id: gyid
+        }).find()
+        if (gygcData.kjgjs != (gygcData.yjgjs + gygcData.sjjs)) // 如果加工未完成自动再开始一条加工记录 
+        {
+            let jgjlData = {
+                id: util.getUUId(),
+                jgryid: worker,
+                jgkssj: util.getNowTime(),
+                gygcid: gyid
+            }
+
+            await this.model('scglxt_t_jggl').add(jgjlData)
+            
+        }
+         else {
+            await this.model('scglxt_t_gygc').where({
+                id: gyid
+            }).update({
+                status: 2,
+                jssj:util.getNowTime()
+            })
+        }
         // }
-        bomData.data = "操作成功！"
+        // bomData.data = "操作成功！"
 
 
-        return this.success(bomData)
+        return this.success(bomData, "操作成功")
     }
 
     //获取检验人员检验列表数据
@@ -269,7 +302,7 @@ module.exports = class extends Base {
         }).update(updateJggl)
 
         let updateSql = `
-        update scglxt_t_gygc a set yjgjs =  yjgjs+(select c.jgjs from scglxt_t_jggl c where c.id = '` + id + `') ,bfjs=0,sjjs=0 where id = '` + gygcid + `'`
+        update scglxt_t_gygc a set sfjy=1,yjgjs =  yjgjs+(select c.jgjs from scglxt_t_jggl c where c.id = '` + id + `') ,bfjs=0,sjjs=0 where id = '` + gygcid + `'`
 
         //更新工艺的已加工件数
         let data = await this.model().execute(updateSql)

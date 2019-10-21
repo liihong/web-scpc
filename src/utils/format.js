@@ -39,7 +39,8 @@ format.menuRouterData = function (menuData) {
                     path: childArr[0].resKey,
                     meta: {
                         title: childArr[0].resName,
-                        icon: childArr[0].icon
+                        icon: childArr[0].icon,
+                        keepAlive: true
                     },
                     hidden: true,
                     name: childArr[0].resKey,
@@ -55,7 +56,8 @@ format.menuRouterData = function (menuData) {
                     path: '/' + child.resKey,
                     meta: {
                         title: child.resName,
-                        icon: child.icon
+                        icon: child.icon,
+                        keepAlive: true
                     },
                     name: child.resKey,
                     component: () =>

@@ -14,7 +14,9 @@ $--color-primary: #42b983;
 .el-upload__input {
   display: none;
 }
-
+.el-form .el-select{
+  width: 100%;
+}
 // 修改table样式
 .el-table .table_th{
   text-align: center;

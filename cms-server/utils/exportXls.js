@@ -58,11 +58,11 @@ _exports.exportXls = function (data, list, res) {
 
 
     res.setHeader('Content-Type', 'application/vnd.openxmlformats;charset=utf-8');
-    res.setHeader("Content-Disposition", "filename="+data.xmname+".xlsx");
+    res.setHeader("Content-Disposition", "filename=" + data.xmname + ".xlsx");
     res.end(result, 'buffer');
 };
 
-_exports.exportBOMXls = function (data, list, res) {
+_exports.exportBOMXls = function (data, list, tjInfo, res) {
     let models = new Buffer(255);
     // 打开文件
     let PUBLIC_PATH = path.resolve(__dirname, 'bomModel.xlsx');
@@ -71,6 +71,7 @@ _exports.exportBOMXls = function (data, list, res) {
         cellStyles: true
     })
     const wsname = workbook2.SheetNames[0] //取第一张表
+    const wsgy = workbook2.SheetNames[1] //取第一张表
     const header = workbook2.Sheets[wsname] //生成json表格内容
 
     header.A1.v = header.A1.v + data.xmname
@@ -101,11 +102,29 @@ _exports.exportBOMXls = function (data, list, res) {
         }
     }
     var keyMap = ["rownum", "zddmc", "clmc", "cldx", "jgsl", "gxnr", "bmcl", "bz", "endtime"];
-
     var dataList = xlsxUtils.format2Sheet(list, 0, 7, keyMap); //偏移8行按keyMap顺序转换
+
     var dataKeys = Object.keys(dataList);
+
+    var d2 = xlsxUtils.format2Sheet([tjInfo], 0, list.length + 7, ["info","zgs"]);
+    // d2["!merges"] = [{
+    //     s: { //s为开始
+    //         c: 1, //开始列
+    //         r: 0 //可以看成开始行,实际是取值范围
+    //     },
+    //     e: { //e结束
+    //         c: 6, //结束列
+    //         r: 0 //结束行
+    //     }
+    // }];
+    
+    dataList = Object.assign(dataList, d2);
+
     for (var k in header) dataList[k] = header[k]; //追加列头
-    var wb = xlsxUtils.format2WB(dataList, data.xmname, undefined, "A1:" + dataKeys[dataKeys.length - 1]);
+    
+    console.log(d2)
+
+    var wb = xlsxUtils.format2WB(d2, data.xmname, undefined, "A1:" + dataKeys[dataKeys.length - 1]);
 
     // 浏览器端和node共有的API,实际上node可以直接使用xlsx.writeFile来写入文件,但是浏览器没有该API
     const result = XLSX.write(wb, {
@@ -116,6 +135,6 @@ _exports.exportBOMXls = function (data, list, res) {
 
 
     res.setHeader('Content-Type', 'application/vnd.openxmlformats;charset=utf-8');
-    res.setHeader("Content-Disposition", "filename="+data.xmname+".xlsx");
+    res.setHeader("Content-Disposition", "filename=" + data.xmname + ".xlsx");
     res.end(result, 'buffer');
 };

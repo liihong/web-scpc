@@ -37,8 +37,8 @@
 </template>
 
 <script>
-import { isvalidUsername } from '@/utils/validate'
-
+// import { isvalidUsername } from '@/utils/validate'
+import md5 from 'js-md5';
 export default {
   name: 'Login',
   data() {
@@ -90,7 +90,10 @@ export default {
       this.$refs.loginForm.validate(valid => {
         if (valid) {
           this.loading = true
-          this.$store.dispatch('Login', this.loginForm).then(() => {
+          this.$store.dispatch('Login', {
+            username: this.loginForm.username,
+            password: md5(this.loginForm.password)
+          }).then(() => {
             this.loading = false
             this.$router.push({ path: '/' })
           }).catch(() => {

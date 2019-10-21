@@ -137,11 +137,11 @@ module.exports = class extends Base {
             gyList.map(item => {
                 item.id = util.getUUId()
                 item.bomid = form.id
-                item.kjgjs=0
-                item.yjgjs=0
-                item.sjjs=0
-                item.bfjs=0
-                item.ssdd=form.ssdd
+                item.kjgjs = 0
+                item.yjgjs = 0
+                item.sjjs = 0
+                item.bfjs = 0
+                item.ssdd = form.ssdd
                 return item
             })
 
@@ -193,22 +193,22 @@ module.exports = class extends Base {
             clzt: clzt,
             bljssj: util.getNowTime(),
             cgsj: cgyj,
-            cgry: cgry ==undefined ? '' : cgry
+            cgry: cgry == undefined ? '' : cgry
         })
         let updateSql = ''
-        if(cgyj != undefined && cgyj != null && cgyj != '' ) {
+        if (cgyj != undefined && cgyj != null && cgyj != '') {
             return this.success(data)
-        } else{
-            updateSql = `UPDATE scglxt_t_gygc gygc SET kjgjs= (SELECT bom.jgsl FROM  scglxt_t_bom bom  WHERE  bom.id = gygc.bomid)
+        } else {
+            updateSql = `UPDATE scglxt_t_gygc gygc SET status=0,kjgjs= (SELECT bom.jgsl FROM  scglxt_t_bom bom  WHERE  bom.id = gygc.bomid)
             WHERE gygc.bomid = '` + id + `' AND gygc.serial = '0'`
         }
-        
+
 
         //如果是同时更新多条
         if (id.indexOf(',') != '-1') {
             let arrs = id.split(',')
             arrs.map(async item => {
-                updateSql = `UPDATE scglxt_t_gygc gygc SET kjgjs= (SELECT bom.jgsl FROM  scglxt_t_bom bom  WHERE  bom.id = gygc.bomid)
+                updateSql = `UPDATE scglxt_t_gygc gygc SET status=0,kjgjs= (SELECT bom.jgsl FROM  scglxt_t_bom bom  WHERE  bom.id = gygc.bomid)
         WHERE gygc.bomid = '` + item + `' AND gygc.serial = '0'`
                 await this.model().execute(updateSql)
             })
@@ -248,7 +248,7 @@ module.exports = class extends Base {
         let id = this.post('id')
 
         let data = await this.model(bomModel).where({
-            id: ['in',id]
+            id: ['in', id]
         }).update({
             zddzt: '0504'
         })
@@ -261,7 +261,7 @@ module.exports = class extends Base {
         let id = this.post('id')
 
         let data = await this.model(bomModel).where({
-            id: ['in',id]
+            id: ['in', id]
         }).update({
             zddzt: '0505',
             rksj: util.getNowTime()
@@ -269,31 +269,59 @@ module.exports = class extends Base {
 
         return this.success(data)
     }
-
+    getOutData(updateList, ssdd) {
+        const vm = this
+        return new Promise(async resolve => {
+            let wjData = await this.model(bomModel).where({
+                ssdd: ssdd,
+                zddzt: ['!=', '0506']
+            }).select()
+            if (wjData.length === 0) {
+                updateList.push(ssdd)
+            }
+            resolve()
+        })
+    }
     //BOM单出库
     async BOMOutStoreAction() {
         let id = this.post('id')
-
+        const _this = this
         let data = await this.model(bomModel).where({
-            id: ['in',id]
+            id: ['in', id]
         }).update({
             zddzt: '0506',
             cksj: util.getNowTime()
         })
 
         let bomData = await this.model(bomModel).where({
-            id: ['in',id]
+            id: ['in', id]
         }).select()
 
-
-        let allBom = await this.model(bomModel).where({
-            ssdd: bomData.ssdd,
-            zddzt: ['!=', '0506']
-        }).select()
-        //如果该订单下所有BOM都完成了就更新订单状态为完成
-        if (allBom.length == 0) {
-            let sql = `update scglxt_t_dd set ckzt='完成',ckdate=DATE_FORMAT(NOW(), '%Y-%m-%d %H:%i:%s') where id=(select ssdd from scglxt_t_bom where id='` + id + `')`
-            let ddData = await this.model().execute(sql)
+        let pArr = []
+        //如果是批量操作
+        if (bomData.length > 1) {
+            let updateList = []
+            bomData.map(async item => {
+                pArr.push(_this.getOutData(updateList,item.ssdd))
+            })
+            if (pArr.length > 0) {
+                await Promise.all(pArr).then(async () => {
+                    if(updateList.length > 0){
+                        let sql = `update scglxt_t_dd set ckzt='完成',ckdate=DATE_FORMAT(NOW(), '%Y-%m-%d %H:%i:%s') where id=(select ssdd from scglxt_t_bom where id in (` + updateList.join(',') + `))`
+                        let ddData = await this.model().execute(sql)
+                    }
+                })
+            }
+        } else {
+            let allBom = await this.model(bomModel).where({
+                ssdd: bomData[0].ssdd,
+                zddzt: ['!=', '0506']
+            }).select()
+            //如果该订单下所有BOM都完成了就更新订单状态为完成
+            if (allBom.length == 0) {
+                let sql = `update scglxt_t_dd set ckzt='完成',ckdate=DATE_FORMAT(NOW(), '%Y-%m-%d %H:%i:%s') where id=(select ssdd from scglxt_t_bom where id='` + id + `')`
+                let ddData = await this.model().execute(sql)
+            }
         }
 
         return this.success(data)

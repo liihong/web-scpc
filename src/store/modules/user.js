@@ -42,6 +42,7 @@ const user = {
         login(username, userInfo.password).then(response => {
           const data = response.data
           setToken(data.token)
+          sessionStorage.setItem('user',JSON.stringify(data))
           commit('SET_TOKEN', data.token)
           resolve()
         }).catch(error => {

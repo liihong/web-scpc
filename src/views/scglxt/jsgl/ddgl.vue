@@ -32,7 +32,7 @@
 </template>
 
 <script>
-import { EXPORT_DDBOM, EXPORT_DDBL } from '@/api/scglxt/oldAPI.js'
+import { EXPORT_DDBL, EXPORT_DDBOM } from '@/api/scglxt/oldAPI.js'
 import uploadTZ from './components/uploadTz'
 import editDD from './components/editDD'
 

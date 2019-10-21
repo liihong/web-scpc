@@ -1,11 +1,11 @@
 <template>
   <div>
     <ResList tableId='0101' ref="htgl" @saveAfter="addDd" :query="this.$route.query" noEdit>
-      <el-table-column slot="operate" fixed="left" label="操作" min-width="320" align="center">
+      <el-table-column slot="operate" fixed="left" label="操作" min-width="250" align="center">
         <template slot-scope="scope">
           <el-button-group size="mini">
-            <el-button size="mini" @click="bjdClickLook(scope.row)" type="primary">查看报价单</el-button>
-            <el-button size="mini" @click="bjdClick(scope.row)" type="primary">上传报价单</el-button>
+            <el-button size="mini" @click="bjdClickLook(scope.row)" type="primary">报价单</el-button>
+            <el-button size="mini" @click="bjdClick(scope.row)" type="primary">上传</el-button>
             <el-button size="mini" @click="$refs.htgl.handleEdit(scope.row)" type="primary">编辑</el-button>
             <el-button size="mini" @click="handleDelete(scope.row)" type="danger">删除</el-button>
           </el-button-group>

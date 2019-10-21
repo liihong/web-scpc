@@ -1,5 +1,10 @@
 module.exports = class extends think.Controller {
   __before() {
+    // if(this.ctx.originalUrl != '/user/login') {
+    //   if(this.header('token') == "" || this.header('token') == undefined) {
+    //     return this.fail(2000, '登录失效，请重新登录', '')
+    //   }
+    // }
   }
   _call(){
     let method = this.http.method.toLowerCase();

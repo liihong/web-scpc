@@ -113,7 +113,7 @@ var xlsxUtils = {
             t: types ? types(v.v) : "s",
             s: {
                 alignment: {
-                    horizontal: "center",
+                    horizontal: "left",
                     vertical: "center"
                 },
                 border: {
