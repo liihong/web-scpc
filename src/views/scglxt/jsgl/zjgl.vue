@@ -16,7 +16,7 @@
       
       </el-form>
     </el-col>
-    <el-table class="el-table" @expand-change="expandChange" :data="ddList" stripe border style="width: 100%;">
+    <el-table class="el-table" @expand-change="expandChange" :data="ddList" stripe border  header-cell-class-name="table_th" style="width: 100%;">
        <el-table-column fixed="left" type="index" width="30" align="center">
         <template slot-scope="scope">
           <span>{{scope.$index+(queryParams.pageNumber - 1) * queryParams.pageSize + 1}} </span>
@@ -33,7 +33,9 @@
       </el-table-column>
       <el-table-column type="expand">
         <template slot-scope="props">
-          <el-table ref="bomTable" :data="props.row.bomList">
+          <el-table ref="bomTable" :data="props.row.bomList"  header-cell-class-name="table_th">
+            <el-table-column fixed="left" type="index" width="30" align="center">
+            </el-table-column>
             <el-table-column fixed="left" label="操作" min-width="110" align="center">
               <template slot-scope="scope">
                 <el-button-group size="mini">
@@ -128,6 +130,9 @@ export default {
   },
   methods: {
     async initData() {
+      if(this.queryParams.queryKey != ''){
+        this.queryParams.pageNumber = 1
+      }
       let res = await this.$ajax.get(this.$api.getZJTreeList, this.queryParams)
       if (res.errno == 0) {
         this.ddList = res.data.data

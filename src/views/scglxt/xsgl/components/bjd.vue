@@ -1,24 +1,24 @@
 <template>
-    <el-dialog title="合同报价单" :visible.sync="dialogState.show" width="50%">
-        <el-row>
-            <el-col>
-                <div style="color:#42b983">当前客户：{{dialogState.row.KHID_TEXT}} </div>
-                <div style="color:#42b983">当前合同：{{dialogState.row.HTBH}} </div>
-            </el-col>
-            <el-col class="upload">
-                <el-upload class="upload-demo" :auto-upload="false" ref="upload" action="/api/util/upload" :on-remove="handleRemove" :on-change="onUpload" :file-list="fileList">
-                    <el-button slot="trigger" size="small" type="primary">选取文件</el-button>
-                    <el-button v-if="step == 1" style="margin-left: 10px;" size="small" type="success" @click="nextStep">下一步</el-button>
-                    <el-button v-if="step == 2" style="margin-left: 10px;" size="small" type="success" @click="submitUpload">确认信息上传到服务器并入库</el-button>
-                    <div slot="tip" class="el-upload__tip">可以上传xls/xlsx</div>
-                </el-upload>
-            </el-col>
-            <el-col v-if="step ==2">
-                <DataTable :nohandle=false :columnDatas="columns" :tableDatas="dataList"/>
-            </el-col>
-        </el-row>
+  <el-dialog title="合同报价单" :visible.sync="dialogState.show" width="50%">
+    <el-row>
+      <el-col>
+        <div style="color:#42b983">当前客户：{{dialogState.row.KHID_TEXT}} </div>
+        <div style="color:#42b983">当前合同：{{dialogState.row.HTBH}} </div>
+      </el-col>
+      <el-col class="upload">
+        <el-upload class="upload-demo" :auto-upload="false" ref="upload" action="/api/util/upload" :on-remove="handleRemove" :on-change="onUpload" :file-list="fileList">
+          <el-button slot="trigger" size="small" type="primary">选取文件</el-button>
+          <el-button v-if="step == 1" style="margin-left: 10px;" size="small" type="success" @click="nextStep">下一步</el-button>
+          <el-button v-if="step == 2" style="margin-left: 10px;" size="small" type="success" @click="submitUpload">确认信息上传到服务器并入库</el-button>
+          <div slot="tip" class="el-upload__tip">可以上传xls/xlsx</div>
+        </el-upload>
+      </el-col>
+      <el-col v-if="step ==2">
+        <DataTable :nohandle=false :columnDatas="columns" :tableDatas="dataList" />
+      </el-col>
+    </el-row>
 
-    </el-dialog>
+  </el-dialog>
 </template>
 
 <script>
@@ -26,7 +26,7 @@ import XLSX from 'xlsx'
 import DataTable from '@/components/Table/dataTable'
 export default {
   components: {
-      DataTable
+    DataTable
   },
   props: ['dialogState'],
   data() {
@@ -37,15 +37,15 @@ export default {
         {
           name: '序号',
           id: 'xh',
-          length:40
+          length: 40
         },
         {
           name: '零件名称',
-          id: 'ljmc',
+          id: 'ljmc'
         },
         {
           name: '图纸号',
-          id: 'th',
+          id: 'th'
         },
         {
           name: '材质',
@@ -54,7 +54,7 @@ export default {
         {
           name: '单位',
           id: 'dw',
-          length:50
+          length: 50
         },
         {
           name: '单价',
@@ -67,19 +67,18 @@ export default {
         {
           name: '数量',
           id: 'sl',
-          length:50
+          length: 50
         },
         {
           name: '税金',
           id: 'sj',
-          length:50
+          length: 50
         }
       ],
       step: 1
     }
   },
-  mounted() {
-  },
+  mounted() {},
   methods: {
     nextStep() {
       this.step = 2
@@ -124,14 +123,14 @@ export default {
 
           if (ws.length > 0) {
             let temp = []
-            ws.map(item=>{
-                let obj = {}
-                this.columns.map(el=>{
-                    obj[el.id] = item[el.name]
-                })
-                obj.ssht = this.dialogState.row.ID
-                obj.id = this.$util.getUUId()
-                temp.push(obj)
+            ws.map(item => {
+              let obj = {}
+              this.columns.map(el => {
+                obj[el.id] = item[el.name] == undefined ? '' : item[el.name]
+              })
+              obj.ssht = this.dialogState.row.ID
+              obj.id = this.$util.getUUId()
+              temp.push(obj)
             })
             this.dataList = temp
           }
@@ -143,9 +142,12 @@ export default {
     }
   },
   watch: {
-    dialogState() {
-      this.fileList = []
-      this.dataList = []
+    'dialogState.show'() {
+      if (this.dialogState.show) {
+        this.fileList = []
+        this.dataList = []
+        this.step = 1
+      }
     }
   }
 }

@@ -157,16 +157,6 @@ module.exports = class extends Base {
             jgjs: jgjs,
             sbid: sbid
         }
-        // let jgglDatas = await this.model('scglxt_t_jggl').where({gygcid: gyid}).select()
-        //如果当前系统中已经有了一条加工记录，则更新该加工记录并新增一条加工记录
-        // if(jgglDatas.length>1){
-        //     let updateData = await this.model('scglxt_t_jggl').where({
-        //         gygcid: gyid,
-        //         jgryid: worker,
-        //         jgjssj: 'is null'
-        //     }).update(jgjlData)
-        // }else{
-
 
         let updateData = await this.model('scglxt_t_jggl').where({
             gygcid: gyid,
@@ -179,7 +169,6 @@ module.exports = class extends Base {
         }).update({
             sjjs: jgjs
         })
-
 
         let gygcData = await this.model('scglxt_t_gygc').where({
             id: gyid
@@ -204,8 +193,6 @@ module.exports = class extends Base {
                 jssj:util.getNowTime()
             })
         }
-        // }
-        // bomData.data = "操作成功！"
 
 
         return this.success(bomData, "操作成功")

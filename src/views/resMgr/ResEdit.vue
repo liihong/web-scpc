@@ -1,48 +1,48 @@
 <template>
   <div class="resEdit">
     <el-dialog append-to-body :modal=false :width="width" size="small" :title="optionType == 'add' ? '新增' : '编辑'" :visible.sync="dialogState.show" :close-on-click-modal="false">
-      <el-form class="form" :inline="true" ref="form" :model="formData" label-width="120px"  label-position="right" size="small">
+      <el-form class="form" :inline="true" ref="form" :model="formData" label-width="120px" label-position="right" size="small">
         <el-row>
-        <el-col :span="12" v-show="item.PROPERTY_TYPE !== '10'" v-for="(item,i) in columnData" :key="i" class="item">
-          <el-form-item :label="item.COLUMN_CNAME" style="width:100%">
-          <!-- <el-col :span="8" class="title">
+          <el-col :span="12" v-show="item.PROPERTY_TYPE !== '10'" v-for="(item,i) in columnData" :key="i" class="item">
+            <el-form-item :label="item.COLUMN_CNAME" style="width:100%">
+              <!-- <el-col :span="8" class="title">
             <span>{{item.COLUMN_CNAME}}</span>
           </el-col>
           <el-col :span="16"> -->
-            <!--主键-->
-            <template v-if="item.PROPERTY_TYPE == '10'">
-              <span v-show="false">{{formData[item.COLUMN_NAME]}}</span>
-            </template>
-            <template style="width:100%" v-else-if="item.PROPERTY_TYPE == '2'">
-              <!--下拉选择-->
-              <el-select @change="$emit('selectChange',formData)" style="width:100%" clearable filterable v-model="formData[item.COLUMN_NAME]">
-                <el-option v-for="(item,key) in dropDownListData[item.COLUMN_NAME]" :key="key" :label="item.NAME" :value="item.id"></el-option>
-              </el-select>
-            </template>
-            <template  style="width:100%" v-else-if="item.PROPERTY_TYPE == '4'">
-              <!--数据字典-->
-              <el-select @change="$emit('selectChange',formData)" style="width:100%" v-model="formData[item.COLUMN_NAME.toLowerCase()]">
-                <el-option v-for="(item,key) in dropDownListData[item.COLUMN_NAME]" :key="key" :label="item.NAME" :value="item.id"></el-option>
-              </el-select>
-            </template>
+              <!--主键-->
+              <template v-if="item.PROPERTY_TYPE == '10'">
+                <span v-show="false">{{formData[item.COLUMN_NAME]}}</span>
+              </template>
+              <template style="width:100%" v-else-if="item.PROPERTY_TYPE == '2'">
+                <!--下拉选择-->
+                <el-select @change="$emit('selectChange',formData)" style="width:100%" clearable filterable v-model="formData[item.COLUMN_NAME]">
+                  <el-option v-for="(item,key) in dropDownListData[item.COLUMN_NAME]" :key="key" :label="item.NAME" :value="item.id"></el-option>
+                </el-select>
+              </template>
+              <template style="width:100%" v-else-if="item.PROPERTY_TYPE == '4'">
+                <!--数据字典-->
+                <el-select @change="$emit('selectChange',formData)" style="width:100%" v-model="formData[item.COLUMN_NAME.toLowerCase()]">
+                  <el-option v-for="(item,key) in dropDownListData[item.COLUMN_NAME]" :key="key" :label="item.NAME" :value="item.id"></el-option>
+                </el-select>
+              </template>
 
-            <template  style="width:100%" v-else-if="item.PROPERTY_TYPE == '5'">
-              <!--日期-->
-              <el-date-picker value-format="yyyy-MM-dd" style="width:100%" v-model="formData[item.COLUMN_NAME]" type="date" placeholder="选择日期">
-              </el-date-picker>
-            </template>
-            <template  style="width:100%" v-else-if="item.PROPERTY_TYPE == '13'">
-              <!--附件上传-->
-              <el-upload class="upload-demo" :data="queryData" :on-preview="onPreview" show-file-list :auto-upload="false" ref="upload" action="/api/util/uploadFile" :file-list="dropDownListData[item.COLUMN_NAME]">
-                <el-button slot="trigger" size="small" type="primary">选取文件</el-button>
-              </el-upload>
-            </template>
-            <template  style="width:100%" v-else>
-              <el-input prefix-icon="1el-icon-search" width="width:100%" v-model="formData[(item.COLUMN_NAME)]"></el-input>
-            </template>
-          <!-- </el-col> -->
-          </el-form-item>
-        </el-col>
+              <template style="width:100%" v-else-if="item.PROPERTY_TYPE == '5'">
+                <!--日期-->
+                <el-date-picker value-format="yyyy-MM-dd" style="width:100%" v-model="formData[item.COLUMN_NAME]" type="date" placeholder="选择日期">
+                </el-date-picker>
+              </template>
+              <template style="width:100%" v-else-if="item.PROPERTY_TYPE == '13'">
+                <!--附件上传-->
+                <el-upload class="upload-demo" :data="queryData" :on-preview="onPreview" :on-remove="onFileRemove" show-file-list :auto-upload="false" ref="upload" action="/api/util/uploadFile" :file-list="dropDownListData[item.COLUMN_NAME]">
+                  <el-button slot="trigger" size="small" type="primary">选取文件</el-button>
+                </el-upload>
+              </template>
+              <template style="width:100%" v-else>
+                <el-input prefix-icon="1el-icon-search" width="width:100%" v-model="formData[(item.COLUMN_NAME)]"></el-input>
+              </template>
+              <!-- </el-col> -->
+            </el-form-item>
+          </el-col>
         </el-row>
       </el-form>
       <el-col :span='24' :offset="9" class="footer">
@@ -131,6 +131,15 @@ export default {
     onPreview(file) {
       window.open(file.url)
     },
+    // 删除文件
+    onFileRemove(file) {
+      this.queryData.id = file.id
+      this.$ajax
+        .post(this.$api.DeleteForeingDataById, this.queryData)
+        .then(res => {
+          this.$message.success('删除文件成功')
+        })
+    },
     onCancel() {
       this.dialogState.show = false
     },
@@ -158,7 +167,7 @@ export default {
         .then(res => {
           this.formData = res.data
           this.queryData.query = this.primaryKey['value']
-          this.getForeingKeyData()
+          this.getForeingKeyData(this.tableId, this.queryData.column_name)
         })
     },
     // 获取数据字典数据
@@ -210,7 +219,6 @@ export default {
             this.getFormData()
           } else {
             this.$nextTick(() => {
-
               this.$refs.form.resetFields()
               this.formData = {}
               console.log(this.formData)

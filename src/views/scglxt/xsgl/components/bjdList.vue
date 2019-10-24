@@ -79,7 +79,10 @@ export default {
     //   deep: true,
     //   handler() {
     //     if(this.dialogState.show){
+    //       this.$refs.bjdList.getConfig()
     //       this.$refs.bjdList.getResList()
+    //     }else{
+    //       this.$parent.destory()
     //     }
     //   }
     // }

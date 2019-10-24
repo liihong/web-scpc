@@ -3,16 +3,16 @@
     <!--工具条-->
     <el-col :span="24" class="toolbar">
       <el-form :inline="true">
-          <el-form-item v-show="!noAdd">
-            <el-button size="mini" @click="handleAdd" type="primary" icon="el-icon-circle-plus">新增</el-button>
-          </el-form-item>
-          <el-form-item v-show="!noAdd">
-            <el-button size="mini" @click="handleExport" type="primary" icon="el-icon-download">导出</el-button>
-          </el-form-item>
-          <slot name="toolBar"></slot>
-          <el-form-item>
-            <el-input size="small" v-model="queryParams.queryKey" placeholder="模糊查询"></el-input>
-          </el-form-item>
+        <el-form-item v-show="!noAdd">
+          <el-button size="mini" @click="handleAdd" type="primary" icon="el-icon-circle-plus">新增</el-button>
+        </el-form-item>
+        <el-form-item v-show="!noAdd">
+          <el-button size="mini" @click="handleExport" type="primary" icon="el-icon-download">导出</el-button>
+        </el-form-item>
+        <slot name="toolBar"></slot>
+        <el-form-item>
+          <el-input size="small" v-model="queryParams.queryKey" placeholder="模糊查询"></el-input>
+        </el-form-item>
       </el-form>
     </el-col>
 
@@ -155,10 +155,20 @@ export default {
     },
     //获取表格数据
     getResList: function() {
+      if (this.query != undefined) {
+        this.queryParams.query = this.query
+      }
       this.$ajax.get(this.$api.queryTableData, this.queryParams).then(res => {
         if (res.data) {
           // 给table赋值，重新遍历新增rowSpan属性，checkRoom，appointmentTime为table里面需要合并的属性名称
-          this.resDatas = this.mergeTableRow(res.data.data, ['SSDD_TEXT', 'SSDD','BOMID','BOMID_TEXT','ssdd','ssdd_TEXT'])
+          this.resDatas = this.mergeTableRow(res.data.data, [
+            'SSDD_TEXT',
+            'SSDD',
+            'BOMID',
+            'BOMID_TEXT',
+            'ssdd',
+            'ssdd_TEXT'
+          ])
           this.total = parseInt(res.data.count)
           this.listLoading = false
         }
@@ -300,7 +310,7 @@ export default {
       }
       this.getResList()
     },
-    objectSpanMethod({ row, column}) {
+    objectSpanMethod({ row, column }) {
       const span = column['property'] + '-span'
       if (row[span]) {
         return row[span]
@@ -335,20 +345,14 @@ export default {
     }
   },
   create() {
-    if (this.query != undefined) {
-      this.queryParams.query = this.query
-    }
     this.getConfig()
     this.getResList()
   },
-  activated(){
-    if (this.query != undefined) {
-      this.queryParams.query = this.query
-    }
+  activated() {
     this.getConfig()
-     this.getResList()
+    this.getResList()
   },
-  beforeRouteLeave(){
+  beforeRouteLeave() {
     this.$destory()
   },
   watch: {
@@ -373,15 +377,12 @@ export default {
         }
       }
     },
-    query: {
-      deep: true,
-      handler() {
+    'query.SSHT'(){
         if (this.query != undefined) {
           this.queryParams.query = this.query
         }
+        this.getConfig()
         this.getResList()
-        console.log('333')
-      }
     }
   }
 }

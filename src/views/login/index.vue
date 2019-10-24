@@ -6,22 +6,24 @@
         <span class="svg-container">
           <svg-icon icon-class="user" />
         </span>
-        <el-input v-model="loginForm.username" name="username" type="text" auto-complete="on" placeholder="username" />
+        <el-input v-model="loginForm.username" name="username" type="text" auto-complete="on" placeholder="用户名" />
       </el-form-item>
       <el-form-item prop="password">
         <span class="svg-container">
           <svg-icon icon-class="password" />
         </span>
-        <el-input
-          :type="pwdType"
-          v-model="loginForm.password"
-          name="password"
-          auto-complete="on"
-          placeholder="password"
-          @keyup.enter.native="handleLogin" />
+        <el-input :type="pwdType" v-model="loginForm.password" name="password" auto-complete="on" placeholder="密码" @keyup.enter.native="handleLogin" />
         <span class="show-pwd" @click="showPwd">
           <svg-icon icon-class="eye" />
         </span>
+      </el-form-item>
+      <el-form-item>
+        <el-col :span="18">
+          <el-input type="text" v-model="loginForm.verify" placeholder="请输入验证码" style="width:100%" />
+        </el-col>
+        <el-col :span="6" @click="changeCode">
+          <Verify :contentHeight="32" :identifyCode="verify" />
+        </el-col>
       </el-form-item>
       <el-form-item>
         <el-button :loading="loading" type="primary" style="width:100%;" @click.native.prevent="handleLogin">
@@ -37,17 +39,17 @@
 </template>
 
 <script>
-// import { isvalidUsername } from '@/utils/validate'
-import md5 from 'js-md5';
+import md5 from 'js-md5'
+import Verify from '@/components/Verify/index'
+import _ from 'lodash'
 export default {
   name: 'Login',
+  components: {
+    Verify
+  },
   data() {
     const validateUsername = (rule, value, callback) => {
-      // if (!isvalidUsername(value)) {
-      //   callback(new Error('请输入正确的用户名'))
-      // } else {
-        callback()
-      // }
+      callback()
     }
     const validatePass = (rule, value, callback) => {
       if (value.length < 5) {
@@ -59,10 +61,14 @@ export default {
     return {
       loginForm: {
         username: '',
-        password: ''
+        password: '',
+        verify: ''
       },
+      verify: '',
       loginRules: {
-        username: [{ required: true, trigger: 'blur', validator: validateUsername }],
+        username: [
+          { required: true, trigger: 'blur', validator: validateUsername }
+        ],
         password: [{ required: true, trigger: 'blur', validator: validatePass }]
       },
       loading: false,
@@ -78,6 +84,9 @@ export default {
       immediate: true
     }
   },
+  created(){
+    this.makeCode()
+  },
   methods: {
     showPwd() {
       if (this.pwdType === 'password') {
@@ -89,29 +98,85 @@ export default {
     handleLogin() {
       this.$refs.loginForm.validate(valid => {
         if (valid) {
+          if (this.verify != this.loginForm.verify) {
+            this.loginForm.verify = ''
+            this.$message.error('验证码不正确')
+            this.makeCode()
+            return
+          }
           this.loading = true
-          this.$store.dispatch('Login', {
-            username: this.loginForm.username,
-            password: md5(this.loginForm.password)
-          }).then(() => {
-            this.loading = false
-            this.$router.push({ path: '/' })
-          }).catch(() => {
-            this.loading = false
-          })
+          
+          this.$store
+            .dispatch('Login', {
+              username: this.loginForm.username,
+              password: md5(this.loginForm.password)
+            })
+            .then(() => {
+              this.loading = false
+              this.$router.push({ path: '/' })
+            })
+            .catch(() => {
+              this.loading = false
+            })
         } else {
           console.log('error submit!!')
           return false
         }
       })
+    },
+    makeCode(len = 4) {
+      let strArr = [
+        'a',
+        'b',
+        'c',
+        'd',
+        'e',
+        'f',
+        'g',
+        'h',
+        'i',
+        'j',
+        'k',
+        'l',
+        'm',
+        'n',
+        'p',
+        'q',
+        'r',
+        's',
+        't',
+        'u',
+        'v',
+        'w',
+        'x',
+        'y',
+        'z',
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9
+      ]
+      let str = ''
+      for (let i = 0; i < len; i++) {
+        str += _.sample(strArr)
+      }
+      this.verify = str
+    },
+    changeCode() {
+      this.makeCode()
     }
   }
 }
 </script>
 
 <style rel="stylesheet/scss" lang="scss">
-$bg:#2d3a4b;
-$light_gray:#eee;
+$bg: #2d3a4b;
+$light_gray: #eee;
 
 /* reset element-ui css */
 .login-container {
@@ -140,13 +205,12 @@ $light_gray:#eee;
     color: #454545;
   }
 }
-
 </style>
 
 <style rel="stylesheet/scss" lang="scss" scoped>
-$bg:#2d3a4b;
-$dark_gray:#889aa4;
-$light_gray:#eee;
+$bg: #2d3a4b;
+$dark_gray: #889aa4;
+$light_gray: #eee;
 .login-container {
   position: fixed;
   height: 100%;

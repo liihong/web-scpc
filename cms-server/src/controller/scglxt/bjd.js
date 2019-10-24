@@ -12,9 +12,9 @@ module.exports = class extends Base {
     async addBjdAction(){
         try{
             let form = this.post('form')
-            form.map(item=>{
-                console.log(item.cz)
-            })
+            // form.map(item=>{
+            //     console.log(item.cz)
+            // })
             let data =  await this.model(bjdModel).addMany(form,{pk: 'ID'});
             
             return this.success(data)

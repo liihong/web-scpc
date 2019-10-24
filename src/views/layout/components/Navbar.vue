@@ -19,7 +19,7 @@
         </el-dropdown-menu>
       </el-dropdown>
     </el-menu>
-    <el-dialog title="修改密码" :visible.sync="isShow" width="30%">
+    <el-dialog title="修改密码" v-if="isShow" :visible.sync="isShow" width="30%">
       <el-form :model="form">
         <el-form-item label="原密码">
           <el-input v-model="form.oldPassword" type="password" autocomplete="off"></el-input>
@@ -43,7 +43,7 @@
 import { mapGetters } from 'vuex'
 import Breadcrumb from '@/components/Breadcrumb'
 import Hamburger from '@/components/Hamburger'
-import services from '@/api/user.js'
+import md5 from 'js-md5'
 export default {
   components: {
     Breadcrumb,
@@ -63,7 +63,18 @@ export default {
       this.$store.dispatch('ToggleSideBar')
     },
     async updatePwd() {
-      let res = await services.updatePwd()
+      if(this.form.password != this.form.newPassword){
+        this.$message({
+          message: '两次密码输入不一致',
+          type: 'error'
+        })
+        return
+      }
+      let params = new FormData()
+      params.append('password', md5(this.form.password))
+      params.append('oldPassword', md5(this.form.oldPassword))
+      params.append('newPassword', md5(this.form.newPassword))
+      let res = await this.$ajax.post('/user/updatePwd', params)
       if (res.errno == 0) {
         this.isShow = false
         this.$message({

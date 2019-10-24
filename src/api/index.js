@@ -11,8 +11,10 @@ let api = {
     //资源呈现时表头信息
     getTableColumns: '/resTableColumn/getTableColumn',
     getDropDownListData: '/resTableColumn/getDropDownListData',
+    //外键表
     getForeingKeyListData: '/resTableColumn/getForeingKeyListData',
-  
+    DeleteForeingDataById: '/resTableColumn/DeleteForeingDataById',
+    
     addTableRes: '/resTable/addTableRes',
     editTableRes: '/resTable/editTableRes',
     deleteTableRes: '/resTable/deleteTableRes',

@@ -41,11 +41,14 @@ module.exports = class extends Base {
         try {
             let gygcId = this.get('id')
             let bomId = this.get('bomId')
+            let reSql = `SELECT gygc.id,dd.xmname ddmc,ddlevel,bom.endtime,bom.zddmc ljmc,bom.ddtz ddtz,(SELECT gymc FROM scglxt_t_jggy t WHERE t.id=gygc.gynr) gymc,edgs,kjgjs,yjgjs,zysx 'gynr',sbid,sb.mc sblx FROM scglxt_t_gygc gygc,scglxt_t_dd dd,scglxt_t_bom bom,scglxt_t_sblx sb WHERE dd.id=gygc.ssdd AND bom.id=gygc.bomid AND sb.id=gygc.sbid and gygc.id='`+gygcId+`'`
+
             let sql = `SELECT gygc.id,dd.xmname ddmc,ddlevel,bom.endtime,bom.zddmc ljmc,bom.ddtz ddtz,(SELECT gymc FROM scglxt_t_jggy t WHERE t.id=gygc.gynr) gymc,edgs,kjgjs,yjgjs,zysx 'gynr',sbid,sb.mc sblx FROM scglxt_t_gygc gygc,scglxt_t_dd dd,scglxt_t_bom bom,scglxt_t_sblx sb WHERE dd.id=gygc.ssdd AND bom.id=gygc.bomid AND sb.id=gygc.sbid AND bomid='` + bomId + `' order by serial`
 
+            let reData = await this.model().query(reSql)
             let data = await this.model().query(sql)
-
-            return this.success(data)
+            reData[0].list = data
+            return this.success(reData[0])
         } catch (ex) {
             return this.fail(ex)
         }
@@ -62,5 +65,63 @@ module.exports = class extends Base {
         data.hour.month = await this.model('scglxt_t_jggl').where("jgryid ='" + userToken + "' and DATE_FORMAT( jgjssj, '%Y%m' ) = DATE_FORMAT( CURDATE( ) , '%Y%m' )").count()
 
         return this.success(data)
+    }
+
+    //结束加工
+    // 1.更新工序已加工件数，更新使用设备，2.更新操作记录表 3.更新送检件数
+    async overWorkAction() {
+        let {
+            gyid,
+            sbid,
+            jgjs,
+            ddjs,
+            kjgjs,
+        } = this.post()
+
+        let worker = this.header('token')
+        let jgjlData = {
+            jgjssj: util.getNowTime(),
+            jgjs: jgjs,
+            sbid: sbid
+        }
+
+        let updateData = await this.model('scglxt_t_jggl').where({
+            gygcid: gyid,
+            jgryid: worker,
+            jgjssj: null
+        }).update(jgjlData)
+
+        let bomData = await this.model('scglxt_t_gygc').where({
+            id: gyid
+        }).update({
+            sjjs: jgjs
+        })
+
+        let gygcData = await this.model('scglxt_t_gygc').where({
+            id: gyid
+        }).find()
+        if (gygcData.kjgjs != (gygcData.yjgjs + gygcData.sjjs)) // 如果加工未完成自动再开始一条加工记录 
+        {
+            let jgjlData = {
+                id: util.getUUId(),
+                jgryid: worker,
+                jgkssj: util.getNowTime(),
+                gygcid: gyid
+            }
+
+            await this.model('scglxt_t_jggl').add(jgjlData)
+            
+        }
+         else {
+            await this.model('scglxt_t_gygc').where({
+                id: gyid
+            }).update({
+                status: 2,
+                jssj:util.getNowTime()
+            })
+        }
+
+
+        return this.success(bomData, "操作成功")
     }
 };

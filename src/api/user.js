@@ -24,12 +24,12 @@ services.addUser = function(token) {
   })
 }
 
-  // 添加用户
-services.updatePwd = function(token) {
+  // 修改密码
+services.updatePwd = function(params) {
   return request({
     url: '/user/updatePwd',
     method: 'post',
-    params: { token }
+    params:  params
   })
 }
 

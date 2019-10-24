@@ -101,12 +101,15 @@ module.exports = class extends Base {
             let {oldPassword,password} = this.post()
             let token = this.header('token'); 
             let data = await this.model('cms_user').where({token:token}).find()
+            let sussData = {}
             if(data.password == oldPassword) {
-                return this.fail(1000, '原密码不一致', {})
-            }else{
-                await this.model('cms_user').where({token:token}).update({
+                sussData = await this.model('cms_user').where({token:token}).update({
                     password: password
                 })
+                
+                return this.success(sussData)
+            }else{
+                return this.fail(1000, '原密码不正确', {})
             }
 
         } catch (ex) {

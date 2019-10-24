@@ -6,9 +6,9 @@ module.exports = class extends think.Controller {
     //   }
     // }
   }
-  _call(){
+  _call() {
     let method = this.http.method.toLowerCase();
-    if(method === "options"){
+    if (method === "options") {
       this.setCorsHeader();
       this.end();
       return;
@@ -16,14 +16,15 @@ module.exports = class extends think.Controller {
     this.setCorsHeader();
     return super.__call();
   }
-  setCorsHeader(){
+  setCorsHeader() {
     this.header("Access-Control-Allow-Origin", "*");
     this.header("Access-Control-Allow-Headers", "x-requested-with,token");
     this.header("Access-Control-Request-Method", "OPTION,GET,POST,PUT,DELETE");
     this.header("Access-Control-Allow-Credentials", "true");
   }
-  constructor(ctx){
+  constructor(ctx) {
     super(ctx); // 调用父级的 constructor 方法，并把 ctx 传递进去
     // 其他额外的操作
   }
+
 };

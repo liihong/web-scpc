@@ -37,7 +37,7 @@
         <el-col :span="24">
           <el-form-item prop="bzj" label="选择标准件">
             <div v-for="(el,i) in selBzjList" :key="i">
-              <el-select @change="((val)=>{changeCZ(val,i)})" filterable v-model="el.bzjid" placeholder="标准件">
+              <el-select  style="width:170px;" @change="((val)=>{changeCZ(val,i)})" filterable v-model="el.bzjid" placeholder="标准件">
                 <el-option v-for="(item,key) in dropDownListData['bzj']" :key="key" :label="item.bzjmc" :value="item.bzjid">
                   <span style="float: left">{{ item.bzjmc }}</span>
                   <span style="float: right; color: #8492a6; font-size: 13px">{{ item.bzjcz }}({{item.bzjgg}})</span>
@@ -54,7 +54,7 @@
           <el-form-item prop="JGJ" label="选择加工件">
             <i style="font-size:18px;" class="el-icon-circle-plus" @click="addJgj"></i>
             <div v-for="(el,i) in selJgjList" :key="i">
-              <el-select @change="((val)=>{changeJgj(val, i)})" filterable v-model="el.bomid" placeholder="加工件">
+              <el-select style="width:170px;" @change="((val)=>{changeJgj(val, i)})" filterable v-model="el.bomid" placeholder="加工件">
                 <el-option v-for="(item,key) in dropDownListData['jgj']" :key="key" :label="item.zddmc" :value="item.bomid">
                   <span style="float: left">{{ item.zddmc }}</span>
                   <span style="float: right; color: #8492a6; font-size: 13px">({{item.cldx}})</span>

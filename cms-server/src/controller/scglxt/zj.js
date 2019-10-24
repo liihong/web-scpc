@@ -47,14 +47,17 @@ module.exports = class extends Base {
                 zjid: primaryKey.id
             }).delete()
 
-            let bzjData = await this.model('scglxt_t_bzj_zj').addMany(bzj, {
-                pk: 'ID'
-            });
-
-            let jgjData = await this.model('scglxt_t_bom_zj').addMany(jgj, {
-                pk: 'ID'
-            });
-
+            if(bzj.length > 0) {
+                let bzjData = await this.model('scglxt_t_bzj_zj').addMany(bzj, {
+                    pk: 'ID'
+                });
+            }
+           
+            if(jgj.length >0) {
+                let jgjData = await this.model('scglxt_t_bom_zj').addMany(jgj, {
+                    pk: 'ID'
+                });
+            }
             let data = await this.model(zjModel).where(primaryKey).update(form)
 
             return this.success(data)
