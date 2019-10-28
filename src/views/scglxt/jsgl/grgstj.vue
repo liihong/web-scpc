@@ -4,7 +4,7 @@
       <datePicker @sureBtnClick="sureBtnClick" v-model="selectDate" />
       <el-button style="margin-left:10px;" size="small" @click="exportExcel" type="primary" icon="el-icon-s-promotion">导出</el-button>
     </div>
-    <el-table ref="elTable" :data="tableData" id="out-table" border>
+    <el-table ref="elTable" show-summary :data="tableData" id="out-table" border  :max-height="tableHeight">
       <el-table-column align="center" label="工艺过程卡明细">
         <el-table-column  type="index" align="center" min-width="10"></el-table-column>
         <el-table-column key="ddmc" prop="ddmc" align="center" label="项目名称"></el-table-column>
@@ -28,6 +28,7 @@ export default {
   },
   data() {
     return {
+      tableHeight: 600,
       selectDate: '',
       bzList: [],
       tableData: []

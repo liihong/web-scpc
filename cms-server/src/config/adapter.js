@@ -30,7 +30,7 @@ exports.cache = {
 exports.model = {
   type: 'mysql',
   common: {
-    logConnect: isDev,
+    logConnect: isDev,  
     logSql: isDev,
     logger: msg => think.logger.info(msg)
   },
@@ -40,6 +40,7 @@ exports.model = {
     // prefix: 'cms_',
     encoding: 'utf8',
     host: '127.0.0.1',
+    // host:'223.72.116.154',
     port: '3306',
     user: 'root',
     password: '123456',

@@ -106,11 +106,11 @@ export default {
       this.$message.confirm('是否确定全部检验通过', () => {
         this.$ajax
           .post(this.$api.gygxCheckPassAll, {
-            id: row.id,
+            id: row.ID,
             gygcid: row.gygcid,
             jgryid: row.jgryid,
             jyryid: this.token,
-            bomid: row.bomid,
+            bomid: row.BOMID,
             bfjs: 0,
             serial: row.serial
           })

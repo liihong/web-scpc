@@ -129,7 +129,16 @@ export default {
     },
     //点击已上传的附件使其直接下载
     onPreview(file) {
-      window.open(file.url)
+      let link = document.createElement('a')
+      link.style.display = 'none'
+      link.href = file.url
+      link.setAttribute('id', 'downloadLink')
+      link.setAttribute('download', file.name)
+      document.body.appendChild(link)
+      link.click()
+      // 删除添加的a链接
+      let objLink = document.getElementById('downloadLink')
+      document.body.removeChild(objLink)
     },
     // 删除文件
     onFileRemove(file) {
@@ -167,7 +176,9 @@ export default {
         .then(res => {
           this.formData = res.data
           this.queryData.query = this.primaryKey['value']
-          this.getForeingKeyData(this.tableId, this.queryData.column_name)
+          if(this.queryData.column_name) {
+            this.getForeingKeyData(this.tableId, this.queryData.column_name)
+          }
         })
     },
     // 获取数据字典数据

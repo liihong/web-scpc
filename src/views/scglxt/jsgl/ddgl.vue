@@ -1,6 +1,6 @@
 <template>
   <div class="ddgl">
-    <ResList tableId='0102' :query="this.$route.query" noEdit ref="ddList">
+    <ResList key="0102" tableId='0102' :query="this.$route.query" noEdit ref="ddList">
       <el-table-column slot="operate" fixed="left" label="操作" min-width="180" align="center">
         <template slot-scope="scope">
           <el-button-group size="mini">

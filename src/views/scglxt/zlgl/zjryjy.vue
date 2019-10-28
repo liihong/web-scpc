@@ -14,8 +14,10 @@
     <template slot="XMNAME" slot-scope="scope">
       <router-link style="color:#48b884;" :to="{path: 'bomgl', query: {SSDD: scope.row.ID, SSHT: scope.row.SSHT}}">{{scope.row.XMNAME}}</router-link>
     </template>
-    <template slot="ZDDJB" slot-scope="scope">
-      <el-tag effect='dark' :type="scope.row.ZDDJB == '0402' ? 'warning' : scope.row.ZDDJB == '0403' ? '' : 'danger'">{{scope.row.ZDDJB_TEXT}}</el-tag>
+    <template slot="SSDD" slot-scope="scope">
+      <el-badge v-show="!!scope.row.ZDDJB" :value="scope.row.ZDDJB == '0402' ? '重要' : scope.row.ZDDJB == '0403' ? '' : '紧急'" class="item" :type="scope.row.ZDDJB == '0402' ? 'warning' : scope.row.ZDDJB == '0403' ? 'info' : 'danger'">
+        <span style="margin:0 5px;">{{scope.row.SSDD_TEXT}}</span>
+      </el-badge>
     </template>
   </ResList>
 </template>

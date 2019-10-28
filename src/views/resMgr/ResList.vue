@@ -17,8 +17,8 @@
     </el-col>
 
     <!--列表-->
-    <el-table ref="elTable" :span-method='objectSpanMethod' highlight-current-row @sort-change="tableSort" @selection-change="selsChange" @row-click="rowClick" :data="resDatas" v-loading="listLoading" header-cell-class-name="table_th" border :max-height="tableHeight" style="width: 100%;">
-      <el-table-column fixed="left" type="selection" width="25" align="center">
+    <el-table ref="elTable" :span-method='objectSpanMethod' highlight-current-row @sort-change="tableSort" @selection-change="selsChange" @row-click="rowClick" :data="resDatas" v-loading="listLoading" header-cell-class-name="table_th" border height="70vh" style="width: 100%;">
+      <el-table-column type="selection" width="25" align="center">
       </el-table-column>
       <el-table-column fixed="left" type="index" width="30" align="center">
         <template slot-scope="scope">
@@ -26,7 +26,7 @@
         </template>
       </el-table-column>
       <slot name="operate" />
-      <el-table-column fixed="left" label="操作" min-width="150" align="center" v-if="!noEdit">
+      <el-table-column label="操作" min-width="150" align="center" v-if="!noEdit">
         <template slot-scope="scope">
           <el-button-group size="mini">
             <el-button size="mini" type="primary" @click="handleEdit(scope.row)">编辑</el-button>
@@ -171,6 +171,9 @@ export default {
           ])
           this.total = parseInt(res.data.count)
           this.listLoading = false
+          this.$nextTick(() => {
+            this.$refs.elTable.doLayout()
+          })
         }
       })
     },
@@ -376,14 +379,14 @@ export default {
           this.getResList()
         }
       }
-    },
-    'query.SSHT'(){
-        if (this.query != undefined) {
-          this.queryParams.query = this.query
-        }
-        this.getConfig()
-        this.getResList()
     }
+    // 'query.SSHT'(){
+    //     if (this.query != undefined) {
+    //       this.queryParams.query = this.query
+    //     }
+    //     this.getConfig()
+    //     this.getResList()
+    // }
   }
 }
 </script>

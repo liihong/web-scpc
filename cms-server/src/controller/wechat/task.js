@@ -91,10 +91,13 @@ module.exports = class extends Base {
             jgjssj: null
         }).update(jgjlData)
 
+        let oldSjjs = await this.model('scglxt_t_gygc').where({
+            id: gyid
+        }).getField('sjjs')
         let bomData = await this.model('scglxt_t_gygc').where({
             id: gyid
         }).update({
-            sjjs: jgjs
+            sjjs: parseInt(jgjs) + parseInt(oldSjjs)
         })
 
         let gygcData = await this.model('scglxt_t_gygc').where({

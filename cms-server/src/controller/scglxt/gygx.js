@@ -22,7 +22,7 @@ module.exports = class extends Base {
             as: 'jggy',
             join: 'left',
             on: ['gynr', 'id']
-        }).order('serial asc').field('scglxt_t_gygc.* ,jggy.gymc, sblx.mc sbmc').where({
+        }).order('serial asc').alias('t').field('t.id,t.bomid,t.gynr,t.edgs,t.zbgs,t.serial,t.sbid,t.zysx,t.bzgs,t.ssdd,jggy.gymc, sblx.mc sbmc').where({
             'bomid': this.get('bomid')
         }).select()
         return this.success(data)
@@ -93,6 +93,7 @@ module.exports = class extends Base {
     // 获取设备列表
     async getSbListAction() {
         let token = this.header('token')
+        
         let BzId = await this.model('cms_user').where({
             token: token
         }).getField('roles', true);
@@ -164,10 +165,14 @@ module.exports = class extends Base {
             jgjssj: null
         }).update(jgjlData)
 
+        let oldSjjs = await this.model('scglxt_t_gygc').where({
+            id: gyid
+        }).getField('sjjs')
         let bomData = await this.model('scglxt_t_gygc').where({
             id: gyid
         }).update({
-            sjjs: jgjs
+            sjjs: parseInt(jgjs) + parseInt(oldSjjs),
+            // czryid: null
         })
 
         let gygcData = await this.model('scglxt_t_gygc').where({
@@ -175,14 +180,20 @@ module.exports = class extends Base {
         }).find()
         if (gygcData.kjgjs != (gygcData.yjgjs + gygcData.sjjs)) // 如果加工未完成自动再开始一条加工记录 
         {
-            let jgjlData = {
-                id: util.getUUId(),
-                jgryid: worker,
-                jgkssj: util.getNowTime(),
-                gygcid: gyid
-            }
+            await this.model('scglxt_t_gygc').where({
+                id: gyid
+            }).update({
+                czryid: null
+            })
 
-            await this.model('scglxt_t_jggl').add(jgjlData)
+            // let jgjlData = {
+            //     id: util.getUUId(),
+            //     jgryid: worker,
+            //     jgkssj: util.getNowTime(),
+            //     gygcid: gyid
+            // }
+
+            // await this.model('scglxt_t_jggl').add(jgjlData)
             
         }
          else {
@@ -190,7 +201,8 @@ module.exports = class extends Base {
                 id: gyid
             }).update({
                 status: 2,
-                jssj:util.getNowTime()
+                jssj:util.getNowTime(),
+                sfjy: 0
             })
         }
 
@@ -207,11 +219,11 @@ module.exports = class extends Base {
         let where = '1=1'
 
         if (!!queryKey) {
-            where = "ddmc like '%" + queryKey + "%' or ljmc like '%" + queryKey + "%' or czry like '%" + queryKey + "%'"
+            where = "SSDD_TEXT like '%" + queryKey + "%' or BOMID_TEXT like '%" + queryKey + "%' or CZRYID_TEXT like '%" + queryKey + "%'"
         }
-        let sql = `SELECT * from (SELECT jggl.id, dd.xmname DDMC,
-        bom.zddmc LJMC, bom.zddjb ZDDJB, bom.bmcl BMCL, tz.tzlx, tz.url tzurl, jggy.gymc GYNR,gygc.kjgjs KJGJS,gygc.YJGJS,
-        ry.rymc CZRY,jggl.jgryid, sb.sbmc SBID, jggl.jgjs SJJS, gygc.bomid,gygc.id gygcid, date_format( dd.endtime, '%Y-%m-%d' ) ddjssj,
+        let sql = `SELECT * from (SELECT jggl.ID, dd.xmname SSDD_TEXT,gygc.ZYSX,
+        bom.zddmc BOMID_TEXT, bom.zddjb ZDDJB, bom.bmcl BMCL, tz.tzlx, tz.url tzurl, jggy.gymc GYNR_TEXT,bom.jgsl KJGJS,gygc.YJGJS,
+        ry.rymc CZRYID_TEXT,jggl.JGRYID, sb.sbmc SBID_TEXT, jggl.jgjs SJJS, gygc.BOMID,gygc.id gygcid, date_format( dd.endtime, '%Y-%m-%d' ) ddjssj,
         gygc.serial  FROM
             scglxt_t_gygc gygc,
             scglxt_t_bom bom
@@ -230,9 +242,9 @@ module.exports = class extends Base {
         AND jggl.sfjy = '0' 
         AND jggl.jgjs IS NOT NULL 
     ORDER BY
-        jgkssj) t where (` + where + `)  limit ` + curPage + `,` + pageSize + `;`
+        bom.ssdd,gygc.bomid,dd.DDLEVEL) t where (` + where + `)  limit ` + curPage + `,` + pageSize + `;`
 
-        let countSql = `SELECT count(*) count  FROM (select gygc.id,dd.xmname ddmc, bom.zddmc ljmc,ry.rymc czry from 
+        let countSql = `SELECT count(*) count  FROM (select gygc.id,dd.xmname SSDD_TEXT, bom.zddmc BOMID_TEXT,ry.rymc CZRYID_TEXT from 
                         scglxt_t_gygc gygc,
                         scglxt_t_bom bom
                         LEFT JOIN scglxt_t_dd_tz tz ON bom.ddtz LIKE CONCAT( tz.tzmc, "%" ),
@@ -270,11 +282,12 @@ module.exports = class extends Base {
             id,
             gygcid,
             jgryid,
-            jyryid,
             bomid,
             bfjs,
             serial
         } = this.post()
+
+        let jyryid = this.header('token');
 
         let updateJggl = {
             jysj: util.getNowTime(),
@@ -285,18 +298,24 @@ module.exports = class extends Base {
         }
         //更新该条加工信息的检验信息
         await this.model('scglxt_t_jggl').where({
-            id: id
+            id:id
         }).update(updateJggl)
 
         let updateSql = `
-        update scglxt_t_gygc a set sfjy=1,yjgjs =  yjgjs+(select c.jgjs from scglxt_t_jggl c where c.id = '` + id + `') ,bfjs=0,sjjs=0 where id = '` + gygcid + `'`
+        update scglxt_t_gygc a set jyryid='`+jyryid+`',sfjy=1,yjgjs =  yjgjs+(select c.jgjs from scglxt_t_jggl c where c.id = '` + id + `' ) ,bfjs=0,sjjs=0 where id = '` + gygcid + `'`
 
+        
         //更新工艺的已加工件数
         let data = await this.model().execute(updateSql)
 
-        let yjgjs = await this.model('scglxt_t_gygc').where({
+        let {yjgjs,kjgjs} = await this.model('scglxt_t_gygc').where({
             id: gygcid
-        }).getField('yjgjs', true)
+        }).getField('yjgjs,kjgjs', true)
+
+        // //如果订单件数全部完成
+        // if(yjgjs == kjgjs) {
+        //     await this.model('scglxt_t_gygc').update({sfjy: 1}).where({id: gygcid})
+        // }
 
         let nextJGgy = await this.model('scglxt_t_gygc').where({
             bomid,

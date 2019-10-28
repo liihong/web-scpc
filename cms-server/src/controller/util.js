@@ -68,7 +68,7 @@ module.exports = class extends Base {
                 fjlx: suffix,
                 name: filename,
                 fjdz: file.path,
-                url: 'upload/' + type + '/' + query + '/' + filename
+                url: '/upload/' + type + '/' + query + '/' + filename
             }
             tzData[columnData.FOREIGNKEY_TABLE_COLUMN] = query
             let data = await this.model(columnData.FOREIGNKEY_TABLENAME).add(tzData)
