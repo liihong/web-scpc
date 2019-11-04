@@ -93,7 +93,7 @@ module.exports = class extends Base {
     // 获取设备列表
     async getSbListAction() {
         let token = this.header('token')
-        
+
         let BzId = await this.model('cms_user').where({
             token: token
         }).getField('roles', true);
@@ -113,31 +113,42 @@ module.exports = class extends Base {
             id: gyid
         }).find()
 
-        let upData = await this.model('scglxt_t_gygc').where({
-            id: gyid
-        }).update({
-            czryid: worker,
-            status: 1,
-            kssj: util.getNowTime()
-        })
-        if (gyData.serial == 0) {
-            let updateData = await this.model('scglxt_t_bom').where({
-                id: gyData.bomid
+        try {
+            let upData = await this.model('scglxt_t_gygc').where({
+                id: gyid
             }).update({
-                zddzt: '0502'
+                czryid: worker,
+                status: 1,
+                kssj: util.getNowTime()
             })
+            if (gyData.serial == 0) {
+                let updateData = await this.model('scglxt_t_bom').where({
+                    id: gyData.bomid
+                }).update({
+                    zddzt: '0502'
+                })
+            }
+
+            let jgjlData = {
+                id: util.getUUId(),
+                jgryid: worker,
+                jgkssj: util.getNowTime(),
+                gygcid: gyid
+            }
+
+            let data = await this.model('scglxt_t_jggl').add(jgjlData)
+
+            return this.success(data)
+        } catch (ex) {
+            let errorLog = {
+                id: util.getUUId(),
+                type: '开始加工',
+                error: JSON.stringify(ex),
+                infos: JSON.stringify(this.post())
+            }
+            await this.model('operate_log').add(errorLog)
         }
 
-        let jgjlData = {
-            id: util.getUUId(),
-            jgryid: worker,
-            jgkssj: util.getNowTime(),
-            gygcid: gyid
-        }
-
-        let data = await this.model('scglxt_t_jggl').add(jgjlData)
-
-        return this.success(data)
     }
 
     //结束加工
@@ -159,55 +170,65 @@ module.exports = class extends Base {
             sbid: sbid
         }
 
-        let updateData = await this.model('scglxt_t_jggl').where({
-            gygcid: gyid,
-            jgryid: worker,
-            jgjssj: null
-        }).update(jgjlData)
+        try {
 
-        let oldSjjs = await this.model('scglxt_t_gygc').where({
-            id: gyid
-        }).getField('sjjs')
-        let bomData = await this.model('scglxt_t_gygc').where({
-            id: gyid
-        }).update({
-            sjjs: parseInt(jgjs) + parseInt(oldSjjs),
-            // czryid: null
-        })
+            let updateData = await this.model('scglxt_t_jggl').where({
+                gygcid: gyid,
+                jgryid: worker,
+                jgjssj: null
+            }).update(jgjlData)
 
-        let gygcData = await this.model('scglxt_t_gygc').where({
-            id: gyid
-        }).find()
-        if (gygcData.kjgjs != (gygcData.yjgjs + gygcData.sjjs)) // 如果加工未完成自动再开始一条加工记录 
-        {
-            await this.model('scglxt_t_gygc').where({
+            let oldSjjs = await this.model('scglxt_t_gygc').where({
+                id: gyid
+            }).getField('sjjs')
+            let bomData = await this.model('scglxt_t_gygc').where({
                 id: gyid
             }).update({
-                czryid: null
+                sjjs: parseInt(jgjs) + parseInt(oldSjjs),
+                // czryid: null
             })
 
-            // let jgjlData = {
-            //     id: util.getUUId(),
-            //     jgryid: worker,
-            //     jgkssj: util.getNowTime(),
-            //     gygcid: gyid
-            // }
-
-            // await this.model('scglxt_t_jggl').add(jgjlData)
-            
-        }
-         else {
-            await this.model('scglxt_t_gygc').where({
+            let gygcData = await this.model('scglxt_t_gygc').where({
                 id: gyid
-            }).update({
-                status: 2,
-                jssj:util.getNowTime(),
-                sfjy: 0
-            })
+            }).find()
+            if (gygcData.kjgjs != (gygcData.yjgjs + gygcData.sjjs)) // 如果加工未完成自动再开始一条加工记录 
+            {
+                await this.model('scglxt_t_gygc').where({
+                    id: gyid
+                }).update({
+                    czryid: null
+                })
+
+                // let jgjlData = {
+                //     id: util.getUUId(),
+                //     jgryid: worker,
+                //     jgkssj: util.getNowTime(),
+                //     gygcid: gyid
+                // }
+
+                // await this.model('scglxt_t_jggl').add(jgjlData)
+
+            } else {
+                await this.model('scglxt_t_gygc').where({
+                    id: gyid
+                }).update({
+                    status: 2,
+                    jssj: util.getNowTime(),
+                    sfjy: 0
+                })
+            }
+
+
+            return this.success(bomData, "操作成功")
+        } catch (ex) {
+            let errorLog = {
+                id: util.getUUId(),
+                type: '结束加工',
+                error: JSON.stringify(ex),
+                infos: JSON.stringify(this.post())
+            }
+            await this.model('operate_log').add(errorLog)
         }
-
-
-        return this.success(bomData, "操作成功")
     }
 
     //获取检验人员检验列表数据
@@ -287,73 +308,87 @@ module.exports = class extends Base {
             serial
         } = this.post()
 
-        let jyryid = this.header('token');
+        try {
+            let jyryid = this.header('token');
 
-        let updateJggl = {
-            jysj: util.getNowTime(),
-            sfjy: '1',
-            jyryid: jyryid,
-            bfjs: bfjs,
-            fgjs: bfjs
-        }
-        //更新该条加工信息的检验信息
-        await this.model('scglxt_t_jggl').where({
-            id:id
-        }).update(updateJggl)
-
-        let updateSql = `
-        update scglxt_t_gygc a set jyryid='`+jyryid+`',sfjy=1,yjgjs =  yjgjs+(select c.jgjs from scglxt_t_jggl c where c.id = '` + id + `' ) ,bfjs=0,sjjs=0 where id = '` + gygcid + `'`
-
-        
-        //更新工艺的已加工件数
-        let data = await this.model().execute(updateSql)
-
-        let {yjgjs,kjgjs} = await this.model('scglxt_t_gygc').where({
-            id: gygcid
-        }).getField('yjgjs,kjgjs', true)
-
-        // //如果订单件数全部完成
-        // if(yjgjs == kjgjs) {
-        //     await this.model('scglxt_t_gygc').update({sfjy: 1}).where({id: gygcid})
-        // }
-
-        let nextJGgy = await this.model('scglxt_t_gygc').where({
-            bomid,
-            serial: serial + 1
-        }).select()
-        //更新下一道工序
-        //如果有下一到工序则更新开始下一道工序的可加工数量
-        if (nextJGgy.length == 1) {
-            await this.model('scglxt_t_gygc').where({
-                bomid: bomid,
-                serial: serial + 1
-            }).update({
-                kjgjs: yjgjs
-            })
-        } else {
-            //如果已加工件数+报废件数=第一条工艺的可加工件数，说明整个流程加工完成，则修改订单状态
-            let bfjs = await this.model('scglxt_t_gygc').where({
-                bomid: bomid
-            }).sum('bfjs')
-            let kjgjsFirst = await this.model('scglxt_t_gygc').where({
-                bomid: bomid,
-                serial: 0
-            }).getField('kjgjs', true)
-            let yjgjsLast = await this.model('scglxt_t_gygc').where({
-                bomid: bomid,
-                serial: serial
-            }).getField('yjgjs', true)
-
-            if (kjgjsFirst == (bfjs + yjgjsLast)) {
-                await this.model('scglxt_t_bom').where({
-                    id: bomid
-                }).update({
-                    zddzt: '0503'
-                })
+            let updateJggl = {
+                jysj: util.getNowTime(),
+                sfjy: '1',
+                jyryid: jyryid,
+                bfjs: bfjs,
+                fgjs: bfjs
             }
+            //更新该条加工信息的检验信息
+            await this.model('scglxt_t_jggl').where({
+                id: id
+            }).update(updateJggl)
+
+            let updateSql = `
+            update scglxt_t_gygc a set jyryid='` + jyryid + `',sfjy=1,yjgjs =  yjgjs+(select c.jgjs from scglxt_t_jggl c where c.id = '` + id + `' ) ,bfjs=0,sjjs=0 where id = '` + gygcid + `'`
+
+
+            //更新工艺的已加工件数
+            let data = await this.model().execute(updateSql)
+
+            let {
+                yjgjs,
+                kjgjs
+            } = await this.model('scglxt_t_gygc').where({
+                id: gygcid
+            }).getField('yjgjs,kjgjs', true)
+
+            // //如果订单件数全部完成
+            // if(yjgjs == kjgjs) {
+            //     await this.model('scglxt_t_gygc').update({sfjy: 1}).where({id: gygcid})
+            // }
+
+            let nextJGgy = await this.model('scglxt_t_gygc').where({
+                bomid,
+                serial: serial + 1
+            }).select()
+            //更新下一道工序
+            //如果有下一到工序则更新开始下一道工序的可加工数量
+            if (nextJGgy.length == 1) {
+                await this.model('scglxt_t_gygc').where({
+                    bomid: bomid,
+                    serial: serial + 1
+                }).update({
+                    kjgjs: yjgjs
+                })
+            } else {
+                //如果已加工件数+报废件数=第一条工艺的可加工件数，说明整个流程加工完成，则修改订单状态
+                let bfjs = await this.model('scglxt_t_gygc').where({
+                    bomid: bomid
+                }).sum('bfjs')
+                let kjgjsFirst = await this.model('scglxt_t_gygc').where({
+                    bomid: bomid,
+                    serial: 0
+                }).getField('kjgjs', true)
+                let yjgjsLast = await this.model('scglxt_t_gygc').where({
+                    bomid: bomid,
+                    serial: serial
+                }).getField('yjgjs', true)
+
+                if (kjgjsFirst == (bfjs + yjgjsLast)) {
+                    await this.model('scglxt_t_bom').where({
+                        id: bomid
+                    }).update({
+                        zddzt: '0503'
+                    })
+                }
+            }
+
+            return this.success(data)
+        } catch (ex) {
+            let errorLog = {
+                id: util.getUUId(),
+                type: '质检检验',
+                error: JSON.stringify(ex),
+                infos: JSON.stringify(this.post())
+            }
+            await this.model('operate_log').add(errorLog)
         }
 
-        return this.success(data)
     }
 
     // 检验部分通过

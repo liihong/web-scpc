@@ -17,10 +17,12 @@ module.exports = class extends Base {
             let table = await this.model('resource_table').getTableInfo(tableId)
             let fileds = await this.model('resource_table_column').getColumnList(tableId)
             fileds = fileds.map(item => {
-                if(item.ATTRIBUTE_TYPE != '2')
+                if (item.ATTRIBUTE_TYPE != '2')
                     return item.COLUMN_NAME
             })
-            fileds = fileds.filter(item=>{return item!=undefined})
+            fileds = fileds.filter(item => {
+                return item != undefined
+            })
             const data = await this.model(table.table_name).field(fileds).where({
                 id: this.get('id')
             }).find()
@@ -191,8 +193,20 @@ module.exports = class extends Base {
             whereObj[idKey] = primaryKeyValue
 
             let data = await this.model(table.table_name).where(whereObj).find()
+
+            let dataLog = {
+                id: util.getUUId(),
+                operater_id: this.header('token'),
+                operater_name: '',
+                operate_type: 'add',
+                tablename: table.table_name,
+                content: primaryKeyValue
+            }
+
+            await this.model('resource_log').add(dataLog)
             return this.success(data)
         } catch (ex) {
+            console.log(ex)
             return this.fail(ex)
         }
     }
@@ -208,6 +222,22 @@ module.exports = class extends Base {
             let affectedRows = await this.model(table.table_name).where(
                 `${primaryKey.name}='${primaryKey.value}'`
             ).update(updateInfo);
+
+            let oldData = await this.model(table.table_name).where(
+                `${primaryKey.name}='${primaryKey.value}'`
+            ).find()
+            let dataLog = {
+                id: util.getUUId(),
+                operater_id: this.header('token'),
+                operater_name: '',
+                operate_type: 'edit',
+                tablename: table.table_name,
+                old_value: JSON.stringify(oldData),
+                new_value: JSON.stringify(updateInfo)
+            }
+
+            await this.model('resource_log').add(dataLog)
+
             return this.success(affectedRows)
         } catch (ex) {
             return this.fail(ex)
@@ -224,6 +254,17 @@ module.exports = class extends Base {
             delete updateInfo.tableId;
             let table = await this.model('resource_table').getTableInfo(tableId)
             let affectedRows = await this.model(table.table_name).where(updateInfo).delete();
+
+            let dataLog = {
+                id: util.getUUId(),
+                operater_id: this.header('token'),
+                operater_name: '',
+                operate_type: 'delete',
+                tablename: table.table_name,
+                old_value: JSON.stringify(updateInfo)
+            }
+
+            await this.model('resource_log').add(dataLog)
 
             return this.success(affectedRows)
         } catch (ex) {

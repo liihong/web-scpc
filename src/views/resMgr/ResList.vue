@@ -379,14 +379,14 @@ export default {
           this.getResList()
         }
       }
+    },
+    'query.SSHT'(){
+        if (this.query != undefined) {
+          this.queryParams.query = this.query
+        }
+        this.getConfig()
+        this.getResList()
     }
-    // 'query.SSHT'(){
-    //     if (this.query != undefined) {
-    //       this.queryParams.query = this.query
-    //     }
-    //     this.getConfig()
-    //     this.getResList()
-    // }
   }
 }
 </script>

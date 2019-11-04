@@ -97,7 +97,7 @@ module.exports = class extends Base {
            fun_yjggs_gy(id,'20170424203552800')   'rechuli',
            fun_yjggs_gy(id,'20170724160856037')  'hanjie',
            fun_yjggs_gy(id,'20170524144646657') 'waixie'
-    FROM  scglxt_t_dd dd where  dd.ckzt is null order by ddlevel`
+    FROM  scglxt_t_dd dd where  dd.ckzt is null order by ddlevel,sjcjsj DESC`
 
         let data = await this.model().query(sql)
 

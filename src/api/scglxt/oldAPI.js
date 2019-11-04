@@ -1,6 +1,6 @@
 const BASE_URL = process.env.NODE_ENV === 'development' ?
 'http://127.0.0.1:8089/scpc/' :
-'http://223.72.116.154:8000//'
+'http://223.72.116.243:8000/'
 
 export var EXPORT_DDBOM = BASE_URL +  'ddInfo_exportData.action'
 

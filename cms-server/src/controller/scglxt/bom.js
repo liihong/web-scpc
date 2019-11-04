@@ -187,35 +187,46 @@ module.exports = class extends Base {
             cgyj,
             cgry
         } = this.post()
-        let data = await this.model(bomModel).where({
-            id: ['in', id]
-        }).update({
-            clzt: clzt,
-            bljssj: util.getNowTime(),
-            cgsj: cgyj,
-            cgry: cgry == undefined ? '' : cgry
-        })
-        let updateSql = ''
-        if (cgyj != undefined && cgyj != null && cgyj != '') {
-            return this.success(data)
-        } else {
-            updateSql = `UPDATE scglxt_t_gygc gygc SET status=0,kjgjs= (SELECT bom.jgsl FROM  scglxt_t_bom bom  WHERE  bom.id = gygc.bomid)
-            WHERE gygc.bomid = '` + id + `' AND gygc.serial = '0'`
-        }
-
-
-        //如果是同时更新多条
-        if (id.indexOf(',') != '-1') {
-            let arrs = id.split(',')
-            arrs.map(async item => {
-                updateSql = `UPDATE scglxt_t_gygc gygc SET status=0,kjgjs= (SELECT bom.jgsl FROM  scglxt_t_bom bom  WHERE  bom.id = gygc.bomid)
-        WHERE gygc.bomid = '` + item + `' AND gygc.serial = '0'`
-                await this.model().execute(updateSql)
+        try {
+            let data = await this.model(bomModel).where({
+                id: ['in', id]
+            }).update({
+                clzt: clzt,
+                bljssj: util.getNowTime(),
+                cgsj: cgyj,
+                cgry: cgry == undefined ? '' : cgry
             })
-        } else {
-            await this.model().execute(updateSql)
+            let updateSql = ''
+            if (cgyj != undefined && cgyj != null && cgyj != '') {
+                return this.success(data)
+            } else {
+                if (clzt != 2) {
+                    updateSql = `UPDATE scglxt_t_gygc gygc SET status=0,kjgjs= (SELECT bom.jgsl FROM  scglxt_t_bom bom  WHERE  bom.id = gygc.bomid)
+                    WHERE gygc.bomid = '` + id + `' AND gygc.serial = '0'`
+                   let updated =  await this.model().execute(updateSql)
+                    return updated
+                }
+            }
+
+
+            //如果是同时更新多条
+            if (id.indexOf(',') != '-1') {
+                let arrs = id.split(',')
+                arrs.map(async item => {
+                    updateSql = `UPDATE scglxt_t_gygc gygc SET status=0,kjgjs= (SELECT bom.jgsl FROM  scglxt_t_bom bom  WHERE  bom.id = gygc.bomid)
+            WHERE gygc.bomid = '` + item + `' AND gygc.serial = '0'`
+                    await this.model().execute(updateSql)
+                })
+            }
+            return this.success(data)
+        } catch (ex) {
+            let errorLog = {
+                id: util.getUUId(),
+                type: '备料操作',
+                error: ex.error
+            }
+            await this.model('operate_log').add(errorLog)
         }
-        return this.success(data)
     }
 
     // 获取生产情况跟踪数据
@@ -302,11 +313,11 @@ module.exports = class extends Base {
         if (bomData.length > 1) {
             let updateList = []
             bomData.map(async item => {
-                pArr.push(_this.getOutData(updateList,item.ssdd))
+                pArr.push(_this.getOutData(updateList, item.ssdd))
             })
             if (pArr.length > 0) {
                 await Promise.all(pArr).then(async () => {
-                    if(updateList.length > 0){
+                    if (updateList.length > 0) {
                         let sql = `update scglxt_t_dd set ckzt='完成',ckdate=DATE_FORMAT(NOW(), '%Y-%m-%d %H:%i:%s') where id=(select ssdd from scglxt_t_bom where id in (` + updateList.join(',') + `))`
                         let ddData = await this.model().execute(sql)
                     }

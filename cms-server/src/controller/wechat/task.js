@@ -105,14 +105,19 @@ module.exports = class extends Base {
         }).find()
         if (gygcData.kjgjs != (gygcData.yjgjs + gygcData.sjjs)) // 如果加工未完成自动再开始一条加工记录 
         {
-            let jgjlData = {
-                id: util.getUUId(),
-                jgryid: worker,
-                jgkssj: util.getNowTime(),
-                gygcid: gyid
-            }
+            await this.model('scglxt_t_gygc').where({
+                id: gyid
+            }).update({
+                czryid: null
+            })
+            // let jgjlData = {
+            //     id: util.getUUId(),
+            //     jgryid: worker,
+            //     jgkssj: util.getNowTime(),
+            //     gygcid: gyid
+            // }
 
-            await this.model('scglxt_t_jggl').add(jgjlData)
+            // await this.model('scglxt_t_jggl').add(jgjlData)
             
         }
          else {

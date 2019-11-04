@@ -29,7 +29,7 @@ module.exports = class extends think.Model {
             }
         })
         const data = await this.model(table.table_name)
-            .field(displayColumnArr.join(',')).where(table.where_sql).where(whereObj).select();
+            .field(displayColumnArr.join(',')).where(table.where_sql).where(whereObj).alias('t').select();
 
         return data
     }
