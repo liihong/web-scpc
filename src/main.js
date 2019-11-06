@@ -20,6 +20,14 @@ import VueI18n from 'vue-i18n'
 import zhCN from './lang/zh'
 import en from './lang/en'
 
+import VueSocketio from 'vue-socket.io';
+
+Vue.use(new VueSocketio({
+  debug: true,
+  connection: 'http://127.0.0.1:8360' //地址+端口，由后端提供
+}));
+
+Vue.prototype.$socket = io.connect('http://localhost:8360')
 Vue.use(VueI18n)
 Vue.use(ElementUI, { size: 'mini' });
 Vue.config.productionTip = false

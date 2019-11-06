@@ -152,7 +152,9 @@ module.exports = class extends Base {
     }
 
     //结束加工
-    // 1.更新工序已加工件数，更新使用设备，2.更新操作记录表 3.更新送检件数
+    // 1.更新工序已加工件数，更新使用设备，
+    //2.更新操作记录表 
+    //3.更新送检件数
     async overWorkAction() {
         let {
             gyid,
@@ -171,7 +173,6 @@ module.exports = class extends Base {
         }
 
         try {
-
             let updateData = await this.model('scglxt_t_jggl').where({
                 gygcid: gyid,
                 jgryid: worker,
@@ -191,6 +192,7 @@ module.exports = class extends Base {
             let gygcData = await this.model('scglxt_t_gygc').where({
                 id: gyid
             }).find()
+            
             if (gygcData.kjgjs != (gygcData.yjgjs + gygcData.sjjs)) // 如果加工未完成自动再开始一条加工记录 
             {
                 await this.model('scglxt_t_gygc').where({
@@ -209,13 +211,19 @@ module.exports = class extends Base {
                 // await this.model('scglxt_t_jggl').add(jgjlData)
 
             } else {
-                await this.model('scglxt_t_gygc').where({
-                    id: gyid
-                }).update({
+                let updateInfo = {
                     status: 2,
                     jssj: util.getNowTime(),
                     sfjy: 0
-                })
+                }
+                //容错处理，如果已加工件数+送检件数大于可加工件数，则默认将已加工件数更新为可加工件数
+                
+                if (gygcData.kjgjs < (gygcData.yjgjs + gygcData.sjjs)){
+                    updateInfo.yjgjs = gygcData.kjgjs
+                }
+                await this.model('scglxt_t_gygc').where({
+                    id: gyid
+                }).update(updateInfo)
             }
 
 
@@ -341,6 +349,11 @@ module.exports = class extends Base {
             // if(yjgjs == kjgjs) {
             //     await this.model('scglxt_t_gygc').update({sfjy: 1}).where({id: gygcid})
             // }
+
+            //容错处理，如果已加工件数+送检件数大于可加工件数，则默认将已加工件数更新为可加工件数
+            if (yjgjs > kjgjs){
+                await this.model('scglxt_t_gygc').update({yjgjs:kjgjs}).where({id:gygcid})
+            }
 
             let nextJGgy = await this.model('scglxt_t_gygc').where({
                 bomid,

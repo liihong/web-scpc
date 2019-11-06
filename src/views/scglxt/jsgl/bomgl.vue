@@ -23,6 +23,9 @@
       <template slot="ZDDJB" slot-scope="scope">
         <el-tag v-show="scope.row.ZDDJB" effect='dark' :type="scope.row.ZDDJB == '0402' ? 'warning' : scope.row.ZDDJB == '0403' ? '' : 'danger'">{{scope.row.ZDDJB_TEXT}}</el-tag>
       </template>
+      <template slot="DQJQ" slot-scope="scope">
+        <div style="text-align:left;" v-html="scope.row.DQJQ"></div>
+      </template>
     </ResList>
     <gygxDialog :dialogState="dialogState" ref="gygx" />
     <editBom :dialogState="bomForm" />

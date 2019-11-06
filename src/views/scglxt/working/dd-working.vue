@@ -1,31 +1,31 @@
 <template>
-    <div class="dd-working">
-        <img width="100%" src="../../../assets/images/head.png">
-        <div class="working">
-            <div>
-                <bar-echarts :option="option" class="echarts-container"></bar-echarts>
-            </div>
-            <el-table class="working-table" :cell-class-name="getCellStyle" header-cell-class-name="header-style" show-summary :data="tableData">
-                <el-table-column type="index" width="25" align="center">
-                </el-table-column>
-                <el-table-column min-width="150" prop="xmname" label="项目名称" align="center"></el-table-column>
-                <el-table-column min-width="100" prop="starttime" label="结束时间" align="center"></el-table-column>
-                <el-table-column min-width="100" prop="endtime" label="结束时间" align="center"></el-table-column>
-                <el-table-column prop="xqg" label="线切割" align="center"></el-table-column>
-                <el-table-column prop="xi" label="铣" align="center"></el-table-column>
-                <el-table-column prop="qian" label="钳" align="center"></el-table-column>
-                <el-table-column prop="zhusu" label="注塑" align="center"></el-table-column>
-                <el-table-column prop="che" label="车" align="center"></el-table-column>
-                <el-table-column prop="cnc" label="CNC" align="center"></el-table-column>
-                <el-table-column prop="dhh" label="电火花" align="center"></el-table-column>
-                <el-table-column prop="mo" label="磨" align="center"></el-table-column>
-                <el-table-column prop="rechuli" label="热处理" align="center"></el-table-column>
-                <el-table-column prop="hanjie" label="焊接" align="center"></el-table-column>
-                <el-table-column prop="waixie" label="外协" align="center"></el-table-column>
-                <el-table-column prop="remark" label="标记" align="center"></el-table-column>
-            </el-table>
-        </div>
+  <div class="dd-working">
+    <img width="100%" src="../../../assets/images/head.png">
+    <div class="working">
+      <div>
+        <bar-echarts :option="option" class="echarts-container"></bar-echarts>
+      </div>
+      <el-table class="working-table" :cell-class-name="getCellStyle" header-cell-class-name="header-style" show-summary :data="tableData">
+        <el-table-column type="index" width="25" align="center">
+        </el-table-column>
+        <el-table-column min-width="150" prop="xmname" label="项目名称" align="center"></el-table-column>
+        <el-table-column min-width="100" prop="starttime" label="结束时间" align="center"></el-table-column>
+        <el-table-column min-width="100" prop="endtime" label="结束时间" align="center"></el-table-column>
+        <el-table-column prop="xqg" label="线切割" align="center"></el-table-column>
+        <el-table-column prop="xi" label="铣" align="center"></el-table-column>
+        <el-table-column prop="qian" label="钳" align="center"></el-table-column>
+        <el-table-column prop="zhusu" label="注塑" align="center"></el-table-column>
+        <el-table-column prop="che" label="车" align="center"></el-table-column>
+        <el-table-column prop="cnc" label="CNC" align="center"></el-table-column>
+        <el-table-column prop="dhh" label="电火花" align="center"></el-table-column>
+        <el-table-column prop="mo" label="磨" align="center"></el-table-column>
+        <el-table-column prop="rechuli" label="热处理" align="center"></el-table-column>
+        <el-table-column prop="hanjie" label="焊接" align="center"></el-table-column>
+        <el-table-column prop="waixie" label="外协" align="center"></el-table-column>
+        <el-table-column prop="remark" label="标记" align="center"></el-table-column>
+      </el-table>
     </div>
+  </div>
 </template>
 
 <script>
@@ -42,7 +42,7 @@ export default {
         title: {
           text: '工时汇总(单位：小时)',
           left: '80%',
-          textStyle:{
+          textStyle: {
             color: '#00D5FF'
           }
         },
@@ -73,7 +73,7 @@ export default {
             stack: '总量 ',
             itemStyle: {
               normal: {
-              color:'#00FFF4',
+                color: '#00FFF4',
                 label: {
                   show: true,
                   position: 'top',
@@ -94,14 +94,17 @@ export default {
   },
   mounted() {
     this.initData()
+    this.$socket.on('getTableData', res => {
+      console.log(res)
+    })
   },
   methods: {
-    getCellStyle({rowIndex}){
-        if(Number.isInteger(rowIndex/2) == 0) {
-            return 'cell-stripe-style'
-        }else{
-            return 'cell-style'
-        }
+    getCellStyle({ rowIndex }) {
+      if (Number.isInteger(rowIndex / 2) == 0) {
+        return 'cell-stripe-style'
+      } else {
+        return 'cell-style'
+      }
     },
     initData() {
       this.$ajax.get(this.$api.getGygsPc).then(res => {
@@ -143,8 +146,8 @@ export default {
     background: #162736;
     border-bottom: 0;
   }
-  .cell-stripe-style{
-      font-size: 18px;
+  .cell-stripe-style {
+    font-size: 18px;
     color: #00d5ff;
     background: #2b4b67;
     border-bottom: 0;
