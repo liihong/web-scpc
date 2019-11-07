@@ -204,7 +204,7 @@ module.exports = class extends Base {
                     updateSql = `UPDATE scglxt_t_gygc gygc SET status=0,kjgjs= (SELECT bom.jgsl FROM  scglxt_t_bom bom  WHERE  bom.id = gygc.bomid)
                     WHERE gygc.bomid = '` + id + `' AND gygc.serial = '0'`
                    let updated =  await this.model().execute(updateSql)
-                    return updated
+                   return this.success(updated)
                 }
             }
 
@@ -226,6 +226,7 @@ module.exports = class extends Base {
                 error: ex.error
             }
             await this.model('operate_log').add(errorLog)
+            return this.success(ex)
         }
     }
 

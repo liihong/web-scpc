@@ -46,8 +46,8 @@ export default {
   computed: {
     ...mapGetters(['token'])
   },
-  activated(){
-     this.initData()
+  activated() {
+    this.initData()
   },
   mounted() {
     this.initData()
@@ -85,8 +85,8 @@ export default {
         })
         if (arr.length > 0) {
           Promise.all(arr).then(function() {
-             vm.$message.success('批量操作成功！')
-             vm.initData()
+            vm.$message.success('批量操作成功！')
+            vm.initData()
           })
         }
       })
@@ -118,6 +118,12 @@ export default {
             if (res.errno == 0) {
               this.$message.success('操作成功！')
               this.initData()
+              setTimeout(() => {
+                this.$socket.emit('getTableData', res => {
+                  console.log(res)
+                  console.log('发送通知更新数据')
+                },0)
+              })
             }
           })
       })

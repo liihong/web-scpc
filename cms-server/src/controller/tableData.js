@@ -15,7 +15,7 @@ module.exports = class extends Base {
             let tableId = this.get('tableId')
 
             let table = await this.model('resource_table').getTableInfo(tableId)
-            let fileds = await this.model('resource_table_column').getColumnList(tableId)
+            let fileds = await this.model('resource_table_column').getColumnList(tableId,'UPDATE')
             fileds = fileds.map(item => {
                 if (item.ATTRIBUTE_TYPE != '2')
                     return item.COLUMN_NAME

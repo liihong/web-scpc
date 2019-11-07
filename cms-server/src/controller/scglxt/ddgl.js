@@ -19,8 +19,12 @@ module.exports = class extends Base {
 
         let pageSize = this.post('pageSize')
         let pageNumber = this.post('pageNumber')
-
-        let data = await this.model(ddModel).field("ID,XMNAME,DDLEVEL,(SELECT NAME FROM (SELECT id,mc NAME FROM scglxt_tyzd WHERE xh LIKE '04__') tras WHERE tras.id=DDLEVEL) DDLEVEL_TEXT,STARTTIME,ENDTIME").where('ckzt is null').order('DDLEVEL,SJCJSJ').page(pageNumber, pageSize).countSelect()
+        let queryKey = this.post('queryKey')
+        let whereObj = {}
+        if(queryKey && queryKey!= ""){
+            whereObj.XMNAME = ['like', '%'+queryKey+'%']
+        }
+        let data = await this.model(ddModel).field("ID,XMNAME,DDLEVEL,(SELECT NAME FROM (SELECT id,mc NAME FROM scglxt_tyzd WHERE xh LIKE '04__') tras WHERE tras.id=DDLEVEL) DDLEVEL_TEXT,STARTTIME,ENDTIME").where('id in (select DISTINCT ssdd from scglxt_t_bom where zddzt=\'0502\')').where(whereObj).page(pageNumber, pageSize).countSelect()
 
         return this.success(data)
     }

@@ -36,9 +36,15 @@ export default {
   },
   activated() {
     this.initData()
+    this.$socket.on('getTableData', () => {
+      this.initData()
+    })
   },
   created() {
     this.initData()
+    this.$socket.on('getTableData', () => {
+      this.initData()
+    })
   },
   methods: {
     async getTableData() {

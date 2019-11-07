@@ -53,7 +53,7 @@
     </el-table>
     <!--工具条-->
     <el-col :span="24" class="pagination">
-      <!-- <el-button v-if="!noEdit" type="danger" @click="batchRemove" :disabled="this.sels.length===0">批量删除</el-button> -->
+      <el-button type="danger" @click="batchRemove" :disabled="this.sels.length===0">批量删除</el-button>
       <el-pagination background @current-change="handleCurrentChange" :current-page="queryParams.pageNumber" :page-sizes="[30, 60, 100, 150]" :page-size="queryParams.pageSize" layout="total, sizes, prev, pager, next, jumper" :total="total" @size-change="sizeChange">
       </el-pagination>
     </el-col>
@@ -286,8 +286,8 @@ export default {
           params[this.primaryKey] = ids
           params['tableId'] = this.tableId
           this.$ajax.post(this.$api.deleteTableData, params).then(res => {
-            if (res && res.data && res.data.data > 0) {
-              this.$message({ message: '删除成功', type: 'success' })
+            if (res && res.data && res.errno == 0) {
+              this.$message.success('批量删除成功')
               this.getResList()
             }
           })
@@ -400,6 +400,8 @@ export default {
 .pagination {
   padding: 10px;
   text-align: right;
+  display: flex;
+  justify-content: space-between;
 }
 .el-table--striped .el-table__body tr.el-table__row--striped td {
   background: #f5f4f4;

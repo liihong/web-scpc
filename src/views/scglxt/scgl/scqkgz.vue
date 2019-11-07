@@ -1,9 +1,14 @@
 <template>
   <div class="blkcgl">
-    <el-table class="el-table" @expand-change="initData" :data="clList" v-loading="listLoading" stripe border :max-height="tableHeight" style="width: 100%;">
+     <!--工具条-->
+    <el-col :span="24" class="toolbar">
+      <el-input @keyup.enter.native="queryData" style="width:200px;" size="small" v-model="query.queryKey" placeholder="模糊查询"></el-input>
+      <el-button size="mini" @click="lookDDWorking" type="primary">订单生产实时看板</el-button>
+    </el-col>
+    <el-table class="el-table"  header-cell-class-name="table_th" @expand-change="initData" :data="clList" v-loading="listLoading" stripe border :max-height="tableHeight" style="width: 100%;">
       <el-table-column type="expand">
         <template slot-scope="props">
-          <el-table ref="bomTable" @selection-change="selectChange" @row-click="bomClick" :data="tableData">
+          <el-table ref="bomTable"  header-cell-class-name="table_th2" @row-click="bomClick" :data="tableData">
             <el-table-column align="center" v-for="(row,index) in blColumns" :key="index" :prop="row.id"  :label="row.name">
             </el-table-column>
           </el-table>
@@ -16,6 +21,8 @@
         </template>
       </el-table-column>
     </el-table>
+     <el-pagination style="text-align:center;" background @current-change="handleCurrentChange" :current-page="query.pageNumber" :page-sizes="[10, 20, 30, 50]" :page-size="query.pageSize" layout="total, sizes, prev, pager, next, jumper" :total="query.total" @size-change="sizeChange">
+    </el-pagination>
   </div>
 </template>
 
@@ -30,23 +37,59 @@ export default {
       activeRow: {},
       listLoading: false,
       radioValue: '',
-      selBomList: [],
+      initList: [],
       columnDatas: [
         {
-          id: 'XMNAME',
+          id: 'xmname',
           name: '订单名称'
         },
         {
-          id: 'DDLEVEL',
-          name: '订单级别'
-        },
-        {
-          id: 'STARTTIME',
+          id: 'starttime',
           name: '开始时间'
         },
         {
-          id: 'ENDTIME',
+          id: 'endtime',
           name: '结束时间'
+        },
+        {
+          id:'xqg',
+          name:'线切割'
+        },
+        {
+          id:'xi',
+          name:'铣'
+        },
+        {
+          id:'qian',
+          name:'钳'
+        },
+        {
+          id:'zhusu',
+          name:'注塑'
+        },
+        {
+          id:'che',
+          name:'车'
+        },
+        {
+          id:'cnc',
+          name:'CNC'
+        },
+        {
+          id:'dhh',
+          name:'电火花'
+        },
+        {
+          id:'rechuli',
+          name:'热处理'
+        },
+        {
+          id:'hanjie',
+          name:'焊接'
+        },
+        {
+          id:'waixie',
+          name:'外协'
         }
       ],
       blColumns: [{
@@ -62,28 +105,36 @@ export default {
           name: '结束时间'
         },
         {
-          id: '车',
-          name: '车'
+          id: '线切割',
+          name: '线切割'
         },
         {
           id: '铣',
           name: '铣'
         },
         {
-          id: 'CNC',
-          name: 'CNC'
+          id: '钳',
+          name: '钳'
         },
         {
-          id: '线切割',
-          name: '线切割'
+          id: '注塑',
+          name: '注塑'
+        },
+        {
+          id: '车',
+          name: '车'
+        },
+        {
+          id: 'CNC',
+          name: 'CNC'
         },
         {
           id: '电火花',
           name: '电火花'
         },
         {
-          id: '钳',
-          name: '钳'
+          id: '热处理',
+          name: '热处理'
         },
         {
           id: '磨',
@@ -92,10 +143,6 @@ export default {
         {
           id: '焊接',
           name: '焊接'
-        },
-        {
-          id: '热处理',
-          name: '热处理'
         }],
       clList: [],
       tableData: [],
@@ -110,11 +157,12 @@ export default {
     var offsetHeight = window.innerHeight
     this.tableHeight = offsetHeight - 80
     this.getSjzdData()
+    let _this = this
+    this.$socket.on('getTableData', () => {
+      _this.getSjzdData()
+    })
   },
   methods: {
-    selectChange(sel) {
-      this.selBomList = sel
-    },
     bomClick(row) {
       this.$refs.bomTable.toggleRowSelection(row)
     },
@@ -123,11 +171,24 @@ export default {
       this.activeRow = row
       this.initData(row)
     },
+    //翻页
+    handleCurrentChange(page) {
+      this.query.pageNumber = page
+      let data = [...this.initList]
+      this.clList = data.slice(this.query.pageNumber,this.query.pageSize)
+    },
+    sizeChange(size) {
+      this.query.pageNumber = 1
+      this.query.pageSize = size
+      let data = [...this.initList]
+      this.clList = data.slice(this.query.pageNumber,this.query.pageSize)
+  
+    },
     initData(row) {
       this.activeRow = row
       this.$ajax
-        .post(this.$api.getGYgslist, {
-          ddid: row.ID
+         .post(this.$api.getGYgslist, {
+          ddid: row.id
         })
         .then(res => {
           if (res.errno == 0) {
@@ -139,34 +200,30 @@ export default {
     
     // 获取数据字典数据
     getSjzdData() {
-      // this.$ajax
-      //   .get(this.$api.getDropDownListData, {
-      //     typesql:
-      //       // "select ID,CLMC,CLDJ,CLSL,MI CLMD from  scglxt_t_cl where id in (select zddcz from scglxt_t_bom where (clzt IS NULL or clzt=0 or clzt =2) AND cldx!='')"
-      //       "select ID,XMNAME,DDLEVEL,(SELECT NAME FROM (SELECT id,mc NAME FROM scglxt_tyzd WHERE xh LIKE '04__') tras WHERE tras.id=DDLEVEL) DDLEVEL_TEXT,STARTTIME,ENDTIME from scglxt_t_dd where id in (select ssdd from scglxt_t_bom where  (clzt IS NULL or clzt=0 or clzt =2) AND cldx!=''  ) ORDER BY DDLEVEL,STARTTIME"
-      //   })
-      //   .then(res => {
-      //     if (res.errno == 0) {
-      //       this.clList = res.data
-      //     }
-      //   })
-
-        this.$ajax.post(this.$api.getDdListByWhere, this.query).then(res => {
+        this.$ajax.post(this.$api.getDDWorkSpeed, this.query).then(res => {
         if (res.errno == 0) {
-          this.clList = res.data.data
-          this.query.total = res.data.count
+          this.initList = res.data
+          this.clList = res.data.slice(this.query.pageNumber,this.query.pageSize)
+          this.query.total = res.data.length
         }
       })
     },
+    //查看订单实时看板
+    lookDDWorking() {
+      window.open('/dd-working')
+    }
   }
 }
 </script>
-<style lang="scss" scoped>
+<style lang="scss">
 .radioGroup {
   text-align: left;
 }
 .radio {
   margin-left: 0 !important;
   margin-right: 0 !important;
+}
+.table_th2{
+   background: red;
 }
 </style>

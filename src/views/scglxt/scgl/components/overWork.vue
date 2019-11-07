@@ -103,11 +103,11 @@ export default {
         .then(res => {
           if (res.errno == 0) {
             this.$message.success('结束加工,操作成功！')
+            this.dialogState.show = false
+            this.$parent.$refs.jgList.getResList()
             this.$socket.emit('getTableData', res => {
               console.log(res)
             })
-            this.dialogState.show = false
-            this.$parent.$refs.jgList.getResList()
           }
         })
     }

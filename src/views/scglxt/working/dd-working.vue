@@ -41,7 +41,7 @@ export default {
         backgroundColor: '#00233a',
         title: {
           text: '工时汇总(单位：小时)',
-          left: '80%',
+          left: '70%',
           textStyle: {
             color: '#00D5FF'
           }
@@ -94,8 +94,9 @@ export default {
   },
   mounted() {
     this.initData()
-    this.$socket.on('getTableData', res => {
-      console.log(res)
+    let _this  = this
+    this.$socket.on('getTableData', () => {
+      _this.initData()
     })
   },
   methods: {

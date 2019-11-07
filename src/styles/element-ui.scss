@@ -23,6 +23,14 @@ $--color-primary: #42b983;
   padding:5px 0 !important;
   background: rgba(98, 98, 99, 0.14) !important;
   background-clip: padding-box;
+  font-weight: 900;
+}
+// 修改table样式
+.el-table .table_th2{
+  text-align: center;
+  padding:5px 0 !important;
+  background: rgba(35, 35, 40, 0.14) !important;
+  background-clip: padding-box;
 }
 .el-table .header-style{
   font-size: 18px;

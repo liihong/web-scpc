@@ -85,19 +85,26 @@ module.exports = class extends Base {
 
     // 获取订单动态剩余工时
     async getDDWorkSpeedAction() {
-        let sql = `  select dd.id,dd.xmname,dd.starttime,dd.endtime,dd.remark,
-        fun_yjggs_gy(id,'201609010949574021') 'xqg',
-        fun_yjggs_gy(id,'201609010949574022') 'xi',
-        fun_yjggs_gy(id,'201609010949574025') 'qian',
-        fun_yjggs_gy(id,'201609010949574023') 'zhusu',
-        fun_yjggs_gy(id,'201609010949574024') 'che',
-        fun_yjggs_gy(id,'201609010949574026') 'cnc',
-       fun_yjggs_gy(id,'201609010949574027') 'dhh',
-          fun_yjggs_gy(id,'201609010949574028')  'mo',
-           fun_yjggs_gy(id,'20170424203552800')   'rechuli',
-           fun_yjggs_gy(id,'20170724160856037')  'hanjie',
-           fun_yjggs_gy(id,'20170524144646657') 'waixie'
-    FROM  scglxt_t_dd dd where  dd.ckzt is null order by ddlevel,sjcjsj DESC`
+        let sql = `  
+        SELECT
+            dd.id,
+            dd.xmname,
+            dd.starttime,
+            dd.endtime,
+            dd.remark,
+             MAX(CASE gynr WHEN '201609010949574021' THEN sygs ELSE 0 END ) 'xqg',
+             MAX(CASE gynr WHEN '201609010949574022' THEN sygs ELSE 0 END ) 'xi',
+            MAX(CASE gynr WHEN '201609010949574025' THEN sygs ELSE 0 END ) 'qian',
+            MAX(CASE gynr WHEN '201609010949574023' THEN sygs ELSE 0 END ) 'zhusu',
+            MAX(CASE gynr WHEN '201609010949574024' THEN sygs ELSE 0 END ) 'che',
+            MAX(CASE gynr WHEN '201609010949574026' THEN sygs ELSE 0 END ) 'cnc',
+            MAX(CASE gynr WHEN '201609010949574027' THEN sygs ELSE 0 END ) 'dhh',
+            MAX(CASE gynr WHEN '201609010949574028' THEN sygs ELSE 0 END ) 'mo',
+            MAX(CASE gynr WHEN '20170424203552800'  THEN sygs ELSE 0 END ) 'rechuli',
+            MAX(CASE gynr WHEN '20170724160856037'  THEN sygs ELSE 0 END ) 'hanjie',
+            MAX(CASE gynr WHEN '20170524144646657'  THEN sygs ELSE 0 END ) 'waixie' 
+        FROM
+            scglxt_t_dd dd ,v_scglxt_sygs sygs where dd.id =sygs.ddid group by ddid`
 
         let data = await this.model().query(sql)
 

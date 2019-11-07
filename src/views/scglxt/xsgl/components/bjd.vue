@@ -61,6 +61,14 @@ export default {
           id: 'dj'
         },
         {
+          name: '未税单价',
+          id: 'wsdj'
+        },
+        {
+          name: '含税单价',
+          id: 'hsdj'
+        },
+        {
           name: '总金额',
           id: 'zje'
         },

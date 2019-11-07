@@ -299,7 +299,8 @@ export default {
       this.$ajax
         .get(this.$api.queryDataById, {
           tableId: this.tableId,
-          id: this.resId
+          id: this.resId,
+          flag: 'UPDATE'
         })
         .then(res => {
           if (res.errno == 0) {

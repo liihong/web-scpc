@@ -28,24 +28,9 @@ module.exports = class extends Base {
         this.emit('getTableData', {
             hello: '查询表格数据'
         })
-        let sql = `  select dd.id,dd.xmname,dd.starttime,dd.endtime,dd.remark,
-        fun_yjggs_gy(id,'201609010949574021') 'xqg',
-        fun_yjggs_gy(id,'201609010949574022') 'xi',
-        fun_yjggs_gy(id,'201609010949574025') 'qian',
-        fun_yjggs_gy(id,'201609010949574023') 'zhusu',
-        fun_yjggs_gy(id,'201609010949574024') 'che',
-        fun_yjggs_gy(id,'201609010949574026') 'cnc',
-       fun_yjggs_gy(id,'201609010949574027') 'dhh',
-          fun_yjggs_gy(id,'201609010949574028')  'mo',
-           fun_yjggs_gy(id,'20170424203552800')   'rechuli',
-           fun_yjggs_gy(id,'20170724160856037')  'hanjie',
-           fun_yjggs_gy(id,'20170524144646657') 'waixie'
-    FROM  scglxt_t_dd dd where  dd.ckzt is null order by ddlevel,sjcjsj DESC`
-
-        let data = await this.model().query(sql)
 
         //广播
-        this.broadcast('getTableData', this.success(data))
+        this.broadcast('getTableData', 'refresh')
     }
 
 };
