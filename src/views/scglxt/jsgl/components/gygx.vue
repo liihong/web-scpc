@@ -5,11 +5,15 @@
         当前订单：
         <span style="color:#42b983">{{row.SSDD_TEXT}} </span>
         零件名称：
-         <a :href="row.DDTZ" target="_blank"><span style="color:#42b983"> {{row.ZDDMC}}</span></a>
+        <a :href="row.DDTZ" target="_blank">
+          <span style="color:#42b983"> {{row.ZDDMC}}</span>
+        </a>
       </span>
       <span v-else>
         零件名称：
-        <a :href="row.DDTZ" target="_blank"><span style="color:#42b983">{{row.BOMID_TEXT}}</span></a>
+        <a :href="row.DDTZ" target="_blank">
+          <span style="color:#42b983">{{row.BOMID_TEXT}}</span>
+        </a>
       </span>
     </div>
     <el-row>
@@ -30,15 +34,19 @@
       </el-col>
       <el-col :span="24">
         <el-table :data="gygxList" class="gygxTable" id="gygxTable" row-key="id">
-          <el-table-column   min-width="20" align="center" v-if="type == 'edit'" property="gxnr" label="删除">
+          <el-table-column min-width="20" align="center" v-if="type == 'edit'" property="gxnr" label="删除">
             <template slot-scope="scope">
-              <el-button @click="deleteGy(scope.$index)" size="mini" type="danger" icon="el-icon-delete" circle></el-button>
+              <el-button @click="deleteGy(scope.$index,scope.row)" size="mini" type="danger" icon="el-icon-delete" circle></el-button>
             </template>
           </el-table-column>
           <el-table-column width="30" type="index" align="center"></el-table-column>
-          <el-table-column class-name="gxnr"  align="center" property="gxnr" label="工序" min-width="40">
+          <el-table-column class-name="gxnr" align="center" property="gxnr" label="工序" min-width="50">
             <template slot-scope="scope">
-              <span>{{scope.row['gymc']}}</span>
+              <!-- <span>{{scope.row['gymc']}}</span> -->
+              <el-select @change="changeGygx(item)" size="mini" v-model="scope.row['gynr']" placeholder="请选择">
+                <el-option v-for="item in jggyList" :key="item.id" :label="item.gymc" :value="item.id">
+                </el-option>
+              </el-select>
             </template>
           </el-table-column>
           <el-table-column property="sbid" label="设备类型" min-width="70">
@@ -139,17 +147,14 @@ export default {
         '.gygxTable .el-table__body-wrapper tbody'
       )
       const _this = this
-      Sortable.create(
-        tbody,
-        {
-          group: '.gxnr',
-          handle: '.gxnr',
-          onEnd({ newIndex, oldIndex }) {
-            const currRow = _this.gygxList.splice(oldIndex, 1)[0]
-            _this.gygxList.splice(newIndex, 0, currRow)
-          }
+      Sortable.create(tbody, {
+        group: '.gxnr',
+        handle: '.gxnr',
+        onEnd({ newIndex, oldIndex }) {
+          const currRow = _this.gygxList.splice(oldIndex, 1)[0]
+          _this.gygxList.splice(newIndex, 0, currRow)
         }
-      )
+      })
     },
     initData() {
       this.$ajax.get(this.$api.getJggyList).then(res => {
@@ -164,8 +169,18 @@ export default {
       })
     },
     //删除
-    deleteGy(index) {
-      this.gygxList.splice(index, 1)
+    deleteGy(index,row) {
+      let id = row.id
+       this.$message.confirm('谨慎删除，若已开始加工则只能进行修改',() => {
+         this.$ajax
+        .post(this.$api.deleteGygx,{id:id}).then((res)=>{
+          if (res.errno == 0) {
+            this.gygxList.splice(index, 1)
+          } else {
+            this.$message.error(res.data)
+          }
+        })
+       })
     },
     onSave() {
       let datas = this.gygxList.map((item, index) => {
@@ -209,7 +224,7 @@ export default {
         gynr: item.value.nodeValue,
         gymc: item.name.nodeValue,
         bomid: this.row.ID,
-        ssdd:this.row.SSDD,
+        ssdd: this.row.SSDD,
         edgs: 0,
         serial: this.gygxList.length,
         sbid: sblx[0].id || '',

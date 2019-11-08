@@ -18,7 +18,7 @@ let api = {
     getSblxList: 'scglxt/gygx/getSblxList',
     getSbList: 'scglxt/gygx/getSbList',
     saveGygxInfo: 'scglxt/gygx/saveGygxInfo',
-
+    deleteGygx: 'scglxt/gygx/deleteGygx',
     // 报价单
     addBjd: 'scglxt/bjd/addBjd',
 

@@ -31,7 +31,11 @@ module.exports = class extends Base {
 
     /**
      * 保存工艺
-     * 1.删除原有bom工艺 2.保存新增的工艺 3.修改bom中显示的工艺内容 4.更新DD的工时
+     * 1.先判断是否已存在工艺
+     * 2.如果没有直接新增，
+     * 3. 如果已有是修改，则只修改即可
+     * 4.修改bom中显示的工艺内容 
+     * 5.更新DD的工时
      * @returns 
      */
     async saveGygxInfoAction() {
@@ -40,15 +44,36 @@ module.exports = class extends Base {
         let rows = await this.model(gyModel).where({
             bomid: form[0].bomid
         }).select();
+        let bomgxgx = await this.model('scglxt_t_bom').field('gxnr').where({
+            id: form[0].bomid
+        })
         try {
-            let affectedRows = await this.model(gyModel).where({
-                bomid: form[0].bomid
-            }).delete();
             let gynr = [],
-                gs = 0
-            let data = await this.model(gyModel).addMany(form, {
-                pk: 'ID'
-            });
+                gs = 0,
+                data = ''
+            //如果是编辑
+            const vm = this
+            if (bomgxgx && bomgxgx != '') {
+                let pArr = []
+                form.forEach(item => {
+                    pArr.push(new Promise(async resolve => {
+                        await vm.model(gyModel).where({
+                            id: item.id
+                        }).update(item)
+                        resolve()
+                    }))
+                })
+                Promise.all(pArr)
+            } else {
+                // let affectedRows = await this.model(gyModel).where({
+                //     bomid: form[0].bomid
+                // }).delete();
+
+                data = await this.model(gyModel).addMany(form, {
+                    pk: 'ID'
+                });
+            }
+
             form.forEach(item => {
                 gynr.push(item.gymc + '(' + parseInt(item.zbgs + item.bzgs) + ')');
                 gs += parseInt(item.zbgs + item.bzgs);
@@ -83,7 +108,18 @@ module.exports = class extends Base {
         }
 
     }
-
+    //删除
+    async deleteGygxAction(){
+        let id = this.post('id')
+        let jgglData = await this.model('scglxt_t_jggl').where({gygcid:id}).select()
+        //如果已经在加工中
+        if(jgglData.length >0) {
+            return this.fail(200,'已经加工无法删除,只能修改')
+        }else{
+            let data = await this.model(gyModel).where({id:id}).delete()
+            return this.success(data)
+        }
+    }
     //获取设备类型
     async getSblxListAction() {
         let data = await this.model('scglxt_t_sblx').select()
@@ -192,7 +228,7 @@ module.exports = class extends Base {
             let gygcData = await this.model('scglxt_t_gygc').where({
                 id: gyid
             }).find()
-            
+
             if (gygcData.kjgjs != (gygcData.yjgjs + gygcData.sjjs)) // 如果加工未完成自动再开始一条加工记录 
             {
                 await this.model('scglxt_t_gygc').where({
@@ -217,8 +253,8 @@ module.exports = class extends Base {
                     sfjy: 0
                 }
                 //容错处理，如果已加工件数+送检件数大于可加工件数，则默认将已加工件数更新为可加工件数
-                
-                if (gygcData.kjgjs < (gygcData.yjgjs + gygcData.sjjs)){
+
+                if (gygcData.kjgjs < (gygcData.yjgjs + gygcData.sjjs)) {
                     updateInfo.yjgjs = gygcData.kjgjs
                 }
                 await this.model('scglxt_t_gygc').where({
@@ -351,8 +387,12 @@ module.exports = class extends Base {
             // }
 
             //容错处理，如果已加工件数+送检件数大于可加工件数，则默认将已加工件数更新为可加工件数
-            if (yjgjs > kjgjs){
-                await this.model('scglxt_t_gygc').update({yjgjs:kjgjs}).where({id:gygcid})
+            if (yjgjs > kjgjs) {
+                await this.model('scglxt_t_gygc').update({
+                    yjgjs: kjgjs
+                }).where({
+                    id: gygcid
+                })
             }
 
             let nextJGgy = await this.model('scglxt_t_gygc').where({
