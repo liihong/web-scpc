@@ -18,7 +18,7 @@
     </div>
     <el-row>
       <el-col v-show="type == 'edit'" :span="22">
-        <draggable class="list-group" v-model="jggyList" :options="{draggable:'.el-tag',filter: '.undraggable', sort: false}" :move="getdata" @end="drop" @update="datadragEnd">
+        <draggable class="list-group" v-model="jggyList" :options="{draggable:'.el-tag',filter: '.undraggable', sort: false}" @end="drop">
           <el-tag class="elTag" v-for="(item,index) in jggyList" :value="item.id" :name="item.gymc" :key="index">{{item.gymc}}</el-tag>
         </draggable>
       </el-col>
@@ -43,7 +43,7 @@
           <el-table-column class-name="gxnr" align="center" property="gxnr" label="工序" min-width="50">
             <template slot-scope="scope">
               <!-- <span>{{scope.row['gymc']}}</span> -->
-              <el-select @change="changeGygx(item)" size="mini" v-model="scope.row['gynr']" placeholder="请选择">
+              <el-select @change="((gyid)=>{changeGygx(gyid,scope.row)})" size="mini" v-model="scope.row['gynr']" placeholder="请选择">
                 <el-option v-for="item in jggyList" :key="item.id" :label="item.gymc" :value="item.id">
                 </el-option>
               </el-select>
@@ -141,6 +141,14 @@ export default {
     }
   },
   methods: {
+    changeGygx(gyid,row) {
+      
+      let sblx = this.sjzdList.filter(el => {
+        return el.ssgy == gyid
+      })
+      row.sblxList = sblx
+      row.sbid = sblx[0].id
+    },
     //行拖拽
     rowDrop() {
       const tbody = document.querySelector(
@@ -169,18 +177,21 @@ export default {
       })
     },
     //删除
-    deleteGy(index,row) {
+    deleteGy(index, row) {
       let id = row.id
-       this.$message.confirm('谨慎删除，若已开始加工则只能进行修改',() => {
-         this.$ajax
-        .post(this.$api.deleteGygx,{id:id}).then((res)=>{
+      this.$message.confirm('谨慎删除，若已开始加工则只能进行修改', () => {
+        this.$ajax.post(this.$api.deleteGygx, { 
+          id: id,
+          bomid: row.bomid,
+          ssdd: row.ssdd
+          }).then(res => {
           if (res.errno == 0) {
             this.gygxList.splice(index, 1)
           } else {
             this.$message.error(res.data)
           }
         })
-       })
+      })
     },
     onSave() {
       let datas = this.gygxList.map((item, index) => {
@@ -205,10 +216,6 @@ export default {
           }
         })
     },
-    getdata(val) {
-      console.log(val)
-    },
-    datadragEnd() {},
     drop(info) {
       let item = info.item.attributes
       let sblx = this.sjzdList.filter(el => {

@@ -41,6 +41,9 @@ module.exports = class extends Base {
     async saveGygxInfoAction() {
         let form = this.post('form')
         let ssdd = this.post('ssdd')
+        if(form.length == 0) {
+            return this.fail(1000,'没有数据')
+        }
         let rows = await this.model(gyModel).where({
             bomid: form[0].bomid
         }).select();
@@ -56,48 +59,75 @@ module.exports = class extends Base {
             if (bomgxgx && bomgxgx != '') {
                 let pArr = []
                 form.forEach(item => {
-                    pArr.push(new Promise(async resolve => {
-                        await vm.model(gyModel).where({
-                            id: item.id
-                        }).update(item)
-                        resolve()
-                    }))
+                    pArr.push(vm.updateGygxOrAdd(item))
                 })
-                Promise.all(pArr)
-            } else {
-                // let affectedRows = await this.model(gyModel).where({
-                //     bomid: form[0].bomid
-                // }).delete();
+                Promise.all(pArr).then(async () => {
+                    let newData = await this.model(gyModel).join({
+                        table: 'scglxt_t_jggy',
+                        join: 'left',
+                        on: ['gynr', 'id']
+                    }).field("gynr,gymc,bzgs,zbgs").where({
+                        bomid: form[0].bomid
+                    }).order('serial').select();
+                    newData.forEach(item => {
+                        gynr.push(item.gymc + '(' + parseInt(item.zbgs + item.bzgs) + ')');
+                        gs += parseInt(item.zbgs + item.bzgs);
+                    })
+                    //修改bom显示的工艺内容
 
+                    await this.model('scglxt_t_bom').where({
+                        id: form[0].bomid
+                    }).update({
+                        gxnr: gynr.join('-'),
+                        gs: gs
+                    });
+
+                    // 更新订单总工时
+                    let zgs = await this.model('scglxt_t_bom').where({
+                        ssdd: ssdd
+                    }).sum('gs');
+
+                    await this.model('scglxt_t_dd').where({
+                        id: ssdd
+                    }).update({
+                        zgs: zgs
+                    });
+                })
+            } else {
                 data = await this.model(gyModel).addMany(form, {
                     pk: 'ID'
                 });
+                let newData = await this.model(gyModel).join({
+                    table: 'scglxt_t_jggy',
+                    join: 'left',
+                    on: ['gynr', 'id']
+                }).field("gynr,gymc,bzgs,zbgs").where({
+                    bomid: form[0].bomid
+                }).order('serial').select();
+                newData.forEach(item => {
+                    gynr.push(item.gymc + '(' + parseInt(item.zbgs + item.bzgs) + ')');
+                    gs += parseInt(item.zbgs + item.bzgs);
+                })
+                //修改bom显示的工艺内容
+
+                await this.model('scglxt_t_bom').where({
+                    id: form[0].bomid
+                }).update({
+                    gxnr: gynr.join('-'),
+                    gs: gs
+                });
+
+                // 更新订单总工时
+                let zgs = await this.model('scglxt_t_bom').where({
+                    ssdd: ssdd
+                }).sum('gs');
+
+                await this.model('scglxt_t_dd').where({
+                    id: ssdd
+                }).update({
+                    zgs: zgs
+                });
             }
-
-            form.forEach(item => {
-                gynr.push(item.gymc + '(' + parseInt(item.zbgs + item.bzgs) + ')');
-                gs += parseInt(item.zbgs + item.bzgs);
-            })
-            //修改bom显示的工艺内容
-
-            await this.model('scglxt_t_bom').where({
-                id: form[0].bomid
-            }).update({
-                gxnr: gynr.join('-'),
-                gs: gs
-            });
-
-            // 更新订单总工时
-            let zgs = await this.model('scglxt_t_bom').where({
-                ssdd: ssdd
-            }).sum('gs');
-
-            await this.model('scglxt_t_dd').where({
-                id: ssdd
-            }).update({
-                zgs: zgs
-            });
-
             return this.success(data)
         } catch (ex) {
             // 如果上面流程执行失败，则恢复原有数据
@@ -108,17 +138,77 @@ module.exports = class extends Base {
         }
 
     }
+    //判断当前工艺是新增还是修改
+    async updateGygxOrAdd(item) {
+        return new Promise(async resolve => {
+            let isData = await this.model(gyModel).where({
+                id: item.id
+            }).select()
+            if (isData.length > 0) //已存在
+            {
+                await this.model(gyModel).where({
+                    id: item.id
+                }).update(item)
+            } else { //不存在新增
+                await this.model(gyModel).where({
+                    id: item.id
+                }).add(item)
+            }
+            resolve()
+        })
+    }
+
     //删除
-    async deleteGygxAction(){
+    async deleteGygxAction() {
         let id = this.post('id')
-        let jgglData = await this.model('scglxt_t_jggl').where({gygcid:id}).select()
+        let bomid = this.post('bomid')
+        let ssdd = this.post('ssdd')
+        let jgglData = await this.model('scglxt_t_jggl').where({
+            gygcid: id
+        }).select()
+        let data = {}
         //如果已经在加工中
-        if(jgglData.length >0) {
-            return this.fail(200,'已经加工无法删除,只能修改')
-        }else{
-            let data = await this.model(gyModel).where({id:id}).delete()
-            return this.success(data)
+        if (jgglData.length > 0) {
+            return this.fail(200, '已经加工无法删除,只能修改')
+        } else {
+            data = await this.model(gyModel).where({
+                id: id
+            }).delete()
         }
+        let gynr = [],gs = 0
+        let newData = await this.model(gyModel).join({
+            table: 'scglxt_t_jggy',
+            join: 'left',
+            on: ['gynr', 'id']
+        }).field("gynr,gymc,bzgs,zbgs").where({
+            bomid: bomid
+        }).order('serial').select();
+        newData.forEach(item => {
+            gynr.push(item.gymc + '(' + parseInt(item.zbgs + item.bzgs) + ')');
+            gs += parseInt(item.zbgs + item.bzgs);
+        })
+        //修改bom显示的工艺内容
+
+        await this.model('scglxt_t_bom').where({
+            id: bomid
+        }).update({
+            gxnr: gynr.join('-'),
+            gs: gs
+        });
+
+        // 更新订单总工时
+        let zgs = await this.model('scglxt_t_bom').where({
+            ssdd: ssdd
+        }).sum('gs');
+
+        await this.model('scglxt_t_dd').where({
+            id: ssdd
+        }).update({
+            zgs: zgs
+        });
+
+        return this.success(data)
+        
     }
     //获取设备类型
     async getSblxListAction() {
