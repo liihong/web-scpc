@@ -5,7 +5,7 @@
         <el-radio-group v-model="scope.row.CLZT" class="radioGroup">
           <el-radio @change="changeRadio(scope.row)" class="radio" :label="1">完成备料</el-radio>
           <el-radio v-show="scope.row.CLZT !=0 && scope.row.CLZT !=2" @change="changeRadio(scope.row)" class="radio" :label="2">自备料</el-radio>
-          <el-radio v-show="scope.row.CLZT !=2 && scope.row.CLZT !=0" @change="changeRadio(scope.row)" class="radio" :label="0">待采购</el-radio>
+          <el-radio v-show="scope.row.CLZT ==2" @change="changeRadio(scope.row)" class="radio" :label="0">待采购</el-radio>
         </el-radio-group>
         <span @click="cgClick(scope.row)" v-show="scope.row.CLZT != '' || scope.row.CLZT != null" class="spanText">{{clztData[scope.row.CLZT]}}</span>
       </template>

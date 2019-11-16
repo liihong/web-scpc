@@ -1,7 +1,7 @@
 <template>
   <div class="resEdit">
     <el-dialog append-to-body :modal=false :width="width" size="small" :title="optionType == 'add' ? '新增' : '编辑'" :visible.sync="dialogState.show" :close-on-click-modal="false">
-      <el-form class="form" :inline="true" ref="form" :model="formData" label-width="120px" label-position="right" size="small">
+      <el-form class="form" :rules="rules" :inline="true" ref="form" :model="formData" label-width="120px" label-position="right" size="small">
         <el-row>
           <el-col :span="12" v-show="item.PROPERTY_TYPE !== '10'" v-for="(item,i) in columnData" :key="i" class="item">
             <el-form-item :label="item.COLUMN_CNAME" style="width:100%">
@@ -63,7 +63,8 @@ export default {
       dropDownListData: {},
       primaryKey: {},
       queryData: {},
-      isUpload: false
+      isUpload: false,
+      rules:{}
     }
   },
   computed: {
@@ -201,6 +202,9 @@ export default {
     }
   },
   watch: {
+    rules:{
+      deep:true
+    },
     dialogState: {
       deep: true,
       handler() {
@@ -224,15 +228,18 @@ export default {
               if (item.PROPERTY_TYPE == '10') {
                 this.primaryKey.name = item.COLUMN_NAME
               }
+              if(item.ISMUST == '1') {
+                this.rules[item.COLUMN_NAME] = [{ required: true, message: `请输入${item.COLUMN_CNAME}`, trigger: 'blur' }]
+              }
             })
           })
+          console.log(this.rules)
           if (this.optionType == 'edit') {
             this.getFormData()
           } else {
             this.$nextTick(() => {
               this.$refs.form.resetFields()
               this.formData = {}
-              console.log(this.formData)
             })
           }
         }

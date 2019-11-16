@@ -34,21 +34,16 @@ export default {
             id: this.$util.getUUId(),
             zddmc: item.LJMC,
             zddcz: item.CZ,
-            clxz: '',
-            cldx: '',
-            cltj: '',
-            clje: '',
-            jgsl: item.LJSL,
+            jgsl: item.SL,
             bmcl: '',
-            // starttime: null,
-            // endtime: '',
             gs: 0,
             ddtz: item.TH,
             ssdd: this.dialogState.query.SSDD || '',
             zddzt: '0501', //默认是未开始状态
             clzl: 0,
             bljs: item.SL,
-            zddjb: ''
+            zddjb: '',
+            bjdid: item.ID
           })
         })
         this.$message.confirm('是否确定生成BOM？', () => {
@@ -89,6 +84,7 @@ export default {
     //   }
     // }
     'dialogState.query'() {
+      console.log(this.dialogState.query)
       this.$nextTick(() => {
         this.query = this.dialogState.query
       })

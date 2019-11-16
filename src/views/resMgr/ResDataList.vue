@@ -308,6 +308,9 @@ export default {
           return item.COLUMN_NAME
         })
         this.queryParams.queryColumn = columns.join(',')
+         if(this.queryParams.queryKey != '') {
+          this.queryParams.pageNumber = 1
+        }
         this.$emit('refreshData', this.queryParams)
       }
     }

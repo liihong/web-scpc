@@ -121,12 +121,19 @@ module.exports = class extends Base {
             
         }
          else {
+            let updateInfo = {
+                status: 2,
+                jssj: util.getNowTime(),
+                sfjy: 0
+            }
+            //容错处理，如果已加工件数+送检件数大于可加工件数，则默认将已加工件数更新为可加工件数
+
+            if (gygcData.kjgjs < (gygcData.yjgjs + gygcData.sjjs)) {
+                updateInfo.yjgjs = gygcData.kjgjs
+            }
             await this.model('scglxt_t_gygc').where({
                 id: gyid
-            }).update({
-                status: 2,
-                jssj:util.getNowTime()
-            })
+            }).update(updateInfo)
         }
 
 

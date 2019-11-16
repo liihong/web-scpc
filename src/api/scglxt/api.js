@@ -50,7 +50,7 @@ let api = {
     BOMInStore: 'scglxt/bom/BOMInStore',//入库
     BOMOutStore: 'scglxt/bom/BOMOutStore',//出库
     BOMSpeedProgress: 'scglxt/bom/BOMSpeedProgress',//进度跟踪
-
+    BOMInSpareStock: 'scglxt/bom/BOMInSpareStock',//成品转入备用库存
     //组件操作
     addZj: 'scglxt/zj/addZj',
     editZj: 'scglxt/zj/editZj',

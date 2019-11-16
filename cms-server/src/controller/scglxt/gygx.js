@@ -22,7 +22,7 @@ module.exports = class extends Base {
             as: 'jggy',
             join: 'left',
             on: ['gynr', 'id']
-        }).order('serial asc').alias('t').field('t.id,t.bomid,t.gynr,t.edgs,t.zbgs,t.serial,t.sbid,t.zysx,t.bzgs,t.ssdd,jggy.gymc, sblx.mc sbmc').where({
+        }).order('serial asc').alias('t').field('t.id,t.bomid,t.gynr,t.edgs,t.zbgs,t.serial,t.sbid,t.zysx,t.bzgs,t.ssdd,jggy.gymc, sblx.mc sbmc,t.sfwx').where({
             'bomid': this.get('bomid')
         }).select()
         return this.success(data)
@@ -33,7 +33,7 @@ module.exports = class extends Base {
      * 保存工艺
      * 1.先判断是否已存在工艺
      * 2.如果没有直接新增，
-     * 3. 如果已有是修改，则只修改即可
+     * 3.如果已有是修改，则只修改即可
      * 4.修改bom中显示的工艺内容 
      * 5.更新DD的工时
      * @returns 
@@ -134,6 +134,13 @@ module.exports = class extends Base {
             await this.model(gyModel).addMany(rows, {
                 pk: 'ID'
             });
+            let errorLog = {
+                id: util.getUUId(),
+                type: '工艺编排',
+                error: JSON.stringify(ex),
+                infos: JSON.stringify(this.post())
+            }
+            await this.model('operate_log').add(errorLog)
             return this.fail(ex)
         }
 
@@ -158,7 +165,7 @@ module.exports = class extends Base {
         })
     }
 
-    //删除
+    //删除,删除时，如果已经开始加工，则更新删除的下一条工艺可加工件数
     async deleteGygxAction() {
         let id = this.post('id')
         let bomid = this.post('bomid')
@@ -171,6 +178,21 @@ module.exports = class extends Base {
         if (jgglData.length > 0) {
             return this.fail(200, '已经加工无法删除,只能修改')
         } else {
+            //判断是否有下一条工艺
+            let nowData = await this.model('scglxt_t_gygc').where({
+                id: id
+            }).find()
+            let nextData = await this.model('scglxt_t_gygc').where({
+                bomid: bomid,
+                serial: parseInt(nowData.serial) + 1
+            }).select()
+            if(nowData.kjgjs!=0 && nextData.length > 0) {//如果有下一条工艺，并且删除的这一条的可加工件数不为0
+                data = await this.model(gyModel).where({
+                    id: nextData[0].id
+                }).update({
+                    kjgjs:nowData.kjgjs
+                })
+            }
             data = await this.model(gyModel).where({
                 id: id
             }).delete()
@@ -494,7 +516,7 @@ module.exports = class extends Base {
             if (nextJGgy.length == 1) {
                 await this.model('scglxt_t_gygc').where({
                     bomid: bomid,
-                    serial: serial + 1
+                    serial: parseInt(serial) + 1
                 }).update({
                     kjgjs: yjgjs
                 })
