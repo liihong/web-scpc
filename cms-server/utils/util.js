@@ -28,13 +28,14 @@ module.exports = {
         let hour = now.getHours()
         let minutes = now.getMinutes()
         let seconds = now.getSeconds()
+        let milliseconds = now.getMilliseconds();
         if (month > 0 && month < 10) {
             month = '0' + month
         }
         if (day > 0 && day < 10) {
             day = '0' + day
         }
-        return now.getFullYear().toString() + month.toString() + day + hour + minutes + seconds + (Math.round(Math.random() * 10000 + 100)).toString()
+        return now.getFullYear().toString() + month.toString() + day + hour + minutes + seconds + milliseconds + (Math.round(Math.random() * 10000 + 100)).toString()
     },
     getNowTime: function () {
         const now = new Date()

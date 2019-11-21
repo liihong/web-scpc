@@ -60,10 +60,11 @@ module.exports = class extends Base {
     async addBomAction() {
         let form = this.post('form')
         //将订单级别取过来更新到BOM中
-        let zddjb = await this.model('scglxt_t_dd').where({
+        let {zddjb,endtime} = await this.model('scglxt_t_dd').where({
             id: form.ssdd
-        }).getField('ddlevel', true)
+        }).getField('ddlevel,endtime', true)
         form.zddjb = zddjb
+        form.endtime = endtime
         let data = await this.model(bomModel).add(form)
 
         // let zj = this.post('zj')
@@ -86,6 +87,7 @@ module.exports = class extends Base {
         for (let i = 0; i < form.length; i++) {
             form[i].zddjb = ddinfo.ddlevel
             form[i].ssdd = ddinfo.id
+            form[i].endtime = ddinfo.endtime
             pArr.push(vm.getData(form[i]))
         }
         let data = {}
@@ -246,24 +248,8 @@ module.exports = class extends Base {
     async getGYgslistAction() {
         let ddid = this.post('ddid')
 
-        // let sql = `
-        // select t.*,bom.zddmc,bom.zddcz,jgsl,DATE_FORMAT(starttime,'%Y-%m-%d') starttime,DATE_FORMAT(endtime,'%Y-%m-%d') endtime from (
-        // SELECT  bomid ,
-        //     sum(CASE gynr WHEN '201609010949574021' THEN (edgs+ ifnull(zbgs,0)) ELSE 0 END ) '线切割',
-        //     sum(CASE gynr WHEN '201609010949574022' THEN (edgs+ifnull(zbgs,0)) ELSE 0 END ) '铣',
-        //     sum(CASE gynr WHEN '201609010949574025' THEN (edgs+ifnull(zbgs,0)) ELSE 0 END ) '钳',
-        //          sum(CASE gynr WHEN '201609010949574023' THEN (edgs+ifnull(zbgs,0)) ELSE 0 END ) '注塑',
-        //          sum(CASE gynr WHEN '201609010949574024' THEN (edgs+ifnull(zbgs,0)) ELSE 0 END ) '车',
-        //           sum(CASE gynr WHEN '201609010949574026' THEN (edgs+ifnull(zbgs,0)) ELSE 0 END ) 'CNC',
-        //              sum(CASE gynr WHEN '201609010949574027' THEN (edgs+ifnull(zbgs,0)) ELSE 0 END ) '电火花',
-        //          sum(CASE gynr WHEN '201609010949574028' THEN (edgs+ifnull(zbgs,0)) ELSE 0 END ) '磨',
-        //           sum(CASE gynr WHEN '20170424203552800' THEN (edgs+ifnull(zbgs,0)) ELSE 0 END ) '热处理',
-        //              sum(CASE gynr WHEN '20170724160856037' THEN (edgs+ifnull(zbgs,0)) ELSE 0 END ) '焊接',
-        //               sum(CASE gynr WHEN '20170524144646657' THEN (edgs+ifnull(zbgs,0)) ELSE 0 END ) '外协'
-        // FROM scglxt_t_gygc
-        // GROUP BY bomid) t,scglxt_t_bom bom where t.bomid = bom.id and bom.ssdd=` + ddid
         let sql = `
-        select t.*,bom.zddmc,bom.zddcz,jgsl,DATE_FORMAT(starttime,'%Y-%m-%d') starttime,DATE_FORMAT(endtime,'%Y-%m-%d') endtime from (
+        select t.*,fun_dqgygc1 (bom.id) ddjd,bom.zddmc,bom.zddcz,jgsl,DATE_FORMAT(starttime,'%Y-%m-%d') starttime,DATE_FORMAT(endtime,'%Y-%m-%d') endtime from (
             SELECT id bomid ,
                 sum(CASE gynr WHEN '201609010949574021' THEN sygs ELSE 0 END ) '线切割',
                 sum(CASE gynr WHEN '201609010949574022' THEN sygs ELSE 0 END ) '铣',

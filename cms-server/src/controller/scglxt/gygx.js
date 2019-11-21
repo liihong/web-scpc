@@ -500,10 +500,10 @@ module.exports = class extends Base {
 
             //容错处理，如果已加工件数+送检件数大于可加工件数，则默认将已加工件数更新为可加工件数
             if (yjgjs > kjgjs) {
-                await this.model('scglxt_t_gygc').update({
-                    yjgjs: kjgjs
-                }).where({
+                await this.model('scglxt_t_gygc').where({
                     id: gygcid
+                }).update({
+                    yjgjs: kjgjs
                 })
             }
 

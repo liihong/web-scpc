@@ -1,7 +1,6 @@
 <template>
   <div class="ddgl">
     <ResList
-      noAdd
       tableId='0104'
       :query="query"
       noEdit

@@ -86,6 +86,10 @@ module.exports = class extends Base {
                         el.yjgjs = 0
                         el.sjjs = 0
                         el.bfjs = 0
+                        el.status = null
+                        el.sfjy = null
+                        el.kssj = null
+                        el.jssj = null
                         el.ssdd = newId
                         el.bomid = newBOMId
                         return el
@@ -113,6 +117,16 @@ module.exports = class extends Base {
         return this.success(addData)
     }
 
+    //循环执行BOM工艺的新增
+    copyBomData(item) {
+        const vm = this
+        return new Promise(async resolve => {
+            await vm.model(bomModel).add(item, {
+                pk: 'ID'
+            });
+            resolve()
+        })
+    }
 
     //订单删除数据
     async deleteDdAction() {

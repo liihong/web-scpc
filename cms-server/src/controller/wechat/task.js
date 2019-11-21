@@ -41,7 +41,7 @@ module.exports = class extends Base {
         try {
             let gygcId = this.get('id')
             let bomId = this.get('bomId')
-            let reSql = `SELECT gygc.id,dd.xmname ddmc,ddlevel,bom.endtime,bom.zddmc ljmc,bom.ddtz ddtz,(SELECT gymc FROM scglxt_t_jggy t WHERE t.id=gygc.gynr) gymc,edgs,kjgjs,yjgjs,zysx 'gynr',sbid,sb.mc sblx FROM scglxt_t_gygc gygc,scglxt_t_dd dd,scglxt_t_bom bom,scglxt_t_sblx sb WHERE dd.id=gygc.ssdd AND bom.id=gygc.bomid AND sb.id=gygc.sbid and gygc.id='`+gygcId+`'`
+            let reSql = `SELECT gygc.id,dd.xmname ddmc,ddlevel,bom.endtime,bom.zddmc ljmc,bom.ddtz ddtz,(SELECT gymc FROM scglxt_t_jggy t WHERE t.id=gygc.gynr) gymc,edgs,kjgjs,yjgjs,zysx 'gynr',sbid,sb.mc sblx FROM scglxt_t_gygc gygc,scglxt_t_dd dd,scglxt_t_bom bom,scglxt_t_sblx sb WHERE dd.id=gygc.ssdd AND bom.id=gygc.bomid AND sb.id=gygc.sbid and gygc.id='` + gygcId + `'`
 
             let sql = `SELECT gygc.id,dd.xmname ddmc,ddlevel,bom.endtime,bom.zddmc ljmc,bom.ddtz ddtz,(SELECT gymc FROM scglxt_t_jggy t WHERE t.id=gygc.gynr) gymc,edgs,kjgjs,yjgjs,zysx 'gynr',sbid,sb.mc sblx FROM scglxt_t_gygc gygc,scglxt_t_dd dd,scglxt_t_bom bom,scglxt_t_sblx sb WHERE dd.id=gygc.ssdd AND bom.id=gygc.bomid AND sb.id=gygc.sbid AND bomid='` + bomId + `' order by serial`
 
@@ -118,9 +118,8 @@ module.exports = class extends Base {
             // }
 
             // await this.model('scglxt_t_jggl').add(jgjlData)
-            
-        }
-         else {
+
+        } else {
             let updateInfo = {
                 status: 2,
                 jssj: util.getNowTime(),

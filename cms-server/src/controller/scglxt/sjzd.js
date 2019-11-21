@@ -12,15 +12,27 @@ module.exports = class extends Base {
         return this.success(data)
     }
 
+    // 获取班组列表
     async getBzListAction() {
         let data = await this.model('scglxt_t_bz').select()
         return this.success(data)
     }
 
+    //获取某一个班组下所有的人员信息
     async getPeopleByBzAction() {
         let bzid = this.post('bzid')
 
         let data = await this.model('scglxt_t_ry').where({ssbz: bzid}).select()
+
+        return this.success(data)
+    }
+
+    // 获取设备类型列表数据
+    async getSBLXListAction(){
+        let data = await this.model('scglxt_t_sblx').join({
+            table: 'scglxt_t_jggy',
+            join: 'left',
+            on: ['ssgy', 'id']}).field("t.id,mc,ssgy,scglxt_t_jggy.gymc,bzcn").alias('t').order('ssgy').select()
 
         return this.success(data)
     }

@@ -104,7 +104,7 @@ module.exports = class extends Base {
             MAX(CASE gynr WHEN '20170724160856037'  THEN sygs ELSE 0 END ) 'hanjie',
             MAX(CASE gynr WHEN '20170524144646657'  THEN sygs ELSE 0 END ) 'waixie' 
         FROM
-            scglxt_t_dd dd ,v_scglxt_sygs sygs where dd.id =sygs.ddid group by ddid`
+            scglxt_t_dd dd ,v_scglxt_sygs sygs where dd.id =sygs.ddid and dd.ckzt is null group by ddid`
 
         let data = await this.model().query(sql)
 

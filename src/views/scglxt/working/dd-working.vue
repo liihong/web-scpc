@@ -1,6 +1,7 @@
 <template>
   <div class="dd-working">
     <img width="100%" src="../../../assets/images/head.png">
+    <div class="header-button" @click="cntzClick">产能调整</div>
     <div class="working">
       <div>
         <bar-echarts :option="option" class="echarts-container"></bar-echarts>
@@ -25,18 +26,23 @@
         <el-table-column prop="remark" label="标记" align="center"></el-table-column>
       </el-table>
     </div>
+    <sbcn :dialogState="dialogState" />
   </div>
 </template>
 
 <script>
 import barEcharts from '@/components/Echarts/barEcharts'
-
+import sbcn from './components/sbcn'
 export default {
   components: {
-    barEcharts
+    barEcharts,
+    sbcn
   },
   data() {
     return {
+      dialogState:{
+        show: false
+      },
       option: {
         backgroundColor: '#00233a',
         title: {
@@ -125,6 +131,9 @@ export default {
           this.tableData = res.data
         }
       })
+    },
+    cntzClick(){
+      this.dialogState.show = true
     }
   }
 }
@@ -136,6 +145,12 @@ export default {
   .working {
     padding: 20px;
   }
+}
+.header-button{
+  color:#ffffff;
+  position: absolute;
+  right:10px;
+  top:15px;
 }
 .echarts-container {
   height: 400px;

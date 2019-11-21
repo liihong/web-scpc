@@ -7,9 +7,15 @@
     </el-col>
     <el-table class="el-table"  header-cell-class-name="table_th" @expand-change="initData" :data="clList" v-loading="listLoading" stripe border :max-height="tableHeight" style="width: 100%;">
       <el-table-column type="expand">
-        <template slot-scope="props">
+        <template>
           <el-table ref="bomTable"  header-cell-class-name="table_th2" @row-click="bomClick" :data="tableData">
-            <el-table-column align="center" v-for="(row,index) in blColumns" :key="index" :prop="row.id"  :label="row.name">
+            <el-table-column align="center" v-for="(row,index) in blColumns" :key="index" :prop="row.id"  :label="row.name" :min-length="row.length ==undefined ? 150: row.length">
+              <template slot-scope="scope" v-if="scope.row.slot == 'ddjd'">
+                <div v-html="scope.row.ddjd"></div>
+              </template>
+              <template v-else>
+                <span>{{scope.row[item.id]}}</span>
+              </template>
             </el-table-column>
           </el-table>
         </template>
@@ -99,6 +105,13 @@ export default {
          {
           id: 'starttime',
           name: '开始时间'
+        },
+        {
+          id: 'ddjd',
+          name: '订单进度(报废件数/已加工件数/可加工件数)',
+          align: 'left',
+          slot: 'ddjd',
+          length: 200
         },
         {
           id: 'endtime',

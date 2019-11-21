@@ -98,7 +98,7 @@ export default {
     handleLogin() {
       this.$refs.loginForm.validate(valid => {
         if (valid) {
-          if (this.verify != this.loginForm.verify) {
+          if ( this.verify.toLowerCase() != this.loginForm.verify.toLowerCase()) {
             this.loginForm.verify = ''
             this.$message.error('验证码不正确')
             this.makeCode()

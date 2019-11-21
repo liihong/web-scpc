@@ -8,11 +8,14 @@ let api = {
     getGygsPc: 'scglxt/statistics/getGygsPc',
     getDDWorkSpeed: 'scglxt/statistics/getDDWorkSpeed',//获取订单动态工时
     getPeopleHour: 'scglxt/statistics/getPeopleHour', //工人工时统计
+    
     //数据字典操作
     getSjzdById: 'scglxt/sjzd/getSjzdById',
     getBzList: 'scglxt/sjzd/getBzList',
     getPeopleByBz: 'scglxt/sjzd/getPeopleByBz',
+    getSBLXList:'scglxt/sjzd/getSBLXList',
 
+    //工艺工序操作
     getJggyList: 'scglxt/gygx/getJggyList',
     getJggxByBOMId: 'scglxt/gygx/getJggxByBOMId',
     getSblxList: 'scglxt/gygx/getSblxList',
@@ -36,6 +39,7 @@ let api = {
     getWorkingDDList: 'scglxt/ddgl/getWorkingDDList',
     uploadDrawing: '/api/scglxt/ddgl/uploadDrawing',
     deleteDdTz: 'scglxt/ddgl/deleteDdTz',
+    
     //bom表操作
     addBomData: 'scglxt/bom/addBom',
     addBomMany: 'scglxt/bom/addBomMany',
@@ -51,6 +55,7 @@ let api = {
     BOMOutStore: 'scglxt/bom/BOMOutStore',//出库
     BOMSpeedProgress: 'scglxt/bom/BOMSpeedProgress',//进度跟踪
     BOMInSpareStock: 'scglxt/bom/BOMInSpareStock',//成品转入备用库存
+    
     //组件操作
     addZj: 'scglxt/zj/addZj',
     editZj: 'scglxt/zj/editZj',
