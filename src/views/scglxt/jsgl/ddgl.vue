@@ -1,7 +1,7 @@
 <template>
   <div class="ddgl">
     <ResList key="0102" tableId='0102' :query="this.$route.query" noEdit ref="ddList">
-      <el-table-column slot="operate" fixed="left" label="操作" min-width="180" align="center">
+      <el-table-column slot="operate" fixed="left" label="操作" width="180" align="center">
         <template slot-scope="scope">
           <el-button-group size="mini">
             <el-button @click="exportBL(scope.row.ID)" size="mini" type="primary">备料</el-button>
@@ -23,7 +23,9 @@
         <el-tag effect='dark' :type="scope.row.DDLEVEL == '0402' ? 'warning' : scope.row.DDLEVEL == '0403' ? '' : 'danger'">{{scope.row.DDLEVEL_TEXT}}</el-tag>
       </template>
       <template slot="DQJD" slot-scope="scope">
-        <router-link target="_blank"  :to="{path:'/dd-detail', query:{id:scope.row.ID}}"><el-progress :text-inside="true" :stroke-width="14" :percentage="getBFB(scope.row.DQJD,scope.row.ZGS)"></el-progress></router-link>
+        <router-link :to="{path:'/ddDetail', query:{id:scope.row.ID}}">
+          <el-progress :text-inside="true" :stroke-width="14" :percentage="getBFB(scope.row.DQJD,scope.row.ZGS)"></el-progress>
+        </router-link>
       </template>
     </ResList>
     <uploadTZ :dialogState="dialogState" />
@@ -44,6 +46,7 @@ export default {
   },
   data() {
     return {
+      isDetail:false,
       dialogState: {
         row: {},
         show: false
@@ -108,27 +111,27 @@ export default {
       })
     },
     exportDD(ddId) {
-      // location.href = EXPORT_DDBOM + '?ddid=' + ddId
-      this.$ajax.getBolb(this.$api.exportDdBOM, {id: ddId}).then(res => {
-        if (res.data) {
-          let url = URL.createObjectURL(res.data)
-          let fileName = res.headers['content-disposition'].split('=')[1]
-          fileName = decodeURI(fileName)
-          let link = document.createElement('a')
-          link.style.display = 'none'
-          link.href = url
-          link.setAttribute('id', 'downloadLink')
-          link.setAttribute('download', fileName)
-          document.body.appendChild(link)
-          link.click()
-          // 删除添加的a链接
-          let objLink = document.getElementById('downloadLink')
-          document.body.removeChild(objLink)
-        }
-      })
+      location.href = 'http://'+ document.domain + ':8000/' + EXPORT_DDBOM + '?ddid=' + ddId
+      // this.$ajax.getBolb(this.$api.exportDdBOM, {id: ddId}).then(res => {
+      //   if (res.data) {
+      //     let url = URL.createObjectURL(res.data)
+      //     let fileName = res.headers['content-disposition'].split('=')[1]
+      //     fileName = decodeURI(fileName)
+      //     let link = document.createElement('a')
+      //     link.style.display = 'none'
+      //     link.href = url
+      //     link.setAttribute('id', 'downloadLink')
+      //     link.setAttribute('download', fileName)
+      //     document.body.appendChild(link)
+      //     link.click()
+      //     // 删除添加的a链接
+      //     let objLink = document.getElementById('downloadLink')
+      //     document.body.removeChild(objLink)
+      //   }
+      // })
     },
     exportBL(ddId) {
-      location.href = EXPORT_DDBL + '?ddid=' + ddId
+      location.href = 'http://'+ document.domain + ':8000/' + EXPORT_DDBL + '?ddid=' + ddId
     },
     // 上传图纸
     uploadTZ(row) {

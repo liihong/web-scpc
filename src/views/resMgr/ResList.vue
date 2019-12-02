@@ -2,7 +2,7 @@
   <section>
     <!--工具条-->
     <el-col :span="24" class="toolbar">
-      <el-form :inline="true">
+      <el-form :inline="true" v-show="!noTool">
         <el-form-item v-show="!noAdd">
           <el-button size="mini" @click="handleAdd" type="primary" icon="el-icon-circle-plus">新增</el-button>
         </el-form-item>
@@ -26,7 +26,7 @@
         </template>
       </el-table-column>
       <slot name="operate" />
-      <el-table-column label="操作" min-width="150" align="center" v-if="!noEdit">
+      <el-table-column label="操作" width="150" align="center" v-if="!noEdit">
         <template slot-scope="scope">
           <el-button-group size="mini">
             <el-button size="mini" type="primary" @click="handleEdit(scope.row)">编辑</el-button>
@@ -70,6 +70,10 @@ export default {
   props: {
     tableId: {
       type: String
+    },
+    noTool:{
+      type: Boolean,
+      default: false
     },
     noEdit: {
       type: Boolean,
@@ -160,15 +164,16 @@ export default {
       }
       this.$ajax.get(this.$api.queryTableData, this.queryParams).then(res => {
         if (res.data) {
+          this.resDatas = res.data.data
           // 给table赋值，重新遍历新增rowSpan属性，checkRoom，appointmentTime为table里面需要合并的属性名称
-          this.resDatas = this.mergeTableRow(res.data.data, [
-            'SSDD_TEXT',
-            'SSDD',
-            'BOMID',
-            'BOMID_TEXT',
-            'ssdd',
-            'ssdd_TEXT'
-          ])
+          // this.resDatas = this.mergeTableRow(res.data.data, [
+          //   'SSDD_TEXT',
+          //   'SSDD',
+          //   'BOMID',
+          //   'BOMID_TEXT',
+          //   'ssdd',
+          //   'ssdd_TEXT'
+          // ])
           this.total = parseInt(res.data.count)
           this.listLoading = false
           this.$nextTick(() => {
@@ -176,6 +181,7 @@ export default {
           })
         }
       })
+      this.$emit('getResList')
     },
     //导出
     handleExport() {

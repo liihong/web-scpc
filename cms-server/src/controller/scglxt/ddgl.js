@@ -5,7 +5,6 @@ const Base = require('../base.js');
 let ddModel = 'scglxt_t_dd'
 import util from '../../../utils/util'
 import exportXls from '../../../utils/exportXls'
-import config from '../../config/config.js';
 const fs = require('fs');
 const path = require('path');
 const xlsx = require('xlsx-style');
@@ -14,6 +13,31 @@ const rename = think.promisify(fs.rename, fs);
 
 module.exports = class extends Base {
 
+    //根据ID获取某一订单详情
+    async getDdDetailAction(){
+        let id = this.get('id')
+
+        let data = await this.model('scglxt_t_dd').join({
+            table: 'scglxt_t_ht',
+            as: 'ht',
+            join: 'left',
+            on: ['ssht', 'id']
+        }).join({
+            table: 'scglxt_t_kh',
+            as: 'kh',
+            join: 'left',
+            on: ['ht.khid', 'id']
+        }).alias('t').field('t.id,kh.mc khmc,ht.htbh,ht.jkje,t.xmname,t.starttime,t.endtime,ht.ywlx,ht.htje,fun_yjggs ( t.id ) dqjd,t.zgs,ht.bjdzj,ht.remark').where({'t.id':id}).find()
+
+        let ddtj = await this.model('scglxt_t_gygc').join({
+            table: 'scglxt_t_jggy',
+            as: 'gy',
+            join: 'left',
+            on: ['gynr', 'id']
+        }).alias('t').field('t.ssdd,t.gynr,gy.gymc,sum(bzgs) zgs').where({'t.ssdd':id}).group('gynr').select()
+        data.gstj = ddtj
+        return this.success(data)
+    }
     //获取进行中的订单
     async getWorkingDDListAction() {
 
@@ -91,6 +115,8 @@ module.exports = class extends Base {
                         el.kssj = null
                         el.jssj = null
                         el.ssdd = newId
+                        el.czryid= null
+                        el.jyryid= null
                         el.bomid = newBOMId
                         return el
                     }
@@ -99,6 +125,7 @@ module.exports = class extends Base {
                 item.clzt = 0
                 item.zddmc = item.zddmc + '_copy'
                 item.zddzt = '0501'
+                item.endtime = data.endtime
                 item.sjcjsj = util.getNowTime()
                 item.blkssj = null
                 item.bljssj = null

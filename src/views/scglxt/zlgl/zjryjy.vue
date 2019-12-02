@@ -3,7 +3,7 @@
     <el-form-item slot="toolBar">
       <el-button type="primary" icon="el-icon-s-unfold" @click="passMany" class="radio" :label="1">批量通过</el-button>
     </el-form-item>
-    <el-table-column slot="operate" fixed="left" label="操作" min-width="170" align="center">
+    <el-table-column slot="operate" fixed="left" label="操作" width="170" align="center">
       <template slot-scope="scope">
         <el-button-group>
           <el-button type="primary" @click="pass(scope.row)" class="radio" :label="1">通过并入库</el-button>

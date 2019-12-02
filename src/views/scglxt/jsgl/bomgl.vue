@@ -25,7 +25,7 @@
         slot="operate"
         fixed="left"
         label="操作"
-        min-width="250"
+        width="250"
         align="center"
       >
         <template slot-scope="scope">
