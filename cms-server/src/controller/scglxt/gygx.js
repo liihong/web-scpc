@@ -408,12 +408,11 @@ module.exports = class extends Base {
             where = "SSDD_TEXT like '%" + queryKey + "%' or BOMID_TEXT like '%" + queryKey + "%' or CZRYID_TEXT like '%" + queryKey + "%'"
         }
         let sql = `SELECT * from (SELECT jggl.ID, dd.xmname SSDD_TEXT,gygc.ZYSX,
-        bom.zddmc BOMID_TEXT, bom.zddjb ZDDJB, bom.bmcl BMCL, tz.tzlx, tz.url tzurl, jggy.gymc GYNR_TEXT,bom.jgsl KJGJS,gygc.YJGJS,
+        bom.zddmc BOMID_TEXT, bom.zddjb ZDDJB, bom.bmcl BMCL, jggy.gymc GYNR_TEXT,bom.jgsl KJGJS,gygc.YJGJS,
         ry.rymc CZRYID_TEXT,jggl.JGRYID, sb.sbmc SBID_TEXT, jggl.jgjs SJJS, gygc.BOMID,gygc.id gygcid, date_format( dd.endtime, '%Y-%m-%d' ) ddjssj,
         gygc.serial  FROM
             scglxt_t_gygc gygc,
-            scglxt_t_bom bom
-            LEFT JOIN scglxt_t_dd_tz tz ON bom.ddtz LIKE CONCAT( tz.tzmc, "%" ),
+            scglxt_t_bom bom,
             scglxt_t_jggy jggy,
             scglxt_t_jggl jggl
             LEFT JOIN scglxt_t_sb sb ON sb.id = jggl.sbid,
@@ -432,8 +431,7 @@ module.exports = class extends Base {
 
         let countSql = `SELECT count(*) count  FROM (select gygc.id,dd.xmname SSDD_TEXT, bom.zddmc BOMID_TEXT,ry.rymc CZRYID_TEXT from 
                         scglxt_t_gygc gygc,
-                        scglxt_t_bom bom
-                        LEFT JOIN scglxt_t_dd_tz tz ON bom.ddtz LIKE CONCAT( tz.tzmc, "%" ),
+                        scglxt_t_bom bom,
                         scglxt_t_jggy jggy,
                         scglxt_t_jggl jggl
                         LEFT JOIN scglxt_t_sb sb ON sb.id = jggl.sbid,

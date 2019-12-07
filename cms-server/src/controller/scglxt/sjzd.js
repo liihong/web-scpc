@@ -8,7 +8,7 @@ module.exports = class extends Base {
     
     // 获取某一个BOM的工艺
     async getSjzdByIdAction(){
-        let data = await this.model(sjzdModel).order('xh asc').where({'id': ['like', `${this.get('id')}%`]}).select()
+        let data = await this.model(sjzdModel).order('xh asc').where({'id': ['like', `${this.get('id')}__`]}).select()
         return this.success(data)
     }
 
