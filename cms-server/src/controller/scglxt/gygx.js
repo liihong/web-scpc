@@ -7,7 +7,12 @@ import util from '../../../utils/util'
 
 module.exports = class extends Base {
     async getJggyListAction() {
-        let data = await this.model('scglxt_t_jggy').select()
+        let data = await this.model('scglxt_t_jggy').join({
+            table: 'v_scglxt_pc_gygx',
+            as: 'gs',
+            join: 'left',
+            on: ['id', 'gynr']
+        }).select()
         return this.success(data)
     }
     // 获取某一个BOM的工艺
@@ -186,6 +191,10 @@ module.exports = class extends Base {
                 bomid: bomid,
                 serial: parseInt(nowData.serial) + 1
             }).select()
+            //如果有下一条工艺则应更新删除后所有数据的serial
+            if(nextData.length > 0){
+                await this.model(gyModel).execute('update scglxt_t_gygc set serial=serial-1 where bomid='+bomid+' and serial>'+nowData.serial)
+            }
             if(nowData.kjgjs!=0 && nextData.length > 0) {//如果有下一条工艺，并且删除的这一条的可加工件数不为0
                 data = await this.model(gyModel).where({
                     id: nextData[0].id

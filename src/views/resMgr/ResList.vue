@@ -2,7 +2,7 @@
   <section>
     <!--工具条-->
     <el-col :span="24" class="toolbar">
-      <el-form :inline="true">
+      <el-form :inline="true" v-show="!noTool">
         <el-form-item v-show="!noAdd">
           <el-button size="mini" @click="handleAdd" type="primary" icon="el-icon-circle-plus">新增</el-button>
         </el-form-item>
@@ -70,6 +70,10 @@ export default {
   props: {
     tableId: {
       type: String
+    },
+    noTool:{
+      type: Boolean,
+      default: false
     },
     noEdit: {
       type: Boolean,
@@ -176,6 +180,7 @@ export default {
           })
         }
       })
+      this.$emit('getResList')
     },
     //导出
     handleExport() {

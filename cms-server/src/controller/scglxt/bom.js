@@ -121,14 +121,21 @@ module.exports = class extends Base {
         let form = this.post('form')
         let primaryKey = this.post('primaryKey')
 
-        let zddjb = await this.model('scglxt_t_dd').where({
+        let {zddjb,endtime} = await this.model('scglxt_t_dd').where({
             id: form.ssdd
-        }).getField('ddlevel', true)
+        }).getField('ddlevel,endtime', true)
         form.zddjb = zddjb
         form.zddzt = '0501'
         form.clzt = null
+        form.endtime = endtime
+        form.sjcjsj = util.getNowTime()
+        form.blkssj = null
+        form.bljssj = null
+        form.cksj = null
+        form.rksj = null
         form.id = util.getUUId()
 
+        //添加BOM
         let data = await this.model(bomModel).add(form)
 
         let gyList = await this.model('scglxt_t_gygc').where({
@@ -142,6 +149,12 @@ module.exports = class extends Base {
                 item.yjgjs = 0
                 item.sjjs = 0
                 item.bfjs = 0
+                item.status = null
+                item.sfjy = null
+                item.kssj = null
+                item.jssj = null
+                item.czryid= null
+                item.jyryid= null
                 item.ssdd = form.ssdd
                 return item
             })

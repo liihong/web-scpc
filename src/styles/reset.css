@@ -55,11 +55,6 @@ html{
    color: #222;
    position:relative;
    box-sizing:border-box;
-   /*阻止默认事件*/
-   -webkit-user-select: none;
-   -khtml-user-select: none;
-   -moz-user-select: none;
-   -ms-user-select: none;
  }
 
  body:before {

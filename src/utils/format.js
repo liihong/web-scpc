@@ -7,7 +7,7 @@ import router from '@/router'
  * @returns {Array}
  */
 format.menuRouterData = function (menuData) {
-    let routers = router.options.routes
+    // let routers = router.options.routes
     let menuRouter = []
     // 提取出父目录
     let parentArr = menuData.filter((doc) => {
@@ -17,6 +17,7 @@ format.menuRouterData = function (menuData) {
     let childArr = menuData.filter((doc) => {
         return doc.parentId != '0'
     });
+
     parentArr.map((item, i) => {
         let routerObj = {
             path: item.resKey,
@@ -47,7 +48,6 @@ format.menuRouterData = function (menuData) {
                     component: () =>
                         import (`@/views/${childArr[0].path}`)
                 }]
-
             }])
         }
         childArr.forEach(child => {
@@ -59,6 +59,7 @@ format.menuRouterData = function (menuData) {
                         icon: child.icon,
                         keepAlive: true
                     },
+                    hidden: (child.ismenu == 0),
                     name: child.resKey,
                     component: () =>
                         import (`@/views/${child.path}`)

@@ -77,8 +77,6 @@ _exports.exportBOMXls = function (data, list, tjInfo, res) {
     header.A1.v = header.A1.v + data.xmname
     header.A1.h = header.A1.h + data.xmname
     header.C2.v = data.htbh
-    header.C3.v = data.htbh
-    header.C4.v = data.starttime
     header.C4.v = data.starttime
     header.H4.v = data.endtime
     header.C5.v = data.ddlevel
@@ -103,7 +101,7 @@ _exports.exportBOMXls = function (data, list, tjInfo, res) {
     }
     var keyMap = ["rownum", "zddmc", "clmc", "cldx", "jgsl", "gxnr", "bmcl", "bz", "endtime"];
     var dataList = xlsxUtils.format2Sheet(list, 0, 7, keyMap); //偏移8行按keyMap顺序转换
-
+    
     var dataKeys = Object.keys(dataList);
 
     var d2 = xlsxUtils.format2Sheet([tjInfo], 0, list.length + 7, ["info","zgs"]);
@@ -122,12 +120,12 @@ _exports.exportBOMXls = function (data, list, tjInfo, res) {
 
     for (var k in header) dataList[k] = header[k]; //追加列头
     
-    console.log(d2)
-
-    var wb = xlsxUtils.format2WB(d2, data.xmname, undefined, "A1:" + dataKeys[dataKeys.length - 1]);
-
+    
+    let wb = xlsxUtils.format2WB(dataList, data.xmname, workbook2, "A1:" + dataKeys[dataKeys.length - 1]);
+    console.log(workbook2.Sheets[0])
+    
     // 浏览器端和node共有的API,实际上node可以直接使用xlsx.writeFile来写入文件,但是浏览器没有该API
-    const result = XLSX.write(wb, {
+    const result = XLSX.write(workbook2, {
         bookType: 'xlsx', // 输出的文件类型
         type: 'buffer', // 输出的数据类型
         compression: true // 开启zip压缩

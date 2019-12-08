@@ -26,6 +26,7 @@ let api = {
     addBjd: 'scglxt/bjd/addBjd',
 
     //订单操作
+    getDdDetail: 'scglxt/ddgl/getDdDetail',
     getDdTz: 'scglxt/ddgl/getDdTz',
     copyDd: 'scglxt/ddgl/copyDd',
     deleteDd: 'scglxt/ddgl/deleteDd',
