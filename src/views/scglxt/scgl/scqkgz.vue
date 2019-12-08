@@ -6,15 +6,20 @@
       <el-button size="mini" @click="lookDDWorking" type="primary">订单生产实时看板</el-button>
     </el-col>
     <el-table class="el-table"  header-cell-class-name="table_th" @expand-change="initData" :data="clList" v-loading="listLoading" stripe border :max-height="tableHeight" style="width: 100%;">
-      <el-table-column type="expand">
-        <template>
-          <el-table ref="bomTable"  header-cell-class-name="table_th2" @row-click="bomClick" :data="tableData">
-            <el-table-column align="center" v-for="(row,index) in blColumns" :key="index" :prop="row.id"  :label="row.name" :min-length="row.length ==undefined ? 150: row.length">
-              <template slot-scope="scope" v-if="scope.row.slot == 'ddjd'">
-                <div v-html="scope.row.ddjd"></div>
-              </template>
-              <template v-else>
-                <span>{{scope.row[item.id]}}</span>
+      <el-table-column fixed="left" label="操作" min-width="80" align="center">
+        <template slot-scope="scope">
+          <el-button-group size="mini">
+            <el-button size="mini" type="primary" @click="uploadEndTime(scope.row)">修改交货时间</el-button>
+          </el-button-group>
+        </template>
+      </el-table-column>
+      <el-table-column  type="expand">
+        <template slot-scope="props">
+          <el-table ref="bomTable"  header-cell-class-name="table_th2" @row-click="bomClick" :data="props.row.bomList">
+            <el-table-column align="center" v-for="(row,index) in blColumns" :key="index" :prop="row.id"  :label="row.name" :min-width="(row.length == undefined)?150:row.length">
+              <template slot-scope="scope">
+                <div v-html="scope.row.ddjd" v-if="row.slot == 'ddjd'"></div> 
+                <span v-else>{{scope.row[row.id]}}</span>
               </template>
             </el-table-column>
           </el-table>
@@ -29,16 +34,23 @@
     </el-table>
      <el-pagination style="text-align:center;" background @current-change="handleCurrentChange" :current-page="query.pageNumber" :page-sizes="[10, 20, 30, 50]" :page-size="query.pageSize" layout="total, sizes, prev, pager, next, jumper" :total="query.total" @size-change="sizeChange">
     </el-pagination>
+    <updateEndTime :dialogState="dialogState"></updateEndTime>
   </div>
 </template>
 
 <script>
+import updateEndTime from './components/updateEndTime.vue'
 export default {
   name: 'blkcgl',
   components: {
+    updateEndTime
   },
   data() {
     return {
+      dialogState:{
+        isShow:false,
+        row:{}
+      },
       tableHeight: 800,
       activeRow: {},
       listLoading: false,
@@ -107,15 +119,15 @@ export default {
           name: '开始时间'
         },
         {
+          id: 'endtime',
+          name: '结束时间'
+        },
+        {
           id: 'ddjd',
           name: '订单进度(报废件数/已加工件数/可加工件数)',
           align: 'left',
           slot: 'ddjd',
-          length: 200
-        },
-        {
-          id: 'endtime',
-          name: '结束时间'
+          length: 400
         },
         {
           id: '线切割',
@@ -171,6 +183,7 @@ export default {
     this.tableHeight = offsetHeight - 80
     this.getSjzdData()
     let _this = this
+    
     this.$socket.on('getTableData', () => {
       _this.getSjzdData()
     })
@@ -178,6 +191,12 @@ export default {
   methods: {
     bomClick(row) {
       this.$refs.bomTable.toggleRowSelection(row)
+    },
+    //修改某一个订单的交货时间
+    uploadEndTime(row){
+      console.log(row)
+      this.dialogState.row = row
+      this.dialogState.show = true
     },
     // 展开执行
     expandChange(row) {
@@ -198,7 +217,6 @@ export default {
   
     },
     initData(row) {
-      this.activeRow = row
       this.$ajax
          .post(this.$api.getGYgslist, {
           ddid: row.id
@@ -207,6 +225,7 @@ export default {
           if (res.errno == 0) {
             row.bomList = res.data
             this.tableData = res.data
+            this.$forceUpdate()
           }
         })
     },
@@ -215,8 +234,11 @@ export default {
     getSjzdData() {
         this.$ajax.post(this.$api.getDDWorkSpeed, this.query).then(res => {
         if (res.errno == 0) {
-          this.initList = res.data
-          this.clList = res.data.slice(this.query.pageNumber,this.query.pageSize)
+          this.initList = res.data.map(item => {
+            item.bomList = []
+            return item
+          })
+          this.clList = this.initList.slice(this.query.pageNumber,this.query.pageSize)
           this.query.total = res.data.length
         }
       })
