@@ -5,7 +5,7 @@
         当前订单：
         <span style="color:#42b983">{{row.DDMC}} </span>
         当前BOM：
-        <span style="color:#42b983">{{row.BOMID}} </span>
+        <span style="color:#42b983">{{row.BOMID_TEXT}} </span>
       </span>
     </div>
     <div class="form">
@@ -67,12 +67,13 @@ export default {
       }
       this.$refs['dhForm'].validate(valid => {
         if (valid) {
-          this.params.id = this.row.id
+          this.params.id = this.row.ID
           this.params.gygcid = this.row.gygcid
           this.params.jyryid = this.token
-          this.params.bomid = this.row.bomid
+          this.params.bomid = this.row.BOMID
           this.params.jgjs = this.row.SJJS
           this.params.yjgjs = this.row.YJGJS
+          console.log(this.row)
           if (this.dialogState.type == 'part') {
             this.$ajax
               .post(this.$api.gygxCheckPassPart, this.params)

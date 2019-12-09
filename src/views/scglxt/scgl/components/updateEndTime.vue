@@ -2,19 +2,22 @@
   <div class="selectPerson">
     <el-dialog
       v-if="dialogState.show"
-      title="修改订单【】交货时间"
+      :title="`修改订单【${dialogState.row.xmname}】交货时间`"
       :visible.sync="dialogState.show"
-      width="30%"
+      width="25%"
     >
       <el-form style="text-align:center;">
-        <el-form-item label="选择时间">
-          <el-date-picker v-model="endTime" type="date" placeholder="选择日期"></el-date-picker>
+        <el-form-item label="现交货日期">
+          <span>{{dialogState.row.endtime}}</span>
+        </el-form-item>
+        <el-form-item label="选择日期">
+          <el-date-picker v-model="dialogState.row.endtime" value-format="yyyy-MM-dd" type="date" placeholder="选择日期"></el-date-picker>
         </el-form-item>
         <el-form-item>
           <el-button
             width="100%"
             size="medium"
-            @click.stop="overWork"
+            @click.stop="updateEndTime"
             class="namesBtn"
             type="primary"
           >确认修改</el-button>
@@ -34,7 +37,19 @@ export default {
     };
   },
   mounted() {},
-  methods: {}
+  methods: {
+    updateEndTime(){
+      this.$ajax.post(this.$api.updateEndTime,{
+        ddid:this.dialogState.row.id,
+        endTime:this.dialogState.row.endtime
+      }).then(res => {
+        if (res.errno == 0) {
+          this.$message('修改交货日期成功！')
+          this.dialogState.show = false
+        }
+      })
+    }
+  }
 };
 </script>
 

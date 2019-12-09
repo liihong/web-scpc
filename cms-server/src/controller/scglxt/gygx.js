@@ -698,6 +698,13 @@ module.exports = class extends Base {
             id: id
         }).delete()
 
+        let errorLog = {
+            id: util.getUUId(),
+            type: '质检打回',
+            infos: JSON.stringify(this.post())
+        }
+        await this.model('operate_log').add(errorLog)
+        
         return this.success(data)
     }
 };

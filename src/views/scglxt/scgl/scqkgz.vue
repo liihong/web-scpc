@@ -15,10 +15,13 @@
       </el-table-column>
       <el-table-column  type="expand">
         <template slot-scope="props">
+          <el-button size="mini" type="primary" @click="uploadBOMEndTime(props.row.bomList)">保存BOM结束时间</el-button>
           <el-table ref="bomTable"  header-cell-class-name="table_th2" @row-click="bomClick" :data="props.row.bomList">
             <el-table-column align="center" v-for="(row,index) in blColumns" :key="index" :prop="row.id"  :label="row.name" :min-width="(row.length == undefined)?150:row.length">
               <template slot-scope="scope">
                 <div v-html="scope.row.ddjd" v-if="row.slot == 'ddjd'"></div> 
+                 <el-date-picker style="width:150px;" v-else-if="row.id == 'endtime'" size="mini" v-model="scope.row[row.id]" type="date"  value-format="yyyy-MM-dd" placeholder="选择结束日期">
+                </el-date-picker>
                 <span v-else>{{scope.row[row.id]}}</span>
               </template>
             </el-table-column>
@@ -48,7 +51,7 @@ export default {
   data() {
     return {
       dialogState:{
-        isShow:false,
+        show:false,
         row:{}
       },
       tableHeight: 800,
@@ -194,9 +197,20 @@ export default {
     },
     //修改某一个订单的交货时间
     uploadEndTime(row){
-      console.log(row)
       this.dialogState.row = row
       this.dialogState.show = true
+    },
+    uploadBOMEndTime(list){
+      this.$message.confirm('是否确认保存所有零件的结束时间？',() => {
+        this.$ajax.post(this.$api.uploadBOMEndTime,{
+          list:list
+        }).then(res => {
+          if (res.errno == 0) {
+            this.$message('修改交货日期成功！')
+            this.dialogState.show = false
+          }
+        })
+      })
     },
     // 展开执行
     expandChange(row) {

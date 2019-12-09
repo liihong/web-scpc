@@ -5,6 +5,7 @@ const Base = require('../base.js');
 let bomModel = 'scglxt_t_bom'
 let gyModel = 'scglxt_t_gygc'
 import util from '../../../utils/util'
+import { lstat } from 'fs';
 
 module.exports = class extends Base {
     async indexAction() {
@@ -381,7 +382,18 @@ module.exports = class extends Base {
         let sjsl = parseInt(data.jgsl)-parseInt(kcsl)
         data.jgsl = kcsl
         let insert = await this.model('scglxt_t_bom_byk').add(data)
-        let update = await this.model('scglxt_t_bom').where({id:id}).update({jgsl:sjsl})
+        await this.model('scglxt_t_bom').where({id:id}).update({jgsl:sjsl})
         return this.success(insert)
+    }
+
+    //修改bom的结束时间
+    async uploadBOMEndTimeAction(){
+        let list = this.post('list')
+        let data = {}
+        list.map(async item=>{
+            data = await this.model('scglxt_t_bom').where({id:item.bomid}).update({endtime:item.endtime})
+        })
+
+        return this.success(data)
     }
 };

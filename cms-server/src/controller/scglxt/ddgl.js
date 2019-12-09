@@ -317,4 +317,14 @@ module.exports = class extends Base {
 
         return this.success(data)
     }
+
+    //修改订单结束时间
+    async updateEndTimeAction(){
+        let id = this.post('ddid')
+        let endTime = this.post('endTime')
+        let data = await this.model('scglxt_t_dd').where({id:id}).update({endtime:endTime})
+
+        await this.model('scglxt_t_bom').where({ssdd:id}).update({endtime:endTime})
+        return this.success(data)
+    }
 };

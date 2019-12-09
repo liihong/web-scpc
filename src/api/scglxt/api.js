@@ -40,7 +40,7 @@ let api = {
     getWorkingDDList: 'scglxt/ddgl/getWorkingDDList',
     uploadDrawing: '/api/scglxt/ddgl/uploadDrawing',
     deleteDdTz: 'scglxt/ddgl/deleteDdTz',
-    
+    updateEndTime: 'scglxt/ddgl/updateEndTime',
     //bom表操作
     addBomData: 'scglxt/bom/addBom',
     addBomMany: 'scglxt/bom/addBomMany',
@@ -56,7 +56,7 @@ let api = {
     BOMOutStore: 'scglxt/bom/BOMOutStore',//出库
     BOMSpeedProgress: 'scglxt/bom/BOMSpeedProgress',//进度跟踪
     BOMInSpareStock: 'scglxt/bom/BOMInSpareStock',//成品转入备用库存
-    
+    uploadBOMEndTime: 'scglxt/bom/uploadBOMEndTime',
     //组件操作
     addZj: 'scglxt/zj/addZj',
     editZj: 'scglxt/zj/editZj',
