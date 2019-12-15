@@ -687,7 +687,13 @@ module.exports = class extends Base {
         let gygcUpdate = {
             bfjs: dhjs,
             sjjs: 0,
-            fgcs: count
+            fgcs: count,
+            czryid:null,
+            yjgjs:0,
+            status: 1,
+            kssj:null,
+            jssj:null,
+            jyryid:null
         }
 
         await this.model('scglxt_t_gygc').where({
@@ -706,5 +712,10 @@ module.exports = class extends Base {
         await this.model('operate_log').add(errorLog)
         
         return this.success(data)
+    }
+
+    // 工艺排序
+    async orderTopAction(){
+        let row = this.post('row')
     }
 };

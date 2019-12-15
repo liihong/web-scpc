@@ -71,7 +71,8 @@ export default {
             }
           })
           this.bzList = data
-          this.$refs.elTable.doLayout()
+          this.getTableData()
+          this.$forceUpdate()
         }
       })
     },

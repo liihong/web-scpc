@@ -21,7 +21,7 @@
             </el-date-picker>
           </el-form-item>
         </el-col>
-        <el-col :span="12">
+        <el-col :span="12" v-if="optionType == 'add'">
           <el-form-item prop="ENDTIME" label="结束时间">
             <el-date-picker value-format="yyyy-MM-dd" v-model="formData.ENDTIME" type="date" placeholder="结束时间">
             </el-date-picker>

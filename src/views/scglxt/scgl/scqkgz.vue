@@ -6,7 +6,7 @@
       <el-button size="mini" @click="lookDDWorking" type="primary">订单生产实时看板</el-button>
     </el-col>
     <el-table class="el-table"  header-cell-class-name="table_th" @expand-change="initData" :data="clList" v-loading="listLoading" stripe border :max-height="tableHeight" style="width: 100%;">
-      <el-table-column fixed="left" label="操作" min-width="80" align="center">
+      <el-table-column fixed="left" label="操作" min-width="100" align="center">
         <template slot-scope="scope">
           <el-button-group size="mini">
             <el-button size="mini" type="primary" @click="uploadEndTime(scope.row)">修改交货时间</el-button>
@@ -19,7 +19,7 @@
           <el-table ref="bomTable"  header-cell-class-name="table_th2" @row-click="bomClick" :data="props.row.bomList">
             <el-table-column align="center" v-for="(row,index) in blColumns" :key="index" :prop="row.id"  :label="row.name" :min-width="(row.length == undefined)?150:row.length">
               <template slot-scope="scope">
-                <div v-html="scope.row.ddjd" v-if="row.slot == 'ddjd'"></div> 
+                <div style="text-align:left;" v-html="scope.row.ddjd" v-if="row.slot == 'ddjd'"></div> 
                  <el-date-picker style="width:150px;" v-else-if="row.id == 'endtime'" size="mini" v-model="scope.row[row.id]" type="date"  value-format="yyyy-MM-dd" placeholder="选择结束日期">
                 </el-date-picker>
                 <span v-else>{{scope.row[row.id]}}</span>
@@ -35,7 +35,7 @@
         </template>
       </el-table-column>
     </el-table>
-     <el-pagination style="text-align:center;" background @current-change="handleCurrentChange" :current-page="query.pageNumber" :page-sizes="[10, 20, 30, 50]" :page-size="query.pageSize" layout="total, sizes, prev, pager, next, jumper" :total="query.total" @size-change="sizeChange">
+    <el-pagination style="text-align:center;" background @current-change="handleCurrentChange" :current-page="query.pageNumber" :page-sizes="[10, 20, 30, 50]" :page-size="query.pageSize" layout="total, sizes, prev, pager, next, jumper" :total="query.total" @size-change="sizeChange">
     </el-pagination>
     <updateEndTime :dialogState="dialogState"></updateEndTime>
   </div>

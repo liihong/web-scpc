@@ -59,12 +59,12 @@ module.exports = class extends Base {
         let sql = `SELECT any_value(gygc.id) id,
         any_value(gygc.ssdd) ssdd, any_value(xmname) ddmc, any_value(bomid) bomid,
         any_value(zddmc) bommc, any_value(gynr) gynr,any_value(jgsl) jgsl,
-        any_value(czryid) czryid, any_value(ry.rymc) rymc, sum( gygc.edgs ) edgs
+        any_value(czryid) czryid, any_value(ry.rymc) rymc, gygc.edgs edgs
     FROM scglxt_t_gygc gygc, scglxt_t_dd dd, scglxt_t_bom bom, scglxt_t_ry ry 
     WHERE
         gygc.ssdd = dd.id  AND gygc.bomid = bom.id 
         AND gygc.czryid = ry.id  AND STATUS = 2  AND jssj BETWEEN "`+time.split(' ')[0]+` 00:00:00" 
-        AND "`+time.split(' ')[1]+`  23:59:59"    GROUP BY  edgs`
+        AND "`+time.split(' ')[1]+`  23:59:59"   order by ddmc,bomid`
         
         let data = await this.model().query(sql)
 

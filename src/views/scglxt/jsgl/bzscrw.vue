@@ -12,6 +12,11 @@
       </span>
     </div>
     <ResList tableId="010401" :query="query" noEdit noAdd noTool ref="jgList">
+      <el-table-column slot="operate" fixed="left" label="操作" min-width="80" align="center">
+        <template slot-scope="scope">
+          <el-button size="mini" type="primary" @click="orderTop(scope.row)">置顶</el-button>
+        </template>
+      </el-table-column>
         <template slot="GYNR" slot-scope="scope">
             <a v-if="!!scope.row.DDTZ" :href="scope.row.DDTZ" target="_blank">
             <span :style="{color:scope.row.CZRYID? 'red': ''}"> {{scope.row.GYNR_TEXT}}</span>
@@ -51,6 +56,15 @@ export default {
       this.activeTab = item.id
       this.query.gynr = item.id
       this.$refs.jgList.getResList()
+    },
+    //置顶
+    async orderTop(row){
+      let resDatas = await this.$ajax.post(this.$api.orderTop, {
+        row: row
+      })
+      if (resDatas.errno == 0) {
+        this.$message('置顶成功！')
+      }
     }
   }
 }
