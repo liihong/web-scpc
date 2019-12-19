@@ -56,6 +56,11 @@ module.exports = class extends Base {
     // 根据时间范围返回工人工时统计
     async getPeopleHourAction(){
         let time = this.post('date')
+
+        let bomSql =`SELECT bom.id,ssdd,dd.xmname ddmc,bom.jgsl,zddmc bommc FROM scglxt_t_bom bom,scglxt_t_dd dd WHERE  bom.ssdd=dd.id and bom.id IN (
+            SELECT bomid FROM scglxt_t_gygc WHERE STATUS=2 AND jssj BETWEEN "`+time.split(' ')[0]+` 00:00:00" AND "`+time.split(' ')[1]+`  23:59:59") order by bom.endtime`
+
+        let bomData  = await this.model().query(bomSql)
         let sql = `SELECT any_value(gygc.id) id,
         any_value(gygc.ssdd) ssdd, any_value(xmname) ddmc, any_value(bomid) bomid,
         any_value(zddmc) bommc, any_value(gynr) gynr,any_value(jgsl) jgsl,
@@ -68,16 +73,22 @@ module.exports = class extends Base {
         
         let data = await this.model().query(sql)
 
-        data.map(item=>{
-            item[item.rymc] = item.edgs
+        bomData.map(item=>{
+            data.map(el=>{
+                if(item.id == el.bomid){
+                    item[el.rymc] = el.edgs
+                }
+            })
         })
-        return this.success(data)
+        return this.success(bomData)
     }
     // 获取车间总工时排产
     async getGygsPcAction() {
-        let sql = `SELECT gynr,gy.gymc,sum(zbgs+bzgs)/60 zgs FROM scglxt_t_gygc gc,scglxt_t_jggy gy WHERE gc.gynr=gy.id AND bomid IN (
-            SELECT id FROM scglxt_t_bom bom WHERE zddzt IN ('0501','0502')) GROUP BY gynr`
+        // let sql = `SELECT gynr,gy.gymc,sum(zbgs+bzgs)/60 zgs FROM scglxt_t_gygc gc,scglxt_t_jggy gy WHERE gc.gynr=gy.id AND bomid IN (
+        //     SELECT id FROM scglxt_t_bom bom WHERE zddzt IN ('0501','0502')) GROUP BY gynr`
 
+        let sql=`SELECT gynr,gy.gymc,TRUNCATE(zgs/60,2) zgs from v_scglxt_pc_gygx gc,scglxt_t_jggy gy WHERE gc.gynr=gy.id`
+        
         let data = await this.model().query(sql)
 
         return this.success(data)

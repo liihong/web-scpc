@@ -383,7 +383,17 @@ module.exports = class extends Base {
         data.jgsl = kcsl
         let insert = await this.model('scglxt_t_bom_byk').add(data)
         await this.model('scglxt_t_bom').where({id:id}).update({jgsl:sjsl})
+
+        let errorLog = {
+            id: util.getUUId(),
+            type: '转入备用库',
+            infos: JSON.stringify(this.post())
+        }
+        await this.model('operate_log').add(errorLog)
+
         return this.success(insert)
+
+
     }
 
     //修改bom的结束时间

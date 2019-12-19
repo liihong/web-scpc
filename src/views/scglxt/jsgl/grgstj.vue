@@ -8,7 +8,7 @@
       <el-table-column align="center" label="工艺过程卡明细">
         <el-table-column  type="index" align="center" min-width="10"></el-table-column>
         <el-table-column key="ddmc" prop="ddmc" align="center" label="项目名称"></el-table-column>
-        <el-table-column key="bommc" prop="bommc" align="center" label="零件名称"></el-table-column>
+        <el-table-column min-width="160" align="left" key="bommc" prop="bommc" label="零件名称"></el-table-column>
         <el-table-column key="jgsl" prop="jgsl" align="center" label="数量"></el-table-column>
       </el-table-column>
       <el-table-column align="center" v-for="(item,key) in bzList" :key="key" :label="item.bzmc">
@@ -34,12 +34,12 @@ export default {
       tableData: []
     }
   },
-  activated() {
-    this.initData()
-    this.$socket.on('getTableData', () => {
-      this.initData()
-    })
-  },
+  // activated() {
+  //   this.initData()
+  //   this.$socket.on('getTableData', () => {
+  //     this.initData()
+  //   })
+  // },
   created() {
     this.initData()
     this.$socket.on('getTableData', () => {

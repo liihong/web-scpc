@@ -68,16 +68,17 @@ export default {
     },
     passMany() {
       const vm = this
+      console.log(this.selectRows)
       this.$message.confirm('是否确定检验通过当前选中行', () => {
         let arr = []
         this.selectRows.map(item => {
           arr.push(
             this.$ajax.post(this.$api.gygxCheckPassAll, {
-              id: item.id,
+              id: item.ID,
               gygcid: item.gygcid,
-              jgryid: item.jgryid,
+              jgryid: item.JGRYID,
               jyryid: this.token,
-              bomid: item.bomid,
+              bomid: item.BOMID,
               bfjs: 0,
               serial: item.serial
             })
@@ -108,7 +109,7 @@ export default {
           .post(this.$api.gygxCheckPassAll, {
             id: row.ID,
             gygcid: row.gygcid,
-            jgryid: row.jgryid,
+            jgryid: row.JGRYID,
             jyryid: this.token,
             bomid: row.BOMID,
             bfjs: 0,

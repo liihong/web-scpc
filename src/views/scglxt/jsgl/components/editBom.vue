@@ -16,7 +16,8 @@
         </el-col>
         <el-col :span="12">
           <el-form-item prop="JGSL" label="加工数量">
-            <el-input-number :controls=false v-model="formData.JGSL" :min="1" label="加工数量"></el-input-number>
+            <el-input-number v-if="formData.ZDDZT =='0501'" :controls=false v-model="formData.JGSL" :min="1" label="加工数量"></el-input-number>
+            <span v-else>{{formData.JGSL}}         (订单已开始加工，不能修改加工数量)</span>
           </el-form-item>
         </el-col>
         <el-col :span="12">
@@ -90,10 +91,6 @@
         </el-col>
         <el-col :span="12">
           <el-form-item prop="DDTZ" label="选择图纸">
-            <!-- <el-input v-model="formData.DDTZ" placeholder="选择图纸"></el-input> -->
-            <!-- <el-radio-group v-model="formData.DDTZ">
-              <el-radio v-for="(item,i) in dropDownListData['tz']" :key="i" :label="item.id">{{item.tzmc}}</el-radio>
-            </el-radio-group> -->
             <el-select v-model="formData.DDTZ" placeholder="请选择">
               <el-option v-for="(item,i) in dropDownListData['tz']" :key="i" :label="item.tzmc" :value="item.id">
                 <span style="float: left">{{ item.tzmc }}</span>
@@ -104,22 +101,6 @@
             </el-select>
           </el-form-item>
         </el-col>
-        <!-- <el-col :span="24">
-          <el-form-item prop="BZJ" label="选择组件">
-            <div v-for="(item,i) in selBzjList" :key="i">
-              <el-select @change="changeZj(dropDownListData['zj'][i], i)" filterable v-model="item.zjid" placeholder="组件">
-                <el-option v-for="(item,key) in dropDownListData['zj']" :key="key" :label="item.zjmc" :value="item.zjid">
-                  <span style="float: left">{{ item.zjmc }}</span>
-                  <span style="float: right; color: #8492a6; font-size: 13px">({{item.zjdj}})</span>
-                </el-option>
-              </el-select>
-              数量：
-              <el-input-number :controls=false v-model="item.zjsl" :min="1" label="组件数量"></el-input-number>
-              <i class="el-icon-circle-plus" @click="addZj"></i>
-              <i v-show="i !=0" class="el-icon-remove" @click="delZj(i)"></i>
-            </div>
-          </el-form-item>
-        </el-col> -->
       </el-form>
       <el-col :span='24' :offset="9" class="footer">
         <el-button type="primary" @click="onSave">保存</el-button>
@@ -206,12 +187,6 @@ export default {
       Object.keys(data).map(item => {
         params.form[item.toLowerCase()] = data[item]
       })
-      // this.selBzjList.map(item => {
-      //   item.bomid = params.form.id
-      // })
-      // params.zj = this.selBzjList.filter(el => {
-      //   return el.zjid != ''
-      // })
       this.$refs['rulesForm'].validate(valid => {
         if (valid) {
           if (this.optionType == 'edit') {

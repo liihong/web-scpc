@@ -3,7 +3,7 @@
     <div class="title">
       <span>
         当前订单：
-        <span style="color:#42b983">{{row.DDMC}} </span>
+        <span style="color:#42b983">{{row.SSDD_TEXT}} </span>
         当前BOM：
         <span style="color:#42b983">{{row.BOMID_TEXT}} </span>
       </span>
@@ -73,6 +73,7 @@ export default {
           this.params.bomid = this.row.BOMID
           this.params.jgjs = this.row.SJJS
           this.params.yjgjs = this.row.YJGJS
+          this.params.serial = this.row.serial
           console.log(this.row)
           if (this.dialogState.type == 'part') {
             this.$ajax
