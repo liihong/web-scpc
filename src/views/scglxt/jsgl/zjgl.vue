@@ -2,7 +2,7 @@
   <div class="zjgl">
     <!--工具条-->
     <el-col :span="24" class="toolbar">
-      <el-form :inline="true">
+      <el-form :inline="true" @submit.native.prevent>
           <el-col :span="2">
           <el-form-item>
             <el-button size="mini" @click="handleAdd" type="primary" icon="el-icon-circle-plus">新增</el-button>
@@ -10,7 +10,7 @@
         </el-col>
        <el-col :span="4">
           <el-form-item>
-            <el-input size="small" @change="initData" v-model="queryParams.queryKey" placeholder="模糊查询"></el-input>
+            <el-input size="small" @change="initData" v-model="queryParams.queryKey" placeholder="模糊查询" @keyup.enter.native="initData"></el-input>
           </el-form-item>
         </el-col>
       
@@ -130,9 +130,9 @@ export default {
   },
   methods: {
     async initData() {
-      if(this.queryParams.queryKey != ''){
-        this.queryParams.pageNumber = 1
-      }
+      // if(this.queryParams.queryKey != ''){
+      //   this.queryParams.pageNumber = 1
+      // }
       let res = await this.$ajax.get(this.$api.getZJTreeList, this.queryParams)
       if (res.errno == 0) {
         this.ddList = res.data.data

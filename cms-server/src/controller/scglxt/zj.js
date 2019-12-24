@@ -140,10 +140,10 @@ module.exports = class extends Base {
         let curPage = (pageNumber - 1) * pageSize
         let where = '1=1'
         if (queryKey && queryKey != '') {
-            where = where + ` and  (XMNAME like '%` + queryKey + `%')`
+            where = where + ` and  (XMNAME like '%` + queryKey + `%' or zjmc like '%` + queryKey + `%')`
         }
         let sql = `SELECT DISTINCT dd.ID,XMNAME,DDLEVEL,(SELECT NAME FROM (SELECT id,mc NAME FROM scglxt_tyzd WHERE xh LIKE '04__') tras WHERE tras.id=DDLEVEL) DDLEVEL_TEXT,STARTTIME,ENDTIME,dd.sjcjsj FROM scglxt_t_dd dd,scglxt_t_zj zj where (dd.id = zj.ssdd and `+where+`)  ORDER BY dd.sjcjsj desc limit ` + curPage + `,` + pageSize + `;`
-        let countSql = `SELECT count(*) count  FROM ( SELECT DISTINCT dd.ID,XMNAME,DDLEVEL,(SELECT NAME FROM (SELECT id,mc NAME FROM scglxt_tyzd WHERE xh LIKE '04__') tras WHERE tras.id=DDLEVEL) DDLEVEL_TEXT,STARTTIME,ENDTIME,dd.sjcjsj FROM scglxt_t_dd dd,scglxt_t_zj zj where dd.id = zj.ssdd  ORDER BY dd.sjcjsj desc ) t where (` + where + `)`
+        let countSql = `SELECT count(*) count  FROM ( SELECT DISTINCT dd.ID,XMNAME,DDLEVEL,(SELECT NAME FROM (SELECT id,mc NAME FROM scglxt_tyzd WHERE xh LIKE '04__') tras WHERE tras.id=DDLEVEL) DDLEVEL_TEXT,STARTTIME,ENDTIME,dd.sjcjsj FROM scglxt_t_dd dd,scglxt_t_zj zj where dd.id = zj.ssdd  and `+where+` ORDER BY dd.sjcjsj desc ) t `
         let data = await this.model().query(sql)
         let count = await this.model().query(countSql)
         let info = {

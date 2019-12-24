@@ -81,14 +81,14 @@ export default {
     let ddbh = await this.$ajax.post(this.$api.getNewDDbh)
      
       let ddData = {
-        ssht: htInfo.id,
+        ssht: htInfo.data.id,
         xmname:
-          htInfo.htjc +
+          htInfo.data.htjc +
           '-' +
           ddbh.data,
         ddlevel: '0403',
-        starttime: htInfo.kssj,
-        endtime: htInfo.jssj,
+        starttime: htInfo.data.kssj,
+        endtime: htInfo.data.jssj,
         xmfzr: '李勇',
         xmlxr: '李勇',
         dqjd: 0,
@@ -101,7 +101,7 @@ export default {
       this.$ajax.post(this.$api.addTableData, params).then(res => {
         if (res && res.errno == 0) {
           this.$message.addSuccess(
-            '合同：【' + htInfo.htbh + '】生成了一条新订单。'
+            '合同：【' + htInfo.data.htbh + '】生成了一条新订单。'
           )
         } else {
           this.$message.addError(res.errmsg)

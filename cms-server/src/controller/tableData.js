@@ -38,6 +38,7 @@ module.exports = class extends Base {
         const tableId = this.get('tableId')
         let queryColumn = this.get('queryColumn')
         let queryKey = this.get('queryKey')
+        let query = this.get('query')
         let whereObj = {}
         if (!!queryColumn) {
             if (queryKey.includes(',')) {
@@ -46,6 +47,15 @@ module.exports = class extends Base {
                 whereObj[`${queryColumn}`] = ['like', `%${queryKey}%`]
             }
         }
+        if (query && query != '{}' && JSON.stringify(query) != '{}') {
+            query = JSON.parse(query)
+            let key = Object.keys(query)[0]
+            whereObj[key] = ['=', `${query[key]}`]
+        }
+        if (!!queryKey) {
+            whereObj = await this.model('tableData').getWhereObj(query, queryColumn, queryKey, tableId)
+        }
+
         var confs = [];
         var conf = {};
         let colArr = []
@@ -195,10 +205,10 @@ module.exports = class extends Base {
             let dataLog = {
                 id: util.getUUId(),
                 operater_id: this.header('token'),
-                operater_name: '',
                 operate_type: 'add',
                 tablename: table.table_name,
-                content: primaryKeyValue
+                content: table.resource_name,
+                old_value: JSON.stringify(form)
             }
 
             await this.model('resource_log').add(dataLog)
@@ -217,19 +227,21 @@ module.exports = class extends Base {
             let primaryKey = this.post('primaryKey')
             let table = await this.model('resource_table').getTableInfo(tableId)
 
+            let oldData = await this.model(table.table_name).where(
+                `${primaryKey.name}='${primaryKey.value}'`
+            ).find()
+
             let affectedRows = await this.model(table.table_name).where(
                 `${primaryKey.name}='${primaryKey.value}'`
             ).update(updateInfo);
 
-            let oldData = await this.model(table.table_name).where(
-                `${primaryKey.name}='${primaryKey.value}'`
-            ).find()
+          
             let dataLog = {
                 id: util.getUUId(),
                 operater_id: this.header('token'),
-                operater_name: '',
                 operate_type: 'edit',
                 tablename: table.table_name,
+                content: table.resource_name,
                 old_value: JSON.stringify(oldData),
                 new_value: JSON.stringify(updateInfo)
             }
@@ -251,15 +263,19 @@ module.exports = class extends Base {
             let updateInfo = this.post()
             delete updateInfo.tableId;
             let table = await this.model('resource_table').getTableInfo(tableId)
+
+            let oldData = await this.model(table.table_name).where(updateInfo).find()
+
             let affectedRows = await this.model(table.table_name).where(updateInfo).delete();
+
 
             let dataLog = {
                 id: util.getUUId(),
                 operater_id: this.header('token'),
-                operater_name: '',
                 operate_type: 'delete',
                 tablename: table.table_name,
-                old_value: JSON.stringify(updateInfo)
+                content: table.resource_name,
+                old_value: JSON.stringify(oldData)
             }
 
             await this.model('resource_log').add(dataLog)

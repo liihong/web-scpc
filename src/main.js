@@ -32,6 +32,11 @@ Vue.use(VueI18n)
 Vue.use(ElementUI, { size: 'mini' });
 Vue.config.productionTip = false
 
+
+import Print from 'vue-print-nb'
+Vue.use(Print);
+
+
 // 注册公共组件
 import ResList from './views/resMgr/ResList.vue'
 Vue.component('ResList',ResList)

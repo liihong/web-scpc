@@ -64,7 +64,7 @@ module.exports = class extends Base {
         let sql = `SELECT any_value(gygc.id) id,
         any_value(gygc.ssdd) ssdd, any_value(xmname) ddmc, any_value(bomid) bomid,
         any_value(zddmc) bommc, any_value(gynr) gynr,any_value(jgsl) jgsl,
-        any_value(czryid) czryid, any_value(ry.rymc) rymc, gygc.edgs edgs
+        any_value(czryid) czryid, any_value(ry.rymc) rymc, (gygc.edgs*jgsl) edgs
     FROM scglxt_t_gygc gygc, scglxt_t_dd dd, scglxt_t_bom bom, scglxt_t_ry ry 
     WHERE
         gygc.ssdd = dd.id  AND gygc.bomid = bom.id 
@@ -113,9 +113,10 @@ module.exports = class extends Base {
             MAX(CASE gynr WHEN '201609010949574028' THEN sygs ELSE 0 END ) 'mo',
             MAX(CASE gynr WHEN '20170424203552800'  THEN sygs ELSE 0 END ) 'rechuli',
             MAX(CASE gynr WHEN '20170724160856037'  THEN sygs ELSE 0 END ) 'hanjie',
-            MAX(CASE gynr WHEN '20170524144646657'  THEN sygs ELSE 0 END ) 'waixie' 
+            MAX(CASE gynr WHEN '20170524144646657'  THEN sygs ELSE 0 END ) 'waixie' ,
+            sum(sygs) sygs
         FROM
-            scglxt_t_dd dd ,v_scglxt_sygs sygs where dd.id =sygs.ddid and dd.ckzt is null group by ddid`
+            scglxt_t_dd dd ,v_scglxt_sygs sygs where sygs<>0 and dd.id =sygs.ddid and dd.ckzt is null group by ddid`
 
         let data = await this.model().query(sql)
 

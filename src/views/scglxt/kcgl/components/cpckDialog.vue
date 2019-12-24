@@ -1,106 +1,173 @@
 <template>
-    <div class="cgjy">
-        <el-dialog append-to-body :modal=false width="50%" size="small" title="填写备用库存出库单" :visible.sync="dialogState.show" :close-on-click-modal="false">
-            <el-row>
-                <el-row>
-                    <el-col>
-                        <div class="line">
-                            订单名称：
-                            <span class="spanText">{{row.SSDD_TEXT}}</span>
-                            零件名称：
-                            <span class="spanText">{{row.ZDDMC}}</span>
-                            材料名称：
-                            <span class="spanText">{{row.ZDDCZ_TEXT}}</span>
-                        </div>
-                    </el-col>
-                    <el-col>
-                        <div class="line">
-                            材料大小：
-                            <span class="spanText">{{row.CLDX}}</span>
-                            材料体积：
-                            <span class="spanText">{{row.CLTJ}}</span>
-                            备料件数：
-                            <span class="spanText">{{row.BLJS}}</span>
-                        </div>
-                    </el-col>
-                </el-row>
-                <el-form class="form" :rules="rules" ref="rulesForm" :model="formData" label-width="120px">
-                    <el-col>
-                        <el-form-item prop="CGSJ" label="采购建议">
-                            <el-input width="100%" type="textarea" :rows="2" v-model="formData.CGSJ" placeholder="采购建议"></el-input>
-                        </el-form-item>
-                    </el-col>
-                    <el-col :span='24' :offset="9" class="footer">
-                        <el-button type="primary" @click="onSave">保存</el-button>
-                        <el-button @click="onCancel">取消</el-button>
-                    </el-col>
-                </el-form>
-
-            </el-row>
-        </el-dialog>
-    </div>
+  <div>
+    <el-dialog
+      v-if="dialogState.show"
+      append-to-body
+      :modal="false"
+      width="50%"
+      size="small"
+      title="出库单预览"
+      :visible.sync="dialogState.show"
+      :close-on-click-modal="false"
+    >
+      <div class="cgjy" id="printTest">
+        <div class="title">
+          <h1>北京三维博艺机械制造有限公司出库单</h1>
+          <h6 style="font-size:14px">Beijing Sanwei Boyi Machinery Manufacturing Co.Ltd. Chukudan</h6>
+          <div></div>
+        </div>
+        <div class="cgd-header">
+          <div class="line">
+            <div>TO:{{khInfo.mc}}</div>
+            <div>TEL:{{khInfo.lxdh}}</div>
+            <div>FAX:{{khInfo.fax}}</div>
+            <div>Date:{{nowDate}}</div>
+          </div>
+          <div class="line">
+            <div>FROM:北京三维博艺机械制造有限公司</div>
+            <div>ADD:北京市顺义区李遂镇葛代子村委会斜对面</div>
+            <div>TEL:010-64386101</div>
+            <div>FAX:010-64325726</div>
+          </div>
+        </div>
+        <el-table border :data="tableData">
+          <el-table-column type="index" align="center"></el-table-column>
+          <el-table-column
+            align="center"
+            v-for="(item,key) in columns"
+            :key="key"
+            :label="item.name"
+            :prop="item.id"
+            :min-width="(item.length != '')?item.length:100"
+          ></el-table-column>
+        </el-table>
+        <div>以上货品已经收妥，核对无误，如有异议，七天内提出。否则不得退货。</div>
+        <div>
+          <span>收货单位：_________________________</span>
+          <span>付款方式：_________________ 日期：____________年_____月_____日</span>
+        </div>
+      </div>
+      <div style="text-align:center;margin:10px;">
+        <el-button type="primary" @click="onPass">确认出库</el-button>
+        <el-button type="primary" v-print="'#printTest'">打印出库单</el-button>
+      </div>
+    </el-dialog>
+  </div>
 </template>
 <script>
 export default {
-  name: 'cgjy',
-  props: ['dialogState'],
+  name: "cgjy",
+  props: ["dialogState"],
   data() {
     return {
-      formData: {},
-      rules: {
-        CGSJ: [{ required: true, message: '请填写采购建议', trigger: 'blur' }]
-      }
-    }
+      tableData: [],
+      khInfo:{},
+      columns: [
+        {
+          id: "ZDDMC",
+          name: "品名",
+          length: 150
+        },
+        {
+          id: "clxd",
+          name: "规格"
+        },
+        {
+          id: "dw",
+          name: "单位",
+          length: 50
+        },
+        {
+          id: "JGSL",
+          name: "数量",
+          length: 50
+        },
+        {
+          id: "dj",
+          name: "单价"
+        },
+        {
+          id: "je",
+          name: "金额"
+        },
+        {
+          id: "remark",
+          name: "备注"
+        }
+      ]
+    };
   },
   computed: {
-    row() {
-      return this.dialogState.row
+    nowDate() {
+      let now = new Date();
+      return (
+        now.getFullYear() + "年" + (now.getMonth()+1) + "月" + now.getDate() + "日"
+      );
     }
   },
   mounted() {},
   methods: {
-    onSave() {
-      this.$refs['rulesForm'].validate(valid => {
-        if (valid) {
-          this.$ajax
-        .post(this.$api.updateBLZT, {
-          id: this.dialogState.row.ID,
-          clzt: '0',
-          cgyj: this.formData.CGSJ
+    initData() {
+      let dd = this.dialogState.selectRows[0].SSDD;
+      this.$ajax
+        .get(this.$api.getDDKhxxById, {
+          ssdd: dd
         })
-        .then(res => {
-          if (res.errno == 0) {
-            this.$message.success('更新备料状态成功！')
-            this.$parent.initData()
+        .then(res=>{
+          if(res.errno == 0){
+            this.khInfo = res.data
           }
-        })
+        });
+    },
+    onPass() {
+      const vm = this
+      this.$message.confirm("是否确认出库信息", () => {
+        let arr = [];
+        this.dialogState.selectRows.map(item => {
+          arr.push(item.ID);
+        });
+        if (arr.length > 0) {
+          this.$ajax
+            .post(this.$api.BOMOutStore, {
+              id: arr.join(",")
+            })
+            .then(function() {
+              vm.$message.success("批量出库成功！");
+              vm.$refs.zjryjy.getResList();
+              vm.dialogState.show = false
+            });
         }
-      })
+      });
     },
     onCancel() {
-      this.dialogState.show = false
+      this.dialogState.show = false;
     }
   },
   watch: {
     dialogState: {
       deep: true,
       handler() {
-        if(this.dialogState.show) {
-          if(this.dialogState.row.CGSJ !='') {
-            this.formData.CGSJ = this.dialogState.row.CGSJ
-          }
-        }
+        this.tableData = this.dialogState.selectRows;
+        this.initData();
       }
     }
   }
-}
+};
 </script>
-<style lang="scss" scoped>
+<style lang="scss" >
 .cgjy {
-  .line {
-    margin: 10px;
-    .spanText {
-      margin: 0 20px;
+  background: #ffffff;
+  padding:20px;
+  .title {
+    font-size: 32px;
+    text-align: center;
+    border-bottom: 1px solid #999999;
+  }
+  .cgd-header {
+    display: flex;
+    justify-content: space-between;
+    .line {
+      margin: 10px;
     }
   }
 }

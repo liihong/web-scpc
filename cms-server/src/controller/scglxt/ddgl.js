@@ -13,6 +13,15 @@ const rename = think.promisify(fs.rename, fs);
 
 module.exports = class extends Base {
 
+    //根据订单ID获取客户信息
+    async getDDKhxxByIdAction(){
+        let ssdd = this.get('ssdd')
+        let sql =` select * from scglxt_t_kh where id in (
+            select khid from scglxt_t_ht where id in (select ssht from scglxt_t_dd where id='`+ssdd+`'))`
+        let data = await this.model().query(sql)
+
+        return this.success(data[0])
+    }
     //根据ID获取某一订单详情
     async getDdDetailAction(){
         let id = this.get('id')
@@ -173,13 +182,27 @@ module.exports = class extends Base {
             let deleteGygc = await this.model('scglxt_t_gygc').where({
                 ssdd: ['in', ddId]
             }).delete()
-    
-            let deleteBom = await this.model('scglxt_t_bom').where({
+            await this.model('scglxt_t_dd_tz').where({
+                ssdd: ['in', ddId]
+            }).delete()
+            await this.model('scglxt_t_bom').where({
                 ssdd: ['in', ddId]
             }).delete()
         }
         
+        let oldData = await this.model(ddModel).where(where).find()
         let deleteDd = await this.model(ddModel).where(where).delete()
+
+        let dataLog = {
+            id: util.getUUId(),
+            operater_id: this.header('token'),
+            operate_type: 'delete',
+            tablename: 'SCGLXT_T_DD',
+            content: '订单管理',
+            old_value: JSON.stringify(oldData)
+        }
+
+        await this.model('resource_log').add(dataLog)
 
         return this.success(deleteDd)
     }

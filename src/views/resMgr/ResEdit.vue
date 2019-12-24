@@ -105,7 +105,10 @@ export default {
               this.queryData.query = this.primaryKey['value']
               this.$refs.upload[0].submit()
             }
-            // this.$emit('saveAfter', params.form)
+            params.type = 'edit'
+            params.data = params.form
+            this.$emit('saveAfter', params)
+
             this.dialogState.show = false
           } else {
             this.$message.editError(res.errmsg)
@@ -120,7 +123,8 @@ export default {
               this.queryData.query = res.data['id']
               this.$refs.upload[0].submit()
             }
-            this.$emit('saveAfter', res.data)
+            res.type='add'
+            this.$emit('saveAfter', res)
             this.dialogState.show = false
           } else {
             this.$message.addError(res.errmsg)
@@ -233,7 +237,6 @@ export default {
               }
             })
           })
-          console.log(this.rules)
           if (this.optionType == 'edit') {
             this.getFormData()
           } else {

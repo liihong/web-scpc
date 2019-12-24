@@ -1,8 +1,17 @@
+<!--通用资源管理组件
+props:{
+
+}
+event:{
+  saveAfter()
+  deleteAfter()
+}
+-->
 <template>
   <section>
     <!--工具条-->
     <el-col :span="24" class="toolbar">
-      <el-form :inline="true" v-show="!noTool">
+      <el-form :inline="true" v-show="!noTool" @submit.native.prevent>
         <el-form-item v-show="!noAdd">
           <el-button size="mini" @click="handleAdd" type="primary" icon="el-icon-circle-plus">新增</el-button>
         </el-form-item>
@@ -11,7 +20,7 @@
         </el-form-item>
         <slot name="toolBar"></slot>
         <el-form-item>
-          <el-input size="small" v-model="queryParams.queryKey" placeholder="模糊查询"></el-input>
+          <el-input size="small" v-model="queryParams.queryKey" placeholder="模糊查询" @keyup.enter.native="getResList"></el-input>
         </el-form-item>
       </el-form>
     </el-col>
@@ -188,9 +197,12 @@ export default {
       let params = {
         tableId: this.tableId
       }
-      if (this.filters.name != '') {
-        params.queryColumn = this.resRows.join(',')
-        params.queryKey = this.filters.name
+      // if (this.filters.name != '') {
+      //   params.queryColumn = this.resRows.join(',')
+      //   params.queryKey = this.filters.name
+      // }
+      if (this.query != undefined) {
+        params.query = this.query
       }
       this.$ajax.getBolb(this.$api.exportExcel, params).then(res => {
         if (res.data) {
@@ -244,6 +256,7 @@ export default {
           this.$ajax.post(this.$api.deleteTableData, params).then(res => {
             if (res && res.data == 1) {
               this.$message.deleteSuccess()
+              this.$emit('deleteAfter',row[this.primaryKey])
               this.getResList()
             } else {
               this.$message.deleteError(res.data.errmsg)
@@ -257,6 +270,7 @@ export default {
         this.$ajax.post(this.$api.deleteTableData, params).then(res => {
           if (res && res.data == 1) {
             this.$message.deleteSuccess()
+            this.$emit('deleteAfter',row[this.primaryKey])
             this.getResList()
           } else {
             this.$message.deleteError(res.data.errmsg)

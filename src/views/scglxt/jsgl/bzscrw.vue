@@ -12,9 +12,9 @@
       </span>
     </div>
     <ResList tableId="010401" :query="query" noEdit noAdd noTool ref="jgList">
-      <el-table-column slot="operate" fixed="left" label="操作" min-width="80" align="center">
+      <el-table-column slot="operate" fixed="left" label="排序加急" min-width="80" align="center">
         <template slot-scope="scope">
-          <el-button size="mini" type="primary" @click="orderTop(scope.row)">置顶</el-button>
+          <el-button size="mini" type="danger" round @click="orderTop(scope.row)">排序加急</el-button>
         </template>
       </el-table-column>
         <template slot="GYNR" slot-scope="scope">

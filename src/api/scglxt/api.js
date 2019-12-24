@@ -42,6 +42,8 @@ let api = {
     uploadDrawing: '/api/scglxt/ddgl/uploadDrawing',
     deleteDdTz: 'scglxt/ddgl/deleteDdTz',
     updateEndTime: 'scglxt/ddgl/updateEndTime',
+    getDDKhxxById:'scglxt/ddgl/getDDKhxxById',
+
     //bom表操作
     addBomData: 'scglxt/bom/addBom',
     addBomMany: 'scglxt/bom/addBomMany',

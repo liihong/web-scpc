@@ -8,19 +8,28 @@ services.getUserList = function() {
   })
 }
 // 删除用户
-services.deleteUser = function(token) {
+services.deleteUser = function(params) {
   return request({
-    url: '/user/info',
-    method: 'get',
-    params: { token }
+    url: '/user/delete',
+    method: 'post',
+    data: params
   })
 }
 // 添加用户
-services.addUser = function(token) {
+services.addUser = function(data) {
   return request({
-    url: '/user/logout',
+    url: '/user/add',
     method: 'post',
-    params: { token }
+    data: {data:data}
+  })
+}
+
+// 修改用户
+services.editUser = function(params) {
+  return request({
+    url: '/user/eidt',
+    method: 'post',
+    data: params
   })
 }
 

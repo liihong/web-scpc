@@ -116,4 +116,26 @@ module.exports = class extends Base {
             return this.fail(2000, '密码修改失败！', {})
         }
     }
+
+    //新增用户
+    async addAction(){
+        let data = this.post('data')
+        let status = await this.model('cms_user').add(data)
+        return this.success(status)
+    }
+
+    //编辑用户
+    async eidtAction(){
+        let id = this.post('id')
+        let update = this.post('data')
+        let status = await this.model('cms_user').where({id:id}).update(update)
+        return this.success(status)
+    }
+
+    //删除用户
+    async deleteAction(){
+        let id = this.post('id')
+        let status = await this.model('cms_user').where({id:id}).delete()
+        return this.success(status)
+    }
 };

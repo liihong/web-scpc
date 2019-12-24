@@ -324,45 +324,70 @@ module.exports = class extends Base {
     async BOMOutStoreAction() {
         let id = this.post('id')
         const _this = this
-        let data = await this.model(bomModel).where({
-            id: ['in', id]
-        }).update({
-            zddzt: '0506',
-            cksj: util.getNowTime()
-        })
-
-        let bomData = await this.model(bomModel).where({
-            id: ['in', id]
-        }).select()
-
-        let pArr = []
-        //如果是批量操作
-        if (bomData.length > 1) {
-            let updateList = []
-            bomData.map(async item => {
-                pArr.push(_this.getOutData(updateList, item.ssdd))
+        try{
+            let data = await this.model(bomModel).where({
+                id: ['in', id]
+            }).update({
+                zddzt: '0506',
+                cksj: util.getNowTime()
             })
-            if (pArr.length > 0) {
-                await Promise.all(pArr).then(async () => {
-                    if (updateList.length > 0) {
-                        let sql = `update scglxt_t_dd set ckzt='完成',ckdate=DATE_FORMAT(NOW(), '%Y-%m-%d %H:%i:%s') where id=(select ssdd from scglxt_t_bom where id in (` + updateList.join(',') + `))`
-                        let ddData = await this.model().execute(sql)
-                    }
-                })
-            }
-        } else {
-            let allBom = await this.model(bomModel).where({
-                ssdd: bomData[0].ssdd,
-                zddzt: ['!=', '0506']
+    
+            let bomData = await this.model(bomModel).where({
+                id: ['in', id]
             }).select()
-            //如果该订单下所有BOM都完成了就更新订单状态为完成
-            if (allBom.length == 0) {
-                let sql = `update scglxt_t_dd set ckzt='完成',ckdate=DATE_FORMAT(NOW(), '%Y-%m-%d %H:%i:%s') where id=(select ssdd from scglxt_t_bom where id='` + id + `')`
-                let ddData = await this.model().execute(sql)
+    
+            let pArr = []
+            //如果是批量操作
+            if (bomData.length > 1) {
+                let updateList = []
+                bomData.map(async item => {
+                    pArr.push(_this.getOutData(updateList, item.ssdd))
+                })
+                if (pArr.length > 0) {
+                    await Promise.all(pArr).then(async () => {
+                        if (updateList.length > 0) {
+                            let sql = `update scglxt_t_dd set ckzt='完成',ckdate=DATE_FORMAT(NOW(), '%Y-%m-%d %H:%i:%s') where id=(select ssdd from scglxt_t_bom where id in (` + updateList.join(',') + `))`
+                            let ddData = await this.model().execute(sql)
+                        }
+                    })
+                }
+            } else {
+                let allBom = await this.model(bomModel).where({
+                    ssdd: bomData[0].ssdd,
+                    zddzt: ['!=', '0506']
+                }).select()
+                //如果该订单下所有BOM都完成了就更新订单状态为完成
+                if (allBom.length == 0) {
+                    let sql = `update scglxt_t_dd set ckzt='完成',ckdate=DATE_FORMAT(NOW(), '%Y-%m-%d %H:%i:%s') where id=(select ssdd from scglxt_t_bom where id='` + id + `')`
+                    let ddData = await this.model().execute(sql)
+                }
             }
-        }
+    
+            let errorLog = {
+                id: util.getUUId(),
+                type: '成品出库',
+                infos: JSON.stringify(this.post()),
+                operater:this.header('token')
+            }
+            await this.model('operate_log').add(errorLog)
 
-        return this.success(data)
+            let log = {
+                id:util.getUUId()
+            }
+
+            return this.success(data)
+        }catch(ex){
+            let errorLog = {
+                id: util.getUUId(),
+                type: '成品出库失败',
+                error: ex,
+                infos: JSON.stringify(this.post()),
+                operater:this.header('token')
+            }
+            await this.model('operate_log').add(errorLog)
+            return this.fail(ex)
+        }
+       
     }
 
     //bom 进度
