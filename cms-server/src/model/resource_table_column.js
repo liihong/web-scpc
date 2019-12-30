@@ -10,8 +10,9 @@ module.exports = class extends think.Model {
                 _logic: 'or'
             }
             complex[`is${flag}`] = '1'
-            complex.ISUNIQUE = '1'
-            complex.PROPERTY_TYPE = '10'
+            if(flag != 'EXPORT'){
+                complex.PROPERTY_TYPE = '10'
+            }
             whereObj._complex = complex
             order = `${flag}_ORDER ASC`
         }

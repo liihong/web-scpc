@@ -112,13 +112,14 @@ module.exports = class extends Base {
         if (bomList.length > 0) {
             bomList.map(item => {
                 var newBOMId = util.getUUId()
-                gygcList.map(el => {
+                gygcList.map((el,i) => {
                     if (item.id == el.bomid) {
                         el.id = util.getUUId()
                         el.kjgjs = 0
                         el.yjgjs = 0
                         el.sjjs = 0
                         el.bfjs = 0
+                        el.serial = i
                         el.status = null
                         el.sfjy = null
                         el.kssj = null
@@ -293,6 +294,39 @@ module.exports = class extends Base {
         console.log(date)
     }
 
+    //导出订单备料
+    async exportDdBLAction(){
+        let ddid = this.get('id')
+        const res = this.ctx.res;
+        // String ddSql="SELECT ht.`htbh`,xmname,zd.mc ddjb,endtime,xmlxr,xmfzr,starttime FROM scglxt_t_dd dd,scglxt_t_ht ht,scglxt_tyzd zd WHERE dd.`ssht`=ht.`id` AND dd.`ddlevel`=zd.`ID` AND zd.xh LIKE '04__' and dd.id='"+ddid+"'";
+
+        // String tjSql="SELECT gymc,CEIL(SUM(bzgs)/60) zgs FROM scglxt_t_gygc gc,`scglxt_t_jggy` gy WHERE gc.`gynr`=gy.id AND bomid IN (SELECT id FROM scglxt_t_bom WHERE ssdd='"+ddid+"') GROUP BY gymc";
+
+        // String bomSql="SELECT  (@rownum := @rownum + 1) AS rownum, bom.id, zddmc,  t2.clmc, cldx, jgsl, gxnr, bmcl, '' AS bz, DATE_FORMAT(endtime, '%Y-%m-%d %h:%m') endtime \n" +
+        //             "FROM scglxt_t_bom bom  LEFT JOIN scglxt_t_cl t2   ON bom.zddcz = t2.id  WHERE ssdd = '"+ddid+"' order by bom.sjcjsj";
+     
+        let ddsql = `select ht.htbh,dd.xmname,zd.mc ddlevel, starttime,endtime from scglxt_t_dd dd,scglxt_t_ht ht,scglxt_tyzd zd where dd.ssht=ht.id and zd.xh = dd.ddlevel and dd.id = '` + ddid + `'`
+        let infos = await this.model().query(ddsql)
+
+        let sql = `SELECT  (@rownum := @rownum + 1) AS rownum, bom.id, zddmc,  t2.clmc, cldx, bljs,jgsl,ROUND(clzl,2) clzl, cldj, ROUND(clje,2) clje 
+        FROM (select @rownum := 0) t,scglxt_t_bom bom  LEFT JOIN scglxt_t_cl t2   ON bom.zddcz = t2.id  WHERE ssdd = '`+ddid+`' order by sjcjsj`
+       
+        let tjSql="SELECT gymc,CEIL(SUM(bzgs)/60) zgs FROM scglxt_t_gygc gc,`scglxt_t_jggy` gy WHERE gc.`gynr`=gy.id AND bomid IN (SELECT id FROM scglxt_t_bom WHERE ssdd='"+ddid+"') GROUP BY gymc";
+
+        let tjInfo = {
+            info: '工时合计：'
+        }
+        
+        let datas = await this.model().query(sql)
+        let tjData = await this.model().query(tjSql)
+        tjData.forEach(item => {
+            tjInfo.info += item.gymc + '(' + item.zgs+ ')' + '-'
+            tjInfo.zgs += parseInt(item.zgs)
+        });
+        tjInfo.info = tjInfo.info.substring(0,tjInfo.info.length -1) 
+        tjInfo.zgs = tjInfo.zgs.toString()
+        exportXls.exportDdBlXls(infos[0], datas, tjInfo, res)
+    }
     // 上传订单图纸
     async uploadDrawingAction() {
         let ssdd = this.post('ssdd');

@@ -34,6 +34,7 @@ let api = {
     
     exportDdByZj: '/api/scglxt/ddgl/exportDdByZj',
     exportDdBOM: '/api/scglxt/ddgl/exportDdBOM',
+    exportDdBL: '/api/scglxt/ddgl/exportDdBL',
     exportGRGSTJ: '/api/scglxt/ddgl/exportGRGSTJ',
 
     getNewDDbh: 'scglxt/ddgl/getNewDDbh',

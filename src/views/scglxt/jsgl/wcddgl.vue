@@ -12,7 +12,7 @@
         </template>
       </el-table-column>
        <template slot="SSHT" slot-scope="scope">
-        <router-link style="color:#48b884;" :to="{path: 'htgl', query: {HTBH: scope.row.SSHT}}">{{scope.row.SSHT_TEXT}}</router-link>
+        <router-link style="color:#48b884;" :to="{path: 'htgl', query: {ID: scope.row.SSHT}}">{{scope.row.SSHT_TEXT}}</router-link>
       </template>
       <template slot="XMNAME" slot-scope="scope">
         <router-link style="color:#48b884;" :to="{path: 'bomgl', query: {SSDD: scope.row.ID, SSHT: scope.row.SSHT}}">{{scope.row.XMNAME}}</router-link>

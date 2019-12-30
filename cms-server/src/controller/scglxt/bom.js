@@ -114,6 +114,8 @@ module.exports = class extends Base {
         let primaryKey = this.post('primaryKey')
         let data = await this.model(bomModel).where(primaryKey).update(form)
 
+        await this.model('scglxt_t_gygc').where({bomid:primaryKey.id}).update({ssdd:form.ssdd})
+
         return this.success(data)
     }
 
@@ -143,13 +145,14 @@ module.exports = class extends Base {
             bomid: primaryKey.id
         }).select()
         if (gyList.length > 0) {
-            gyList.map(item => {
+            gyList.map((item,i) => {
                 item.id = util.getUUId()
                 item.bomid = form.id
                 item.kjgjs = 0
                 item.yjgjs = 0
                 item.sjjs = 0
                 item.bfjs = 0
+                item.serial = i
                 item.status = null
                 item.sfjy = null
                 item.kssj = null

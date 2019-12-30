@@ -18,7 +18,7 @@ module.exports = class extends Base {
             form.map(item=>{
                item.id= util.getUUId()
                pArr.push(this.getCzId(item,item.cz))
-               zdj = parseFloat(item.dj) + zdj
+               zdj = parseFloat(item.zje) + zdj
             })
             let data = {}
             Promise.all(pArr).then(async () => {
