@@ -2,10 +2,10 @@
   <div class="blkcgl">
      <!--工具条-->
     <el-col :span="24" class="toolbar">
-      <el-input @keyup.enter.native="queryData" style="width:200px;" size="small" v-model="query.queryKey" placeholder="模糊查询"></el-input>
+      <el-input @keyup.enter.native="getSjzdData"  @change="getSjzdData" style="width:200px;" size="small" v-model="query.xmname" placeholder="模糊查询"></el-input>
       <el-button size="mini" @click="lookDDWorking" type="primary">订单生产实时看板</el-button>
     </el-col>
-    <el-table class="el-table"  header-cell-class-name="table_th" @expand-change="initData" :data="clList" v-loading="listLoading" stripe border :max-height="tableHeight" style="width: 100%;">
+    <el-table class="el-table" :expand-row-keys="$route.query.ddid" row-key="id" header-cell-class-name="table_th" @expand-change="initData" :data="clList" v-loading="listLoading" stripe border :max-height="tableHeight" style="width: 100%;">
       <el-table-column fixed="left" label="操作" min-width="100" align="center">
         <template slot-scope="scope">
           <el-button-group size="mini">
@@ -175,6 +175,7 @@ export default {
       clList: [],
       tableData: [],
       query: {
+        xmname: '',
         where: 'ckzt is null',
         pageSize: 20,
         pageNumber: 1
@@ -184,12 +185,10 @@ export default {
   mounted() {
     var offsetHeight = window.innerHeight
     this.tableHeight = offsetHeight - 80
+    if(this.$route.query.ddid){
+      this.query.ddid = this.$route.query.ddid
+    }
     this.getSjzdData()
-    let _this = this
-    
-    this.$socket.on('getTableData', () => {
-      _this.getSjzdData()
-    })
   },
   methods: {
     bomClick(row) {
@@ -252,7 +251,8 @@ export default {
             item.bomList = []
             return item
           })
-          this.clList = this.initList.slice(this.query.pageNumber,this.query.pageSize)
+
+          this.clList = this.initList.slice(this.query.pageNumber-1,this.query.pageSize)
           this.query.total = res.data.length
         }
       })

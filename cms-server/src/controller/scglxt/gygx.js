@@ -350,7 +350,8 @@ module.exports = class extends Base {
                 id: gyid
             }).find()
 
-            if (gygcData.kjgjs != (gygcData.yjgjs + gygcData.sjjs)) // 如果加工未完成自动再开始一条加工记录 
+            
+            if (ddjs != (gygcData.yjgjs + gygcData.sjjs)) // 如果加工未完成自动再开始一条加工记录 
             {
                 await this.model('scglxt_t_gygc').where({
                     id: gyid
@@ -407,7 +408,7 @@ module.exports = class extends Base {
         if (!!queryKey) {
             where = "SSDD_TEXT like '%" + queryKey + "%' or BOMID_TEXT like '%" + queryKey + "%' or CZRYID_TEXT like '%" + queryKey + "%'"
         }
-        let sql = `SELECT * from (SELECT jggl.ID, dd.xmname SSDD_TEXT,gygc.ZYSX,gygc.KSSJ,gygc.JSSJ,
+        let sql = `SELECT * from (SELECT jggl.ID, dd.xmname SSDD_TEXT,gygc.ZYSX,gygc.KSSJ,gygc.JSSJ,fun_dqgygc1 (gygc.BOMID) DQJD,
         bom.zddmc BOMID_TEXT, bom.zddjb ZDDJB, bom.bmcl BMCL, jggy.gymc GYNR_TEXT,bom.jgsl KJGJS,gygc.YJGJS,
         ry.rymc CZRYID_TEXT,jggl.JGRYID, sb.sbmc SBID_TEXT, jggl.jgjs SJJS, gygc.BOMID,gygc.id gygcid, date_format( dd.endtime, '%Y-%m-%d' ) ddjssj,
         gygc.serial  FROM

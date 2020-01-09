@@ -63,11 +63,15 @@ module.exports = class extends Base {
     }
     //根据订单表数据，生成新的订单编号
     async getNewDDbhAction() {
-        let count = await this.model('scglxt_t_dd').query(`SELECT SUBSTRING_INDEX(xmname,'-',-1) AS count FROM scglxt_t_dd order by sjcjsj desc limit 1`)
+        let count = await this.model('scglxt_t_dd').query(`SELECT SUBSTRING_INDEX(xmname,'-',-1) AS count FROM scglxt_t_dd   where xmname like '2020%' order by sjcjsj desc limit 1`)
 
-        count = '00000' + (parseInt(count[0].count) + 1);
-        count = count.substring(3, count.length);
-
+        if(count.length > 0){
+            count = '00000' + (parseInt(count[0].count) + 1);
+            count = count.substring(3, count.length);
+        }else{
+            count = '00001'
+        }
+      
         return this.success(count)
     }
     /**
@@ -229,20 +233,21 @@ module.exports = class extends Base {
         FROM (select @rownum := 0) t,scglxt_t_bom bom  LEFT JOIN scglxt_t_cl t2   ON bom.zddcz = t2.id  WHERE ssdd = '` + ddid + `' order by bom.sjcjsj
         `
 
-        let tjSql="SELECT gymc,CEIL(SUM(bzgs)/60) zgs FROM scglxt_t_gygc gc,`scglxt_t_jggy` gy WHERE gc.`gynr`=gy.id AND bomid IN (SELECT id FROM scglxt_t_bom WHERE ssdd='"+ddid+"') GROUP BY gymc";
+        let tjSql="SELECT gymc,ROUND( SUM( bzgs )/ 60,2 ) zgs FROM scglxt_t_gygc gc,`scglxt_t_jggy` gy WHERE gc.`gynr`=gy.id AND bomid IN (SELECT id FROM scglxt_t_bom WHERE ssdd='"+ddid+"') GROUP BY gymc";
 
         let tjInfo = {
-            info: '工时合计：'
+            info: '工时合计：',
+            zgs:0
         }
         
         let datas = await this.model().query(sql)
         let tjData = await this.model().query(tjSql)
         tjData.forEach(item => {
             tjInfo.info += item.gymc + '(' + item.zgs+ ')' + '-'
-            tjInfo.zgs += parseInt(item.zgs)
+            tjInfo.zgs += parseFloat(item.zgs)
         });
         tjInfo.info = tjInfo.info.substring(0,tjInfo.info.length -1) 
-        tjInfo.zgs = tjInfo.zgs.toString()
+        tjInfo.zgs = "合计：" +  tjInfo.zgs.toFixed(2).toString()
         exportXls.exportBOMXls(infos[0], datas, tjInfo, res)
     }
     //导出组件
@@ -298,33 +303,25 @@ module.exports = class extends Base {
     async exportDdBLAction(){
         let ddid = this.get('id')
         const res = this.ctx.res;
-        // String ddSql="SELECT ht.`htbh`,xmname,zd.mc ddjb,endtime,xmlxr,xmfzr,starttime FROM scglxt_t_dd dd,scglxt_t_ht ht,scglxt_tyzd zd WHERE dd.`ssht`=ht.`id` AND dd.`ddlevel`=zd.`ID` AND zd.xh LIKE '04__' and dd.id='"+ddid+"'";
-
-        // String tjSql="SELECT gymc,CEIL(SUM(bzgs)/60) zgs FROM scglxt_t_gygc gc,`scglxt_t_jggy` gy WHERE gc.`gynr`=gy.id AND bomid IN (SELECT id FROM scglxt_t_bom WHERE ssdd='"+ddid+"') GROUP BY gymc";
-
-        // String bomSql="SELECT  (@rownum := @rownum + 1) AS rownum, bom.id, zddmc,  t2.clmc, cldx, jgsl, gxnr, bmcl, '' AS bz, DATE_FORMAT(endtime, '%Y-%m-%d %h:%m') endtime \n" +
-        //             "FROM scglxt_t_bom bom  LEFT JOIN scglxt_t_cl t2   ON bom.zddcz = t2.id  WHERE ssdd = '"+ddid+"' order by bom.sjcjsj";
-     
+         
         let ddsql = `select ht.htbh,dd.xmname,zd.mc ddlevel, starttime,endtime from scglxt_t_dd dd,scglxt_t_ht ht,scglxt_tyzd zd where dd.ssht=ht.id and zd.xh = dd.ddlevel and dd.id = '` + ddid + `'`
         let infos = await this.model().query(ddsql)
 
-        let sql = `SELECT  (@rownum := @rownum + 1) AS rownum, bom.id, zddmc,  t2.clmc, cldx, bljs,jgsl,ROUND(clzl,2) clzl, cldj, ROUND(clje,2) clje 
+        let sql = `SELECT  (@rownum := @rownum + 1) AS rownum, bom.id, zddmc,  t2.clmc, cldx, bljs,jgsl,ROUND(IFNULL(clzl,0),2) clzl,IFNULL(cldj,0) cldj, ROUND(IFNULL(clje, 0),2)*bljs clje 
         FROM (select @rownum := 0) t,scglxt_t_bom bom  LEFT JOIN scglxt_t_cl t2   ON bom.zddcz = t2.id  WHERE ssdd = '`+ddid+`' order by sjcjsj`
        
-        let tjSql="SELECT gymc,CEIL(SUM(bzgs)/60) zgs FROM scglxt_t_gygc gc,`scglxt_t_jggy` gy WHERE gc.`gynr`=gy.id AND bomid IN (SELECT id FROM scglxt_t_bom WHERE ssdd='"+ddid+"') GROUP BY gymc";
 
         let tjInfo = {
-            info: '工时合计：'
+            info: '合计：',
+            zgs: 0
         }
         
         let datas = await this.model().query(sql)
-        let tjData = await this.model().query(tjSql)
-        tjData.forEach(item => {
-            tjInfo.info += item.gymc + '(' + item.zgs+ ')' + '-'
-            tjInfo.zgs += parseInt(item.zgs)
+        datas.forEach(item => {
+            tjInfo.zgs += parseFloat(item.clje)
         });
         tjInfo.info = tjInfo.info.substring(0,tjInfo.info.length -1) 
-        tjInfo.zgs = tjInfo.zgs.toString()
+        tjInfo.zgs = tjInfo.zgs.toFixed(2).toString()
         exportXls.exportDdBlXls(infos[0], datas, tjInfo, res)
     }
     // 上传订单图纸

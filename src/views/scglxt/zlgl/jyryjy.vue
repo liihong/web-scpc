@@ -13,6 +13,9 @@
           </el-button-group>
         </template>
       </el-table-column>
+       <template slot="DQJD" slot-scope="scope">
+        <div style="text-align:left;" v-html="scope.row.DQJD"></div>
+      </template>
     </DataResList>
     <passPart :dialogState="dialogState" />
   </div>

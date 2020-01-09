@@ -22,8 +22,7 @@ _exports.exportXls = function (data, list, res) {
     header.A1.v = header.A1.v + data.xmname
     header.A1.h = header.A1.h + data.xmname
     header.C2.v = data.htbh
-    header.C3.v = data.htbh
-    header.C4.v = data.starttime
+    header.C3.v = data.xmname
     header.C4.v = data.starttime
     header.H4.v = data.endtime
     header.C5.v = data.ddlevel
@@ -77,6 +76,7 @@ _exports.exportBOMXls = function (data, list, tjInfo, res) {
     header.A1.v = header.A1.v + data.xmname
     header.A1.h = header.A1.h + data.xmname
     header.C2.v = data.htbh
+    header.C3.v = data.xmname
     header.C4.v = data.starttime
     header.H4.v = data.endtime
     header.C5.v = data.ddlevel
@@ -102,30 +102,35 @@ _exports.exportBOMXls = function (data, list, tjInfo, res) {
     var keyMap = ["rownum", "zddmc", "clmc", "cldx", "jgsl", "gxnr", "bmcl", "bz", "endtime"];
     var dataList = xlsxUtils.format2Sheet(list, 0, 7, keyMap); //偏移8行按keyMap顺序转换
     
-    var dataKeys = Object.keys(dataList);
 
-    var d2 = xlsxUtils.format2Sheet([tjInfo], 0, list.length + 7, ["info","zgs"]);
-    // d2["!merges"] = [{
-    //     s: { //s为开始
-    //         c: 1, //开始列
-    //         r: 0 //可以看成开始行,实际是取值范围
-    //     },
-    //     e: { //e结束
-    //         c: 6, //结束列
-    //         r: 0 //结束行
-    //     }
-    // }];
+    var d2 = xlsxUtils.format2Sheet([tjInfo], 0, list.length + 7, ["info","","","","","","","","zgs"]);
+   
     
     dataList = Object.assign(dataList, d2);
 
+    var dataKeys = Object.keys(dataList);
+
     for (var k in header) dataList[k] = header[k]; //追加列头
     
+    //合并统计行
+    dataList["!merges"].push({
+        s: { //s为开始
+            c: 0, //开始列
+            r: list.length + 7 //可以看成开始行,实际是取值范围
+        },
+        e: { //e结束
+            c: 7, //结束列
+            r: list.length + 7 //结束行
+        }
+    });
+
+    let wb = xlsxUtils.format2WB(dataList, data.xmname, null, "A1:" + dataKeys[dataKeys.length - 1]);
     
-    let wb = xlsxUtils.format2WB(dataList, data.xmname, workbook2, "A1:" + dataKeys[dataKeys.length - 1]);
-    console.log(workbook2.Sheets[0])
-    
+    wb.SheetNames.push('工艺工时');
+
+    wb.Sheets['工艺工时'] = wsgy
     // 浏览器端和node共有的API,实际上node可以直接使用xlsx.writeFile来写入文件,但是浏览器没有该API
-    const result = XLSX.write(workbook2, {
+    const result = XLSX.write(wb, {
         bookType: 'xlsx', // 输出的文件类型
         type: 'buffer', // 输出的数据类型
         compression: true // 开启zip压缩
@@ -147,13 +152,13 @@ _exports.exportDdBlXls = function (data, list, tjInfo, res) {
         cellStyles: true
     })
     const wsname = workbook2.SheetNames[0] //取第一张表
-    const wsgy = workbook2.SheetNames[1] //取第一张表
     const header = workbook2.Sheets[wsname] //生成json表格内容
 
     header.A1.v = header.A1.v + data.xmname
     header.A1.h = header.A1.h + data.xmname
+    header.C3.v = data.xmname
     header.C2.v = data.htbh
-    header.C4.v = data.starttime
+    header.C4.v = data.starttime == null ? '' : data.starttime
     header.H4.v = data.endtime
     header.C5.v = data.ddlevel
     header.A1.s = {
@@ -178,29 +183,21 @@ _exports.exportDdBlXls = function (data, list, tjInfo, res) {
     var keyMap = ["rownum", "zddmc", "clmc", "cldx","bljs", "jgsl", "clzl", "cldj", "clje"];
     var dataList = xlsxUtils.format2Sheet(list, 0, 7, keyMap); //偏移8行按keyMap顺序转换
     
-    var dataKeys = Object.keys(dataList);
 
-    var d2 = xlsxUtils.format2Sheet([tjInfo], 0, list.length + 7, ["info","zgs"]);
-    // d2["!merges"] = [{
-    //     s: { //s为开始
-    //         c: 1, //开始列
-    //         r: 0 //可以看成开始行,实际是取值范围
-    //     },
-    //     e: { //e结束
-    //         c: 6, //结束列
-    //         r: 0 //结束行
-    //     }
-    // }];
-    
+    var d2 = xlsxUtils.format2Sheet([tjInfo], 7, list.length + 7, ["info","zgs"]);
+   
     dataList = Object.assign(dataList, d2);
 
+    var dataKeys = Object.keys(dataList);
+    
+    console.log(dataList)
     for (var k in header) dataList[k] = header[k]; //追加列头
     
-    
-    let wb = xlsxUtils.format2WB(dataList, data.xmname, workbook2, "A1:" + dataKeys[dataKeys.length - 1]);
+   
+    let wb = xlsxUtils.format2WB(dataList, data.xmname, undefined, "A1:" + dataKeys[dataKeys.length - 1]);
     
     // 浏览器端和node共有的API,实际上node可以直接使用xlsx.writeFile来写入文件,但是浏览器没有该API
-    const result = XLSX.write(workbook2, {
+    const result = XLSX.write(wb, {
         bookType: 'xlsx', // 输出的文件类型
         type: 'buffer', // 输出的数据类型
         compression: true // 开启zip压缩

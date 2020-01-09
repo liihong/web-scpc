@@ -34,7 +34,7 @@
 </template>
 
 <script>
-import { EXPORT_DDBL, EXPORT_DDBOM } from '@/api/scglxt/oldAPI.js'
+import { EXPORT_DDBOM } from '@/api/scglxt/oldAPI.js'
 import uploadTZ from './components/uploadTz'
 import editDD from './components/editDD'
 
@@ -131,24 +131,24 @@ export default {
       // })
     },
     exportBL(ddId) {
-      location.href = 'http://'+ document.domain + ':8000/' + EXPORT_DDBL + '?ddid=' + ddId
-      // this.$ajax.getBolb(this.$api.exportDdBL, {id: ddId}).then(res => {
-      //   if (res.data) {
-      //     let url = URL.createObjectURL(res.data)
-      //     let fileName = res.headers['content-disposition'].split('=')[1]
-      //     fileName = decodeURI(fileName)
-      //     let link = document.createElement('a')
-      //     link.style.display = 'none'
-      //     link.href = url
-      //     link.setAttribute('id', 'downloadLink')
-      //     link.setAttribute('download', fileName)
-      //     document.body.appendChild(link)
-      //     link.click()
-      //     // 删除添加的a链接
-      //     let objLink = document.getElementById('downloadLink')
-      //     document.body.removeChild(objLink)
-        // }
-      // })
+      // location.href = 'http://'+ document.domain + ':8000/' + EXPORT_DDBL + '?ddid=' + ddId
+      this.$ajax.getBolb(this.$api.exportDdBL, {id: ddId}).then(res => {
+        if (res.data) {
+          let url = URL.createObjectURL(res.data)
+          let fileName = res.headers['content-disposition'].split('=')[1]
+          fileName = decodeURI(fileName)
+          let link = document.createElement('a')
+          link.style.display = 'none'
+          link.href = url
+          link.setAttribute('id', 'downloadLink')
+          link.setAttribute('download', fileName)
+          document.body.appendChild(link)
+          link.click()
+          // 删除添加的a链接
+          let objLink = document.getElementById('downloadLink')
+          document.body.removeChild(objLink)
+        }
+      })
     },
     // 上传图纸
     uploadTZ(row) {

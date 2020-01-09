@@ -96,6 +96,14 @@ module.exports = class extends Base {
 
     // 获取订单动态剩余工时
     async getDDWorkSpeedAction() {
+        let query = this.post()
+        let whereObj = '1=1'
+        if(query.xmname && query.xmname != ''){
+            whereObj = `1=1 and dd.xmname like '%`+query.xmname+`%'`
+        }
+        if(query.ddid && query.ddid != ''){
+            whereObj = `1=1 and dd.id='`+query.ddid+`'`
+        }
         let sql = `  
         SELECT
             dd.id,
@@ -116,7 +124,7 @@ module.exports = class extends Base {
             MAX(CASE gynr WHEN '20170524144646657'  THEN sygs ELSE 0 END ) 'waixie' ,
             sum(sygs) sygs
         FROM
-            scglxt_t_dd dd ,v_scglxt_sygs sygs where sygs<>0 and dd.id =sygs.ddid and dd.ckzt is null group by ddid`
+            scglxt_t_dd dd ,v_scglxt_sygs sygs where sygs<>0 and dd.id =sygs.ddid and dd.ckzt is null and `+whereObj+` group by ddid`
 
         let data = await this.model().query(sql)
 

@@ -111,7 +111,7 @@ export default {
         return item.id == val
       })
       let ddbh = await this.$ajax.post(this.$api.getNewDDbh)
-      this.formData.XMNAME = (arr[0].htjc).toUpperCase() + '-' + ddbh.data
+      this.formData.XMNAME = '2020-' + (arr[0].htjc).toUpperCase() + '-' + ddbh.data
     },
     onSave() {
       let params = {}

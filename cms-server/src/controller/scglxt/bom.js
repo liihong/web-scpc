@@ -143,7 +143,7 @@ module.exports = class extends Base {
 
         let gyList = await this.model('scglxt_t_gygc').where({
             bomid: primaryKey.id
-        }).select()
+        }).order('serial').select()
         if (gyList.length > 0) {
             gyList.map((item,i) => {
                 item.id = util.getUUId()

@@ -24,6 +24,9 @@
           <svg-icon icon-class="ing" />
         </i>
       </template>
+      <template slot="DQJD" slot-scope="scope">
+        <div style="text-align:left;" v-html="scope.row.DQJD"></div>
+      </template>
     </ResList>
     <gybp :dialogState="dialogState" ref="gygx" />
     <selectPerson :dialogState="personState" />

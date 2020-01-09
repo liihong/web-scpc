@@ -83,7 +83,7 @@ export default {
       let ddData = {
         ssht: htInfo.data.id,
         xmname:
-          htInfo.data.htjc +
+          '2020-' + htInfo.data.htjc +
           '-' +
           ddbh.data,
         ddlevel: '0403',

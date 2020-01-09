@@ -305,19 +305,19 @@ export default {
       let { l, h, w, d, cldj, mi } = this.volume;
 
       if (radio == 1) {
-        this.$set(this.formData, "CLTJ", (l * w * h) / 1000);
+        this.$set(this.formData, "CLTJ", ((l * w * h) / 1000).toFixed(2));
         this.formData.CLDX = l + "*" + w + "*" + h;
       } else {
         this.$set(
           this.formData,
           "CLTJ",
-          (3.1415926 * ((d / 2) * (d / 2)) * h) / 1000
+          ((3.1415926 * ((d / 2) * (d / 2)) * h) / 1000).toFixed(2)
         );
         this.formData.CLDX = "φ" + d + "*" + h;
       }
       this.formData.CLZL = this.formData.CLTJ * mi;
       this.formData.CLJE =
-        this.formData.BLJS * (this.formData.CLTJ * mi * cldj);
+        (this.formData.BLJS * (this.formData.CLTJ * mi * cldj)).toFixed(2);
     },
     // 获取表单数据，如果是编辑进行数据回填
     getFormData() {
