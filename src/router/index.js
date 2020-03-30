@@ -38,6 +38,12 @@ export const constantRouterMap = [{
     hidden: true
   },
   {
+    path: '/test',
+    component: () =>
+      import ('@/views/scglxt/jsgl/components/gygxModel.vue'),
+    hidden: true
+  },
+  {
     path: '/dd-detail',
     component: () =>
       import ('@/views/scglxt/jsgl/ddDetail.vue'),

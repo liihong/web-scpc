@@ -44,7 +44,10 @@ let api = {
     deleteDdTz: 'scglxt/ddgl/deleteDdTz',
     updateEndTime: 'scglxt/ddgl/updateEndTime',
     getDDKhxxById:'scglxt/ddgl/getDDKhxxById',
+    //获取订单BOM信息
+    getDdBOMData: 'scglxt/ddgl/getDdBOMData',
 
+    
     //bom表操作
     addBomData: 'scglxt/bom/addBom',
     addBomMany: 'scglxt/bom/addBomMany',
@@ -61,6 +64,9 @@ let api = {
     BOMSpeedProgress: 'scglxt/bom/BOMSpeedProgress',//进度跟踪
     BOMInSpareStock: 'scglxt/bom/BOMInSpareStock',//成品转入备用库存
     uploadBOMEndTime: 'scglxt/bom/uploadBOMEndTime',
+    getBOMBykc:'scglxt/bom/getBOMBykc', //获取BOM备用库存
+    setBOMBykc:'scglxt/bom/setBOMBykc',//关联备用库存
+
     //组件操作
     addZj: 'scglxt/zj/addZj',
     editZj: 'scglxt/zj/editZj',

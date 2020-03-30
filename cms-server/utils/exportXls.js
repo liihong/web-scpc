@@ -71,6 +71,7 @@ _exports.exportBOMXls = function (data, list, tjInfo, res) {
     })
     const wsname = workbook2.SheetNames[0] //取第一张表
     const wsgy = workbook2.SheetNames[1] //取第一张表
+    
     const header = workbook2.Sheets[wsname] //生成json表格内容
 
     header.A1.v = header.A1.v + data.xmname
@@ -128,7 +129,13 @@ _exports.exportBOMXls = function (data, list, tjInfo, res) {
     
     wb.SheetNames.push('工艺工时');
 
+    //开始编制BOM工艺卡
     wb.Sheets['工艺工时'] = wsgy
+
+    const bomHeader = workbook2.Sheets[wsgy] //生成BOM 的json表格内容
+    console.log(bomHeader)
+
+
     // 浏览器端和node共有的API,实际上node可以直接使用xlsx.writeFile来写入文件,但是浏览器没有该API
     const result = XLSX.write(wb, {
         bookType: 'xlsx', // 输出的文件类型
@@ -190,9 +197,7 @@ _exports.exportDdBlXls = function (data, list, tjInfo, res) {
 
     var dataKeys = Object.keys(dataList);
     
-    console.log(dataList)
     for (var k in header) dataList[k] = header[k]; //追加列头
-    
    
     let wb = xlsxUtils.format2WB(dataList, data.xmname, undefined, "A1:" + dataKeys[dataKeys.length - 1]);
     

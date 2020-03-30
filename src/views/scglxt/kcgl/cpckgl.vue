@@ -4,14 +4,14 @@
     <el-form-item slot="toolBar">
       <el-button type="primary" icon="el-icon-s-unfold" @click="passMany" class="radio" :label="1">批量出库</el-button>
     </el-form-item>
-    <el-table-column slot="operate" fixed="left" label="操作" min-width="200" align="center">
+    <!-- <el-table-column slot="operate" fixed="left" label="操作" min-width="200" align="center">
       <template slot-scope="scope">
         <el-button-group>
           <el-button type="primary" @click="pass(scope.row)" class="radio" :label="1">出库</el-button>
           <el-button type="danger" @click="passSection(scope.row)" class="radio" :label="2">不通过</el-button>
         </el-button-group>
       </template>
-    </el-table-column>
+    </el-table-column> -->
     <template slot="XMNAME" slot-scope="scope">
       <router-link style="color:#48b884;" :to="{path: 'bomgl', query: {SSDD: scope.row.ID, SSHT: scope.row.SSHT}}">{{scope.row.XMNAME}}</router-link>
     </template>

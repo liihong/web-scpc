@@ -5,7 +5,9 @@ const Base = require('../base.js');
 let bomModel = 'scglxt_t_bom'
 let gyModel = 'scglxt_t_gygc'
 import util from '../../../utils/util'
-import { lstat } from 'fs';
+import {
+    lstat
+} from 'fs';
 
 module.exports = class extends Base {
     async indexAction() {
@@ -61,7 +63,10 @@ module.exports = class extends Base {
     async addBomAction() {
         let form = this.post('form')
         //将订单级别取过来更新到BOM中
-        let {zddjb,endtime} = await this.model('scglxt_t_dd').where({
+        let {
+            zddjb,
+            endtime
+        } = await this.model('scglxt_t_dd').where({
             id: form.ssdd
         }).getField('ddlevel,endtime', true)
         form.zddjb = zddjb
@@ -114,7 +119,11 @@ module.exports = class extends Base {
         let primaryKey = this.post('primaryKey')
         let data = await this.model(bomModel).where(primaryKey).update(form)
 
-        await this.model('scglxt_t_gygc').where({bomid:primaryKey.id}).update({ssdd:form.ssdd})
+        await this.model('scglxt_t_gygc').where({
+            bomid: primaryKey.id
+        }).update({
+            ssdd: form.ssdd
+        })
 
         return this.success(data)
     }
@@ -124,7 +133,10 @@ module.exports = class extends Base {
         let form = this.post('form')
         let primaryKey = this.post('primaryKey')
 
-        let {zddjb,endtime} = await this.model('scglxt_t_dd').where({
+        let {
+            zddjb,
+            endtime
+        } = await this.model('scglxt_t_dd').where({
             id: form.ssdd
         }).getField('ddlevel,endtime', true)
         form.zddjb = zddjb
@@ -145,7 +157,7 @@ module.exports = class extends Base {
             bomid: primaryKey.id
         }).order('serial').select()
         if (gyList.length > 0) {
-            gyList.map((item,i) => {
+            gyList.map((item, i) => {
                 item.id = util.getUUId()
                 item.bomid = form.id
                 item.kjgjs = 0
@@ -157,8 +169,8 @@ module.exports = class extends Base {
                 item.sfjy = null
                 item.kssj = null
                 item.jssj = null
-                item.czryid= null
-                item.jyryid= null
+                item.czryid = null
+                item.jyryid = null
                 item.ssdd = form.ssdd
                 return item
             })
@@ -199,17 +211,19 @@ module.exports = class extends Base {
     }
     // 修改备料状态，备料成功后更新第一条工艺为可加工状态
     async updateBLZTAction() {
+        const vm = this
         let {
             id,
             clzt,
             cgyj,
             cgry
         } = this.post()
+        let data = ''
         try {
             let updateSql = ''
             //如果是同时更新多条
             if (id.indexOf(',') != '-1') {
-                let data = await this.model(bomModel).where({
+                data = await this.model(bomModel).where({
                     id: ['in', id]
                 }).update({
                     clzt: clzt,
@@ -219,15 +233,23 @@ module.exports = class extends Base {
                 })
 
                 let arrs = id.split(',')
-                if(clzt != 0 && clzt!=2) {
+                if (clzt != 0 && clzt != 2) {
+                    //     arrs.map(async item => {
+                    //         updateSql = `UPDATE scglxt_t_gygc gygc SET status=0,kjgjs= (SELECT bom.jgsl FROM  scglxt_t_bom bom  WHERE  bom.id = gygc.bomid)
+                    // WHERE gygc.bomid = '` + item + `' AND gygc.serial = '0'`
+                    //         await this.model().execute(updateSql)
+                    //     })
+                    let jgjsList = [],
+                        pArr = []
                     arrs.map(async item => {
-                        updateSql = `UPDATE scglxt_t_gygc gygc SET status=0,kjgjs= (SELECT bom.jgsl FROM  scglxt_t_bom bom  WHERE  bom.id = gygc.bomid)
-                WHERE gygc.bomid = '` + item + `' AND gygc.serial = '0'`
-                        await this.model().execute(updateSql)
+                        pArr.push(vm.updateBLZTData(jgjsList, item))
                     })
+                    if (pArr.length > 0) {
+                        await Promise.all(pArr)
+                    }
                 }
-               
-            }else{
+
+            } else {
                 let data = await this.model(bomModel).where({
                     id: ['in', id]
                 }).update({
@@ -236,15 +258,15 @@ module.exports = class extends Base {
                     cgsj: cgyj,
                     cgry: cgry == undefined ? '' : cgry
                 })
-                
+
                 if (cgyj != undefined && cgyj != null && cgyj != '') {
                     return this.success(data)
                 } else {
-                    if (clzt != 0 &&clzt != 2) {
+                    if (clzt != 0 && clzt != 2) {
                         updateSql = `UPDATE scglxt_t_gygc gygc SET status=0,kjgjs= (SELECT bom.jgsl FROM  scglxt_t_bom bom  WHERE  bom.id = gygc.bomid)
                         WHERE gygc.bomid = '` + id + `' AND gygc.serial = '0'`
-                       let updated =  await this.model().execute(updateSql)
-                       return this.success(updated)
+                        let updated = await this.model().execute(updateSql)
+                        return this.success(updated)
                     }
                 }
             }
@@ -253,14 +275,39 @@ module.exports = class extends Base {
             let errorLog = {
                 id: util.getUUId(),
                 type: '备料操作',
-                error: ex,
+                error: '批量备料报错',
+                operater: this.header('token'),
                 infos: JSON.stringify(this.post())
             }
             await this.model('operate_log').add(errorLog)
-            return this.success(ex)
+            return this.fail({
+                errno: 200,
+                errmsg: '更新BOM加工数量出错！'
+            })
         }
     }
+    //批量更新备料状态并且更新对应BOM的加工件数
+    updateBLZTData(jgjsList, bomid) {
+        const vm = this
 
+        return new Promise(async resolve => {
+            let jgsl = await this.model(bomModel).where({
+                id: bomid
+            }).getField('jgsl')
+            console.log(jgsl[0])
+            jgjsList.push(new Promise(async resolve => {
+                await this.model('scglxt_t_gygc').where({
+                    bomid: bomid,
+                    serial: '0'
+                }).alias('gygc').update({
+                    status: 0,
+                    kjgjs: jgsl[0]
+                })
+                resolve()
+            }))
+            resolve()
+        })
+    }
     // 获取生产情况跟踪数据
     async getGYgslistAction() {
         let ddid = this.post('ddid')
@@ -310,6 +357,9 @@ module.exports = class extends Base {
 
         return this.success(data)
     }
+
+
+    //批量更新BOM出库状态
     getOutData(updateList, ssdd) {
         const vm = this
         return new Promise(async resolve => {
@@ -327,18 +377,18 @@ module.exports = class extends Base {
     async BOMOutStoreAction() {
         let id = this.post('id')
         const _this = this
-        try{
+        try {
             let data = await this.model(bomModel).where({
                 id: ['in', id]
             }).update({
                 zddzt: '0506',
                 cksj: util.getNowTime()
             })
-    
+
             let bomData = await this.model(bomModel).where({
                 id: ['in', id]
             }).select()
-    
+
             let pArr = []
             //如果是批量操作
             if (bomData.length > 1) {
@@ -349,7 +399,7 @@ module.exports = class extends Base {
                 if (pArr.length > 0) {
                     await Promise.all(pArr).then(async () => {
                         if (updateList.length > 0) {
-                            let sql = `update scglxt_t_dd set ckzt='完成',ckdate=DATE_FORMAT(NOW(), '%Y-%m-%d %H:%i:%s') where id=(select ssdd from scglxt_t_bom where id in (` + updateList.join(',') + `))`
+                            let sql = `update scglxt_t_dd set ckzt='完成',ckdate=DATE_FORMAT(NOW(), '%Y-%m-%d %H:%i:%s') where id in (` + updateList.join(',') + `))`
                             let ddData = await this.model().execute(sql)
                         }
                     })
@@ -365,32 +415,51 @@ module.exports = class extends Base {
                     let ddData = await this.model().execute(sql)
                 }
             }
-    
+
+            //出库后，形成出库单记录，可以查看
+            let infos = await this.model('scglxt_t_bom').where({
+                id: ['in', id]
+            }).select()
+            let ddinfos = await this.model('scglxt_t_dd').where({
+                id: infos[0].ssdd
+            }).find()
+            let names = []
+            if (infos.length > 0) {
+                infos.map(item => {
+                    names.push(item.zddmc)
+                })
+            }
+            let ckLog = {
+                id: util.getUUId(),
+                cksj: util.getNowTime(),
+                ckr: this.header('token'),
+                ssdd: ddinfos.id,
+                ddmc: ddinfos.xmname,
+                ssht: ddinfos.ssht,
+                ckinfo: names.join(',')
+            }
+            await this.model('scglxt_t_dd_ck').add(ckLog)
             let errorLog = {
                 id: util.getUUId(),
                 type: '成品出库',
                 infos: JSON.stringify(this.post()),
-                operater:this.header('token')
+                operater: this.header('token')
             }
             await this.model('operate_log').add(errorLog)
 
-            let log = {
-                id:util.getUUId()
-            }
-
             return this.success(data)
-        }catch(ex){
+        } catch (ex) {
             let errorLog = {
                 id: util.getUUId(),
                 type: '成品出库失败',
                 error: ex,
                 infos: JSON.stringify(this.post()),
-                operater:this.header('token')
+                operater: this.header('token')
             }
             await this.model('operate_log').add(errorLog)
             return this.fail(ex)
         }
-       
+
     }
 
     //bom 进度
@@ -402,15 +471,21 @@ module.exports = class extends Base {
     }
 
     //**成品转入备用库存以便下次使用 */
-    async BOMInSpareStockAction(){
+    async BOMInSpareStockAction() {
         let id = this.post('id')
         let kcsl = this.post('kcsl')
-        let data = await this.model('scglxt_t_bom').where({id:id}).find()
-        
-        let sjsl = parseInt(data.jgsl)-parseInt(kcsl)
+        let data = await this.model('scglxt_t_bom').where({
+            id: id
+        }).find()
+
+        let sjsl = parseInt(data.jgsl) - parseInt(kcsl)
         data.jgsl = kcsl
         let insert = await this.model('scglxt_t_bom_byk').add(data)
-        await this.model('scglxt_t_bom').where({id:id}).update({jgsl:sjsl})
+        await this.model('scglxt_t_bom').where({
+            id: id
+        }).update({
+            jgsl: sjsl
+        })
 
         let errorLog = {
             id: util.getUUId(),
@@ -425,11 +500,50 @@ module.exports = class extends Base {
     }
 
     //修改bom的结束时间
-    async uploadBOMEndTimeAction(){
+    async uploadBOMEndTimeAction() {
         let list = this.post('list')
         let data = {}
-        list.map(async item=>{
-            data = await this.model('scglxt_t_bom').where({id:item.bomid}).update({endtime:item.endtime})
+        list.map(async item => {
+            data = await this.model('scglxt_t_bom').where({
+                id: item.bomid
+            }).update({
+                endtime: item.endtime
+            })
+        })
+
+        return this.success(data)
+    }
+
+
+    //获取BOM零件的备用库存
+    async getBOMBykcAction() {
+        let name = this.post('name')
+        let data = await this.model('scglxt_t_bom_byk').where({
+            zddmc: name
+        }).select()
+
+        return this.success(data)
+    }
+
+    //关联备用库存
+
+    async setBOMBykcAction() {
+
+        let form = this.post()
+        form.id = util.getUUId()
+        form.czryid = this.header('token')
+        form.sfck = 0
+        
+        let data = await this.model('scglxt_t_bom_byk_log').add(form)
+
+        let jgsl = await this.model('scglxt_t_bom_byk').where({
+            id: form.bykcid
+        }).getField('jgsl')
+
+        await this.model('scglxt_t_bom_byk').where({
+            id: form.bykcid
+        }).update({
+            jgsl: jgsl - form.sysl
         })
 
         return this.success(data)

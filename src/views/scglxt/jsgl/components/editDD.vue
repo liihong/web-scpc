@@ -1,6 +1,6 @@
 <template>
   <div class="resEdit">
-    <el-dialog append-to-body :modal=false width="50%" size="small" :title="optionList[optionType] + '订单'" :visible.sync="dialogState.show" :close-on-click-modal="false">
+    <el-dialog append-to-body width="50%" size="small" :title="optionList[optionType] + '订单'" :visible.sync="dialogState.show" :close-on-click-modal="false">
       <el-form class="form" :rules="rules" ref="rulesForm" :model="formData" label-width="120px">
         <el-col :span="12">
           <el-form-item prop="SSHT" label="所属合同">
@@ -47,8 +47,13 @@
           </el-form-item>
         </el-col>
         <el-col :span="12">
-          <el-form-item prop="TZ" label="图纸">
-            <el-input-number :controls=false v-model="formData.JGSL" :min="1" label="加工数量"></el-input-number>
+          <el-form-item prop="DDORDER" label="订单排序">
+            <el-input-number v-model="formData.DDORDER" :min="1" label="订单排序"></el-input-number>
+          </el-form-item>
+        </el-col>
+         <el-col :span="24">
+          <el-form-item prop="REMARK" label="备注">
+            <el-input  type="textarea" v-model="formData.REMARK" placeholder="备注"></el-input>
           </el-form-item>
         </el-col>
       </el-form>
@@ -134,7 +139,23 @@ export default {
             this.$message.editError(res.errmsg)
           }
         })
-      } else {
+      } 
+      else if(this.optionType == 'copy'){
+        params.primaryKey = this.primaryKey
+        this.$message.confirm('复制订单,并复制该订单下工艺?', () => {
+        this.$ajax
+          .post(this.$api.copyDd, params)
+          .then(res => {
+            if (res && res.errno == 0) {
+              this.$message.success('成功复制订单和工艺！')
+              this.dialogState.show = false
+            } else {
+              this.$message.error(res.data.errmsg)
+            }
+          })
+      })
+      }
+      else{
         // 新增
         this.$ajax.post(this.$api.addTableData, params).then(res => {
           if (res && res.errno == 0) {
@@ -203,7 +224,7 @@ export default {
               }
             })
           })
-          if (this.optionType == 'edit') {
+          if (this.optionType == 'edit' || this.optionType == 'copy') {
             this.getFormData()
           } else {
             this.$nextTick(() => {

@@ -3,6 +3,7 @@
     <!--工具条-->
     <el-col :span="24" class="toolbar">
       <el-input @keyup.enter.native="queryData" style="width:200px;" size="small" v-model="query.queryKey" placeholder="模糊查询"></el-input>
+      <el-button size="mini" @click="queryData" type="primary">查询</el-button>
       <el-button size="mini" @click="lookDDWorking" type="primary">订单生产实时看板</el-button>
     </el-col>
     <el-table class="el-table" @expand-change="expandChange" :data="ddList" stripe border style="width: 100%;">

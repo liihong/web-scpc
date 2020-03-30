@@ -3,6 +3,7 @@
      <!--工具条-->
     <el-col :span="24" class="toolbar">
       <el-input @keyup.enter.native="getSjzdData"  @change="getSjzdData" style="width:200px;" size="small" v-model="query.xmname" placeholder="模糊查询"></el-input>
+      <el-button size="mini" @click="getSjzdData" type="primary">查询</el-button>
       <el-button size="mini" @click="lookDDWorking" type="primary">订单生产实时看板</el-button>
     </el-col>
     <el-table class="el-table" :expand-row-keys="$route.query.ddid" row-key="id" header-cell-class-name="table_th" @expand-change="initData" :data="clList" v-loading="listLoading" stripe border :max-height="tableHeight" style="width: 100%;">

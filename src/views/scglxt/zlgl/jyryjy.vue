@@ -1,35 +1,47 @@
 <template>
   <div class="ddgl">
+    <div class="tool_desc">提示：点击零件名称查看加工记录</div>
     <DataResList @refreshData="refreshData" @selectChange="getChecks" :tableData="checkList" tableId='010403' noEdit noAdd>
       <el-form-item slot="toolBar">
-        <el-button type="primary" icon="el-icon-s-unfold" @click="passMany" class="radio" :label="1">批量通过</el-button>
+        <el-button size="mini" @click="refreshData" type="primary">查询</el-button>
+        <el-button type="primary" icon="el-icon-s-unfold" @click="passMany"  :label="1">批量通过</el-button>
       </el-form-item>
       <el-table-column slot="operate" fixed="left" label="操作" width="250" align="center">
         <template slot-scope="scope">
           <el-button-group>
-            <el-button type="primary" @click="changeRadio(scope.row)" class="radio" :label="1">全部通过</el-button>
+            <el-button type="primary" @click="changeRadio(scope.row)" class="radio" :label="1">通过</el-button>
             <el-button type="warning" @click="passSection(scope.row)" class="radio" :label="2">部分通过</el-button>
-            <el-button type="danger" @click="noPass(scope.row)" class="radio" :label="3">全部返工</el-button>
+            <el-button type="danger" @click="noPass(scope.row)" class="radio" :label="3">返工</el-button>
           </el-button-group>
         </template>
       </el-table-column>
        <template slot="DQJD" slot-scope="scope">
         <div style="text-align:left;" v-html="scope.row.DQJD"></div>
       </template>
+      <template slot="BOMID" slot-scope="scope">
+        <a @click="openJgjl(scope.row.BOMID)" style="text-align:left;" v-html="scope.row.BOMID_TEXT"></a>
+      </template>
     </DataResList>
     <passPart :dialogState="dialogState" />
+    <jgjlDialog :dialogState="dialogJgjl" />
   </div>
 </template>
 
 <script>
 import DataResList from '../../resMgr/ResDataList'
 import passPart from './components/passPart'
+import jgjlDialog from './components/jgjlDialog'
+
 import { mapGetters } from 'vuex'
 
 export default {
   data() {
     return {
       checkList: {},
+      dialogJgjl:{
+        show: false,
+        query:{}
+      },
       dialogState: {
         show: false,
         type: 'part',
@@ -44,7 +56,8 @@ export default {
   },
   components: {
     DataResList,
-    passPart
+    passPart,
+    jgjlDialog
   },
   computed: {
     ...mapGetters(['token'])
@@ -56,6 +69,10 @@ export default {
     this.initData()
   },
   methods: {
+    openJgjl(bomid){
+      this.dialogJgjl.query = {BOMID:bomid}
+      this.dialogJgjl.show = true
+    },
     async initData() {
       let res = await this.$ajax.post(this.$api.getCheckList, this.query)
       if (res.errno == 0) {
@@ -136,6 +153,12 @@ export default {
 }
 </script>
 <style lang="scss" scoped>
+.tool_desc{
+  position: absolute;
+  left: 500px;
+  top:20px;
+  color:red;
+}
 .radioGroup {
   text-align: left;
 }

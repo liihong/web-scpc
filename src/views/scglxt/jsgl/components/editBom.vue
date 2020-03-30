@@ -2,7 +2,6 @@
   <div class="resEdit">
     <el-dialog
       append-to-body
-      :modal="false"
       width="65%"
       size="small"
       :title="optionList[optionType] + 'BOM'"
@@ -12,7 +11,7 @@
       <el-form class="form" :rules="rules" ref="rulesForm" :model="formData" label-width="120px">
         <el-col :span="12">
           <el-form-item prop="ZDDMC" label="零件名称">
-            <el-input v-model="formData.ZDDMC" placeholder="零件名称"></el-input>
+            <el-input @blur="getBYKC" v-model="formData.ZDDMC" placeholder="零件名称"></el-input>
           </el-form-item>
         </el-col>
         <el-col :span="12">
@@ -37,6 +36,7 @@
               label="加工数量"
             ></el-input-number>
             <span v-else>{{formData.JGSL}} (订单已开始加工，不能修改加工数量)</span>
+            <span style="color:red;" v-if="dialogByk.sysl!=0&&dialogByk.isAdd">已使用备用库存 {{dialogByk.sysl}} 件</span>
           </el-form-item>
         </el-col>
         <el-col :span="12">
@@ -171,14 +171,26 @@
         <el-button @click="onCancel">取消</el-button>
       </el-col>
     </el-dialog>
+    <selectByk :dialogState="dialogByk" :data="dialogState.data" />
   </div>
 </template>
 <script>
+import selectByk from "./selectByk";
 export default {
   name: "resEdit",
   props: ["dialogState"],
+  components: {
+    selectByk
+  },
   data() {
     return {
+      //是否使用备用库存零件
+      dialogByk: {
+        show: false,
+        data: [],
+        sysl: 0,
+        isAdd: false
+      },
       optionList: {
         add: "新增",
         edit: "编辑",
@@ -229,8 +241,27 @@ export default {
         this.formData.SSDD +
         "'"
     );
+    this.dialogByk.isAdd = false
+    this.dialogByk.JGSL = 0
+    this.dialogByk.show = false
   },
   methods: {
+    getBYKC() {
+      if (this.formData.ZDDMC.length > 0) {
+        this.$ajax
+          .post(this.$api.getBOMBykc, { name: this.formData.ZDDMC })
+          .then(res => {
+            if (res.errno == 0) {
+              if (res.data.length > 0) {
+                this.dialogByk.data = res.data;
+                this.dialogByk.show = true;
+              }
+            } else {
+              console.log("没有检索到库存");
+            }
+          });
+      }
+    },
     showImage(file) {
       window.open(file.id, "_blank");
     },
@@ -273,6 +304,22 @@ export default {
                 this.$message.addSuccess();
                 this.dialogState.show = false;
                 this.$parent.$refs.resList.getResList();
+                this.$ajax
+                  .post(this.$api.setBOMBykc, {
+                    bomid: params.form.id,
+                    bykcid: this.dialogByk.data[0].id,
+                    sysl: this.dialogByk.sysl
+                  })
+                  .then(res => {
+                    if (res.errno == 0) {
+                      if (res.errno == 0) {
+                        this.$message.success("关联成功");
+                        this.dialogState.show = false;
+                      }
+                    } else {
+                      console.log("没有检索到库存");
+                    }
+                  });
               } else {
                 this.$message.addError(res.errmsg);
               }
@@ -316,8 +363,10 @@ export default {
         this.formData.CLDX = "φ" + d + "*" + h;
       }
       this.formData.CLZL = this.formData.CLTJ * mi;
-      this.formData.CLJE =
-        (this.formData.BLJS * (this.formData.CLTJ * mi * cldj)).toFixed(2);
+      this.formData.CLJE = (
+        this.formData.BLJS *
+        (this.formData.CLTJ * mi * cldj)
+      ).toFixed(2);
     },
     // 获取表单数据，如果是编辑进行数据回填
     getFormData() {
@@ -343,7 +392,7 @@ export default {
               this.volume.d = dx[0].slice(1, dx[0].length);
               this.volume.h = dx[1];
             }
-            this.changeCZ(this.formData.ZDDCZ)
+            this.changeCZ(this.formData.ZDDCZ);
           }
         });
     },
@@ -356,7 +405,7 @@ export default {
         .then(res => {
           this.$set(this.dropDownListData, attr, res.data);
         });
-    },
+    }
   },
   watch: {
     dialogState: {

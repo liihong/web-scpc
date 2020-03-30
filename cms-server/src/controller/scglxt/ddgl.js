@@ -92,26 +92,21 @@ module.exports = class extends Base {
     }
     // 拷贝该订单并拷贝该订单下的所有工艺
     async copyDdAction() {
-        let id = this.post('id')
-
+        let id = this.post('primaryKey').value
         let newId = util.getUUId()
-        let data = await this.model(ddModel).where({
-            id: id
-        }).find()
+       
+        let data = this.post('form')
         data.id = newId
-        data.xmname = data.xmname + '_copy'
         data.ckdate = null
         data.ckzt = null
-        delete data.sjcjsj
-
         let addData = await this.model(ddModel).add(data)
 
         let bomList = await this.model('scglxt_t_bom').where({
             ssdd: id
-        }).select()
+        }).order('id').select()
         let gygcList = await this.model('scglxt_t_gygc').where({
             ssdd: id
-        }).select()
+        }).order('id').select()
 
         if (bomList.length > 0) {
             bomList.map(item => {
@@ -137,7 +132,7 @@ module.exports = class extends Base {
                 })
                 item.id = newBOMId
                 item.clzt = 0
-                item.zddmc = item.zddmc + '_copy'
+                item.zddmc = item.zddmc
                 item.zddzt = '0501'
                 item.endtime = data.endtime
                 item.sjcjsj = util.getNowTime()
@@ -155,6 +150,18 @@ module.exports = class extends Base {
         await this.model('scglxt_t_gygc').addMany(gygcList, {
             pk: 'ID'
         });
+
+        let dataLog = {
+            id: util.getUUId(),
+            operater_id: this.header('token'),
+            operate_type: 'copy',
+            tablename: 'SCGLXT_T_DD',
+            content: '订单管理',
+            old_value: JSON.stringify(data)
+        }
+
+        await this.model('resource_log').add(dataLog)
+
         return this.success(addData)
     }
 
@@ -221,6 +228,61 @@ module.exports = class extends Base {
         let data = await this.model(ddModel).field("ID,XMNAME,DDLEVEL,(SELECT NAME FROM (SELECT id,mc NAME FROM scglxt_tyzd WHERE xh LIKE '04__') tras WHERE tras.id=DDLEVEL) DDLEVEL_TEXT,STARTTIME,ENDTIME").where(where).order('DDLEVEL,SJCJSJ').page(pageNumber, pageSize).countSelect()
         // let data = await this.model().query(sql)
         return this.success(data)
+    }
+
+    //获取订单的BOM数据
+    async getDdBOMDataAction() {
+        let ddid = this.get('id')
+        let ddsql = `select ht.htbh,dd.xmname,zd.mc ddlevel, starttime,endtime from scglxt_t_dd dd,scglxt_t_ht ht,scglxt_tyzd zd where dd.ssht=ht.id and zd.xh = dd.ddlevel and dd.id = '` + ddid + `'`
+        let infos = await this.model().query(ddsql)
+        const _this = this
+        let sql = `SELECT  (@rownum := @rownum + 1) AS rownum, bom.id, zddmc,  t2.clmc, cldx, jgsl, gxnr, bmcl, '' AS bz, '' endtime 
+        FROM (select @rownum := 0) t,scglxt_t_bom bom  LEFT JOIN scglxt_t_cl t2   ON bom.zddcz = t2.id  WHERE ssdd = '` + ddid + `' order by bom.sjcjsj
+        `
+
+        let tjSql="SELECT gymc,ROUND( SUM( bzgs )/ 60,2 ) zgs FROM scglxt_t_gygc gc,`scglxt_t_jggy` gy WHERE gc.`gynr`=gy.id AND bomid IN (SELECT id FROM scglxt_t_bom WHERE ssdd='"+ddid+"') GROUP BY gymc";
+
+        let tjInfo = {
+            info: '工时合计：',
+            zgs:0
+        }
+        
+        let datas = await this.model().query(sql)
+        let tjData = await this.model().query(tjSql)
+        tjData.forEach(item => {
+            tjInfo.info += item.gymc + '(' + item.zgs+ ')' + '-'
+            tjInfo.zgs += parseFloat(item.zgs)
+        });
+        tjInfo.info = tjInfo.info.substring(0,tjInfo.info.length -1) 
+        tjInfo.zgs = "合计：" +  tjInfo.zgs.toFixed(2).toString()
+        let pArr = []
+        datas.map(async item => {
+            pArr.push(_this.getGygxData(item, item.id))
+        })
+        await Promise.all(pArr)
+
+        let data = {
+            ddInfo:infos,
+            bomInfo: datas,
+            tjInfo: tjInfo
+        }
+
+        return this.success(data)
+    }
+    //批量更新BOM出库状态
+    getGygxData(item, bomid) {
+        const vm = this
+        let  blsql=`SELECT '1' AS rownum,'备料' AS sbmc,CONCAT(bom.cldx,' ',bom.bljs,' ',cl.clmc ) gynr,NULL AS t,NULL AS edgs,NULL AS zgs,NULL AS jhwcsj,NULL AS sjwcsj, NULL AS czr,
+        NULL AS jyr FROM scglxt_t_bom bom,scglxt_t_cl cl WHERE bom.zddcz=cl.id AND  bom.id ='${bomid}'
+union all
+SELECT (@rownum:=@rownum+1) AS rownum,gy.gymc sbmc,gc.ZYSX gynr,null as t,edgs,gc.bzgs zgs,gc.zbgs,NULL AS jhwcsj,NULL AS sjwcsj,
+        '' AS czr FROM scglxt_t_sblx sb right JOIN scglxt_t_gygc gc ON sb.id=gc.sbid LEFT JOIN scglxt_t_jggy gy ON gc.gynr = gy.id where  bomid='${bomid}'`
+;
+        return new Promise(async resolve => {
+            let wjData = await this.model().query(blsql)
+            item.gygxList = wjData
+            resolve()
+        })
     }
     //导出BOM
     async exportDdBOMAction() {
@@ -307,7 +369,7 @@ module.exports = class extends Base {
         let ddsql = `select ht.htbh,dd.xmname,zd.mc ddlevel, starttime,endtime from scglxt_t_dd dd,scglxt_t_ht ht,scglxt_tyzd zd where dd.ssht=ht.id and zd.xh = dd.ddlevel and dd.id = '` + ddid + `'`
         let infos = await this.model().query(ddsql)
 
-        let sql = `SELECT  (@rownum := @rownum + 1) AS rownum, bom.id, zddmc,  t2.clmc, cldx, bljs,jgsl,ROUND(IFNULL(clzl,0),2) clzl,IFNULL(cldj,0) cldj, ROUND(IFNULL(clje, 0),2)*bljs clje 
+        let sql = `SELECT  (@rownum := @rownum + 1) AS rownum, bom.id, zddmc,  t2.clmc, cldx, bljs,jgsl,ROUND(IFNULL(clzl,0),2) clzl,IFNULL(cldj,0) cldj, ROUND(IFNULL(clje, 0),2) clje 
         FROM (select @rownum := 0) t,scglxt_t_bom bom  LEFT JOIN scglxt_t_cl t2   ON bom.zddcz = t2.id  WHERE ssdd = '`+ddid+`' order by sjcjsj`
        
 
@@ -379,6 +441,16 @@ module.exports = class extends Base {
         let data = await this.model('scglxt_t_dd').where({id:id}).update({endtime:endTime})
 
         await this.model('scglxt_t_bom').where({ssdd:id}).update({endtime:endTime})
+
+        let log = {
+            id:util.getUUId(),
+            type:'修改订单结束时间',
+            error:'',
+            infos:this.post(),
+            operater:this.header('token')
+        }
+
+        await this.model('operate_log').add(log)
         return this.success(data)
     }
 };

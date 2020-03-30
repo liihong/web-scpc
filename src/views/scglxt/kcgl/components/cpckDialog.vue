@@ -133,7 +133,7 @@ export default {
             })
             .then(function() {
               vm.$message.success("批量出库成功！");
-              vm.$refs.zjryjy.getResList();
+              vm.$parent.$refs.zjryjy.getResList();
               vm.dialogState.show = false
             });
         }

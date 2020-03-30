@@ -77,7 +77,7 @@ module.exports = class extends Base {
         tableData.map(item => {
             let datas = []
             Object.keys(item).map(el => {
-                datas.push(item[el])
+                datas.push(String(item[el]).replace('null',''))
             })
             infos.push(datas)
         })

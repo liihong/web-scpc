@@ -1,14 +1,10 @@
 <template>
   <div class="resEdit">
-    <el-dialog append-to-body :modal=false :width="width" size="small" :title="optionType == 'add' ? '新增' : '编辑'" :visible.sync="dialogState.show" :close-on-click-modal="false">
+    <el-dialog append-to-body  :width="width" size="small" :title="optionType == 'add' ? '新增' : '编辑'" :visible.sync="dialogState.show" :close-on-click-modal="false">
       <el-form class="form" :rules="rules" :inline="true" ref="form" :model="formData" label-width="120px" label-position="right" size="small">
         <el-row>
           <el-col :span="12" v-show="item.PROPERTY_TYPE !== '10'" v-for="(item,i) in columnData" :key="i" class="item">
-            <el-form-item :label="item.COLUMN_CNAME" style="width:100%">
-              <!-- <el-col :span="8" class="title">
-            <span>{{item.COLUMN_CNAME}}</span>
-          </el-col>
-          <el-col :span="16"> -->
+            <el-form-item :label="item.COLUMN_CNAME" :prop="item.COLUMN_NAME" style="width:100%">
               <!--主键-->
               <template v-if="item.PROPERTY_TYPE == '10'">
                 <span v-show="false">{{formData[item.COLUMN_NAME]}}</span>
@@ -37,8 +33,12 @@
                   <el-button slot="trigger" size="small" type="primary">选取文件</el-button>
                 </el-upload>
               </template>
+              <template style="width:100%" v-else-if="item.PROPERTY_TYPE == '6'">
+                <!--文本域-->
+               <el-input  type="textarea"  width="width:100%" v-model="formData[(item.COLUMN_NAME)]"></el-input>
+              </template>
               <template style="width:100%" v-else>
-                <el-input prefix-icon="1el-icon-search" width="width:100%" v-model="formData[(item.COLUMN_NAME)]"></el-input>
+                <el-input width="width:100%" v-model="formData[(item.COLUMN_NAME)]"></el-input>
               </template>
               <!-- </el-col> -->
             </el-form-item>
@@ -206,9 +206,6 @@ export default {
     }
   },
   watch: {
-    rules:{
-      deep:true
-    },
     dialogState: {
       deep: true,
       handler() {
@@ -233,7 +230,8 @@ export default {
                 this.primaryKey.name = item.COLUMN_NAME
               }
               if(item.ISMUST == '1') {
-                this.rules[item.COLUMN_NAME] = [{ required: true, message: `请输入${item.COLUMN_CNAME}`, trigger: 'blur' }]
+                // this.rules[item.COLUMN_NAME] = [{ required: true, message: `请输入${item.COLUMN_CNAME}`, trigger: 'blur' }]
+                this.$set(this.rules,item.COLUMN_NAME,[{ required: true, message: `请输入${item.COLUMN_CNAME}`, trigger: 'blur' }])
               }
             })
           })

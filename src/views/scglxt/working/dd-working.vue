@@ -27,7 +27,13 @@
           </template>
         </el-table-column>
         <el-table-column min-width="100" prop="starttime" label="结束时间" align="center"></el-table-column>
-        <el-table-column min-width="100" prop="endtime" label="结束时间" align="center"></el-table-column>
+        <el-table-column min-width="100" prop="endtime" label="结束时间" align="center">
+          <template slot-scope="scope">
+            <span :class="checkTime(scope.row['endtime'])?'': 'red'">
+              {{scope.row['endtime']}}
+            </span>
+          </template>
+        </el-table-column>
         <el-table-column prop="xqg" label="线切割" align="center"></el-table-column>
         <el-table-column prop="xi" label="铣" align="center"></el-table-column>
         <el-table-column prop="qian" label="钳" align="center"></el-table-column>
@@ -194,6 +200,15 @@ export default {
     cntzClick() {
       this.dialogState.show = true;
     },
+    checkTime(endtime){
+        let date1 = new Date(endtime);
+        let date2 = new Date();
+        if (date1.getTime() > date2.getTime()) {
+            return true;
+        } else {
+            return false;
+        }
+    },
     exportExecel() {
       /* generate workbook object from table */
       var wb = XLSX.utils.table_to_book(document.querySelector("#out-table"));
@@ -272,5 +287,8 @@ export default {
     background: #2b4b67;
     border-bottom: 0;
   }
+}
+.red{
+  color:rgb(240, 62, 62); 
 }
 </style>

@@ -79,20 +79,24 @@ export default {
     },
     //复制订单
     copyRow(row) {
-      this.$message.confirm('复制订单,并复制该订单下工艺?', () => {
-        this.$ajax
-          .post(this.$api.copyDd, {
-            id: row['ID']
-          })
-          .then(res => {
-            if (res && res.errno == 0) {
-              this.$message.success('成功复制订单和工艺！')
-              this.$refs.ddList.getResList()
-            } else {
-              this.$message.error(res.data.errmsg)
-            }
-          })
-      })
+      // this.$message.confirm('复制订单,并复制该订单下工艺?', () => {
+      //   this.$ajax
+      //     .post(this.$api.copyDd, {
+      //       id: row['ID']
+      //     })
+      //     .then(res => {
+      //       if (res && res.errno == 0) {
+      //         this.$message.success('成功复制订单和工艺！')
+      //         this.$refs.ddList.getResList()
+      //       } else {
+      //         this.$message.error(res.data.errmsg)
+      //       }
+      //     })
+      // })
+      this.ddForm.type = 'copy'
+      this.ddForm.id = row.ID
+      this.ddForm.show = true
+      this.ddForm.formData = row
     },
     handleDelete(row) {
       this.$message.confirm('删除订单并删除该订单下所有工艺?', () => {

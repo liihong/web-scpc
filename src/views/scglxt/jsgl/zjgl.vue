@@ -11,6 +11,8 @@
        <el-col :span="4">
           <el-form-item>
             <el-input size="small" @change="initData" v-model="queryParams.queryKey" placeholder="模糊查询" @keyup.enter.native="initData"></el-input>
+            <el-button size="mini" @click="initData" type="primary">查询</el-button>
+
           </el-form-item>
         </el-col>
       
