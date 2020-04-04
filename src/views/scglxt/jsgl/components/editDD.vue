@@ -28,16 +28,6 @@
           </el-form-item>
         </el-col>
         <el-col :span="12">
-          <el-form-item prop="XMFZR" label="项目负责人">
-            <el-input v-model="formData.XMFZR" placeholder="项目负责人"></el-input>
-          </el-form-item>
-        </el-col>
-        <el-col :span="12">
-          <el-form-item prop="XMLXR" label="项目联系人">
-            <el-input  v-model="formData.XMLXR" placeholder="项目联系人"></el-input>
-          </el-form-item>
-        </el-col>
-        <el-col :span="12">
           <el-form-item prop="DDLEVEL" label="订单级别">
             <el-radio-group v-model="formData.DDLEVEL">
               <el-radio-button label="0403">普通</el-radio-button>
@@ -149,6 +139,7 @@ export default {
             if (res && res.errno == 0) {
               this.$message.success('成功复制订单和工艺！')
               this.dialogState.show = false
+              this.$parent.$refs.ddList.getResList()
             } else {
               this.$message.error(res.data.errmsg)
             }

@@ -36,4 +36,14 @@ module.exports = class extends Base {
 
         return this.success(data)
     }
+
+    //批量修改设备类型
+    async updateSblxInfoAction(){
+        let info = this.post()
+
+        await this.model('scglxt_t_sblx').delete()
+        let data = await this.model('scglxt_t_sblx').addMany(info)
+
+        return this.success(data)
+    }
 };

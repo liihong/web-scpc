@@ -7,10 +7,11 @@
       <el-button size="mini" @click="lookDDWorking" type="primary">订单生产实时看板</el-button>
     </el-col>
     <el-table class="el-table" :expand-row-keys="$route.query.ddid" row-key="id" header-cell-class-name="table_th" @expand-change="initData" :data="clList" v-loading="listLoading" stripe border :max-height="tableHeight" style="width: 100%;">
-      <el-table-column fixed="left" label="操作" min-width="100" align="center">
+      <el-table-column fixed="left" label="操作" min-width="180" align="center">
         <template slot-scope="scope">
           <el-button-group size="mini">
             <el-button size="mini" type="primary" @click="uploadEndTime(scope.row)">修改交货时间</el-button>
+            <el-button size="mini" type="warning" @click="addRemark(scope.row)">标注</el-button>
           </el-button-group>
         </template>
       </el-table-column>
@@ -39,19 +40,26 @@
     <el-pagination style="text-align:center;" background @current-change="handleCurrentChange" :current-page="query.pageNumber" :page-sizes="[10, 20, 30, 50]" :page-size="query.pageSize" layout="total, sizes, prev, pager, next, jumper" :total="query.total" @size-change="sizeChange">
     </el-pagination>
     <updateEndTime :dialogState="dialogState"></updateEndTime>
+    <addRemark :dialogState="remarkDialog" />
   </div>
 </template>
 
 <script>
 import updateEndTime from './components/updateEndTime.vue'
+import addRemark from './components/addRemark.vue'
 export default {
   name: 'blkcgl',
   components: {
-    updateEndTime
+    updateEndTime,
+    addRemark
   },
   data() {
     return {
       dialogState:{
+        show:false,
+        row:{}
+      },
+      remarkDialog:{
         show:false,
         row:{}
       },
@@ -72,6 +80,10 @@ export default {
         {
           id: 'endtime',
           name: '结束时间'
+        },
+        {
+          id:'mark',
+          name:'标注'
         },
         {
           id:'xqg',
@@ -199,6 +211,10 @@ export default {
     uploadEndTime(row){
       this.dialogState.row = row
       this.dialogState.show = true
+    },
+    addRemark(row){
+      this.remarkDialog.row = row
+      this.remarkDialog.show = true
     },
     uploadBOMEndTime(list){
       this.$message.confirm('是否确认保存所有零件的结束时间？',() => {

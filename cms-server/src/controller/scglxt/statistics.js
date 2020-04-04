@@ -111,6 +111,7 @@ module.exports = class extends Base {
             dd.starttime,
             dd.endtime,
             dd.remark,
+            dd.mark,
              MAX(CASE gynr WHEN '201609010949574021' THEN sygs ELSE 0 END ) 'xqg',
              MAX(CASE gynr WHEN '201609010949574022' THEN sygs ELSE 0 END ) 'xi',
             MAX(CASE gynr WHEN '201609010949574025' THEN sygs ELSE 0 END ) 'qian',

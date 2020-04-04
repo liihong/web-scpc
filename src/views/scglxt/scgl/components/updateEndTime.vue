@@ -46,6 +46,7 @@ export default {
         if (res.errno == 0) {
           this.$message('修改交货日期成功！')
           this.dialogState.show = false
+          this.$parent.getSjzdData()
         }
       })
     }

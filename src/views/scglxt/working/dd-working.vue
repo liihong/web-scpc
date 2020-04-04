@@ -12,6 +12,7 @@
       <el-table
         id="out-table"
         class="working-table"
+        height="500px"
         :cell-class-name="getCellStyle"
         header-cell-class-name="header-style"
         :data="tableData"
@@ -34,17 +35,17 @@
             </span>
           </template>
         </el-table-column>
-        <el-table-column prop="xqg" label="线切割" align="center"></el-table-column>
-        <el-table-column prop="xi" label="铣" align="center"></el-table-column>
-        <el-table-column prop="qian" label="钳" align="center"></el-table-column>
-        <el-table-column prop="zhusu" label="注塑" align="center"></el-table-column>
         <el-table-column prop="che" label="车" align="center"></el-table-column>
+        <el-table-column prop="xi" label="铣" align="center"></el-table-column>
         <el-table-column prop="cnc" label="CNC" align="center"></el-table-column>
+        <el-table-column prop="xqg" label="线切割" align="center"></el-table-column>
         <el-table-column prop="dhh" label="电火花" align="center"></el-table-column>
+        <el-table-column prop="qian" label="钳" align="center"></el-table-column>
         <el-table-column prop="mo" label="磨" align="center"></el-table-column>
-        <el-table-column prop="rechuli" label="热处理" align="center"></el-table-column>
         <el-table-column prop="hanjie" label="焊接" align="center"></el-table-column>
         <el-table-column prop="waixie" label="外协" align="center"></el-table-column>
+        <el-table-column prop="zhusu" label="注塑" align="center"></el-table-column>
+        <el-table-column prop="rechuli" label="热处理" align="center"></el-table-column>
         <el-table-column prop="sygs" label="总计" align="center"></el-table-column>
       </el-table>
     </div>
@@ -261,18 +262,20 @@ export default {
 <style lang="scss">
 .dd-working {
   background: #00233a;
+  overflow: hidden;
   .working {
     padding: 20px;
   }
 }
 .header-button {
+  cursor: pointer;
   color: #ffffff;
   position: absolute;
   right: 10px;
   top: 15px;
 }
 .echarts-container {
-  height: 400px;
+  height: 160px;
 }
 .working-table {
   .cell-style {

@@ -1,12 +1,37 @@
 
 /**
- * 加工工艺操作的接口
+ * 报价单操作的接口
  */
 const Base = require('../base.js');
 import util from '../../../utils/util'
 let bjdModel = 'scglxt_t_ht_bjd'
 module.exports = class extends Base {
 
+    //审批合同
+    async ht_sptgAction(){
+        let htid = this.post('id')
+        let htbh = this.post('htbh')
+        let spzt = this.post('spzt')
+        let bhly = this.post('bhly')
+
+
+        let data = await this.model('scglxt_t_ht').where({id:htid}).update({
+            spzt:spzt
+        })
+
+        //增加审批日志
+        let logData = {
+            id:util.getUUId(),
+            htid:htid,
+            htbh:htbh,
+            spzt:spzt,
+            bhly:bhly
+        }
+
+        await this.model('scglxt_t_ht_splog').add(logData)
+
+        return this.success(data)
+    }
     /**
      * 成功上传报价单后，将报价单数据入库
      */

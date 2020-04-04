@@ -65,10 +65,11 @@ event:{
       </el-table-column>
       <el-table-column
         :sortable="row.IS_SORT == '1' ? 'custom' : false"
-        v-if="row.PROPERTY_TYPE != '10'"
         align="center"
+        v-if="row.PROPERTY_TYPE != '10'"
         v-for="(row,index) in resRows"
         :key="index"
+        :filters="row.PROPERTY_TYPE =='2'?[]:selectObj[row.COLUMN_NAME] "
         :prop="row.COLUMN_NAME"
         :fixed="(row.IS_FROZEN == 1?'left':false)"
         :label="row.COLUMN_CNAME"
@@ -185,16 +186,12 @@ export default {
     }
   },
   methods: {
-    changeSelectQuery(name) {
-      this.selectObj = this.resRows.filter(item => {
-        return item.COLUMN_NAME == name;
-      })[0];
-      if (
-        this.selectObj.PROPERTY_TYPE == "2" ||
-        this.selectObj.PROPERTY_TYPE == "4"
-      ) {
-        this.getSjzdData("data", this.selectObj.TYPESQL);
-      }
+    getSelectQuery() {
+      this.resRows.map(item => {
+        if(item.PROPERTY_TYPE == '2'){
+          this.getSjzdData(item.COLUMN_NAME, item.TYPESQL);
+        }
+      });
     },
     //获取表格配置信息
     getConfig() {
@@ -205,6 +202,7 @@ export default {
         })
         .then(res => {
           this.resRows = res.data;
+          this.getSelectQuery();
           this.listLoading = false;
         });
     },
@@ -380,7 +378,10 @@ export default {
           typesql: sql
         })
         .then(res => {
-          this.$set(this.selectObj, attr, res.data);
+          let infos = res.data.map(item=>{
+            return {text:item.NAME,value:item.id}
+          })
+          this.$set(this.selectObj, attr, infos);
         });
     },
     // eslint-disable-next-line

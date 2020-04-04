@@ -1,6 +1,6 @@
 <template>
   <div>
-      <ResList tableId='0503'/>
+      <ResList noAdd noEdit tableId='0503'/>
   </div>
 </template>
 

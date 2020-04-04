@@ -453,4 +453,20 @@ SELECT (@rownum:=@rownum+1) AS rownum,gy.gymc sbmc,gc.ZYSX gynr,null as t,edgs,g
         await this.model('operate_log').add(log)
         return this.success(data)
     }
+
+    //获取订单标注
+    async getDdMarkAction(){
+        let id = this.post('id')
+        let data = await this.model(ddModel).field('mark').where({id:id}).find()
+        return this.success(data)
+    }
+    //设置订单标注
+    async setDdMarkAction(){
+        let id = this.post('id')
+        let mark = this.post('mark')
+
+        let data = await this.model(ddModel).where({id:id}).update({mark:mark})
+
+        return this.success(data)
+    }
 };

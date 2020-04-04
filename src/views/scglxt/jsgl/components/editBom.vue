@@ -56,6 +56,7 @@
             <el-radio-group v-model="formData.CLXZ">
               <el-radio :label="1">长方体</el-radio>
               <el-radio :label="2">圆柱体</el-radio>
+              <el-radio :label="3">塑料</el-radio>
             </el-radio-group>
           </el-form-item>
         </el-col>

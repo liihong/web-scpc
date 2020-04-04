@@ -46,8 +46,8 @@ module.exports = class extends Base {
     async saveGygxInfoAction() {
         let form = this.post('form')
         let ssdd = this.post('ssdd')
-        if(form.length == 0) {
-            return this.fail(1000,'没有数据')
+        if (form.length == 0) {
+            return this.fail(1000, '没有数据')
         }
         let rows = await this.model(gyModel).where({
             bomid: form[0].bomid
@@ -133,6 +133,19 @@ module.exports = class extends Base {
                     zgs: zgs
                 });
             }
+
+            // 新增日志
+            let errorLog = {
+                id: util.getUUId(),
+                operate_type: 'bom',
+                operater_id: this.header('token'),
+                content: form[0].bomid,
+                tablename: 'SCGLXT_T_GYGC',
+                old_value: JSON.stringify(rows),
+                new_value: JSON.stringify(this.post())
+            }
+            await this.model('resource_log').add(errorLog)
+
             return this.success(data)
         } catch (ex) {
             // 如果上面流程执行失败，则恢复原有数据
@@ -192,21 +205,22 @@ module.exports = class extends Base {
                 serial: parseInt(nowData.serial) + 1
             }).select()
             //如果有下一条工艺则应更新删除后所有数据的serial
-            if(nextData.length > 0){
-                await this.model(gyModel).execute('update scglxt_t_gygc set serial=serial-1 where bomid='+bomid+' and serial>'+nowData.serial)
+            if (nextData.length > 0) {
+                await this.model(gyModel).execute('update scglxt_t_gygc set serial=serial-1 where bomid=' + bomid + ' and serial>' + nowData.serial)
             }
-            if(nowData.kjgjs!=0 && nextData.length > 0) {//如果有下一条工艺，并且删除的这一条的可加工件数不为0
+            if (nowData.kjgjs != 0 && nextData.length > 0) { //如果有下一条工艺，并且删除的这一条的可加工件数不为0
                 data = await this.model(gyModel).where({
                     id: nextData[0].id
                 }).update({
-                    kjgjs:nowData.kjgjs
+                    kjgjs: nowData.kjgjs
                 })
             }
             data = await this.model(gyModel).where({
                 id: id
             }).delete()
         }
-        let gynr = [],gs = 0
+        let gynr = [],
+            gs = 0
         let newData = await this.model(gyModel).join({
             table: 'scglxt_t_jggy',
             join: 'left',
@@ -239,7 +253,7 @@ module.exports = class extends Base {
         });
 
         return this.success(data)
-        
+
     }
     //获取设备类型
     async getSblxListAction() {
@@ -350,7 +364,7 @@ module.exports = class extends Base {
                 id: gyid
             }).find()
 
-            
+
             if (ddjs != (gygcData.yjgjs + gygcData.sjjs)) // 如果加工未完成自动再开始一条加工记录 
             {
                 await this.model('scglxt_t_gygc').where({
@@ -374,10 +388,10 @@ module.exports = class extends Base {
                     jssj: util.getNowTime(),
                     sfjy: 0
                 }
-                //容错处理，如果已加工件数+送检件数大于可加工件数，则默认将已加工件数更新为可加工件数
+                //容错处理，如果已加工件数+送检件数大于可加工件数，则默认将已加工件数更新为订单件数
 
                 if (gygcData.kjgjs < (gygcData.yjgjs + gygcData.sjjs)) {
-                    updateInfo.yjgjs = gygcData.kjgjs
+                    updateInfo.yjgjs = ddjs
                 }
                 await this.model('scglxt_t_gygc').where({
                     id: gyid
@@ -589,9 +603,9 @@ module.exports = class extends Base {
             bfjs: dhjs,
             sfjy: '1',
             jyryid: this.header('token'),
-            status:2,
-            fgcs:1,
-            sjjs:0
+            status: 2,
+            fgcs: 1,
+            sjjs: 0
         }
         let jgglData = await this.model('scglxt_t_jggl').where({
             id: id
@@ -624,12 +638,14 @@ module.exports = class extends Base {
 
         } else { //报废，重新生成BOM从头开始加工
             let newbomid = util.getUUId()
-           
+
             data = await this.model('scglxt_t_bom').where({
                 id: bomid
-            }).update({bfjs:dhjs})
+            }).update({
+                bfjs: dhjs
+            })
             bomData.id = newbomid
-            bomData.zddmc = bomData.zddmc + '_报废单'
+            bomData.zddmc = bomData.zddmc + '_报废重做'
             bomData.zddzt = '0501'
             bomData.jgsl = dhjs
             bomData.clzt = null
@@ -664,6 +680,37 @@ module.exports = class extends Base {
                     return item
                 })
                 data = await this.model('scglxt_t_gygc').addMany(gygxDatas)
+
+                //如果报废件数=订单件数则该零件直接出库，如果报废件数少于订单件数则剩余件数继续走下一道工序
+                if (jgjs == dhjs) {
+                    await this.model('scglxt_t_bom').where({
+                        id: bomid
+                    }).update({
+                        zddzt: '0506'
+                    })
+                } else {
+                    let nextJGgy = await this.model('scglxt_t_gygc').where({
+                        bomid,
+                        serial: parseInt(serial) + 1
+                    }).select()
+                    //更新下一道工序
+                    //如果有下一到工序则更新开始下一道工序的可加工数量
+                    if (nextJGgy.length == 1) {
+                        await this.model('scglxt_t_gygc').where({
+                            bomid: bomid,
+                            serial: parseInt(serial) + 1
+                        }).update({
+                            kjgjs: jgjs-dhjs,
+                            bfjs:dhjs
+                        })
+                    }else{
+                        await this.model('scglxt_t_bom').where({
+                            id: bomid
+                        }).update({
+                            zddzt: '0503'
+                        })
+                    }
+                }
             }
 
             let errorLog = {
@@ -686,43 +733,7 @@ module.exports = class extends Base {
         await this.model('scglxt_t_jggl').where({
             id: id
         }).update(updateJggl)
-        
-        let nextJGgy = await this.model('scglxt_t_gygc').where({
-            bomid,
-            serial: parseInt(serial) + 1
-        }).select()
-        //更新下一道工序
-        //如果有下一到工序则更新开始下一道工序的可加工数量
-        if (nextJGgy.length == 1) {
-            await this.model('scglxt_t_gygc').where({
-                bomid: bomid,
-                serial: parseInt(serial) + 1
-            }).update({
-                kjgjs: bomData.yjgjs
-            })
-        } else {
-            //如果已加工件数+报废件数=第一条工艺的可加工件数，说明整个流程加工完成，则修改订单状态
-            let bfjs = await this.model('scglxt_t_gygc').where({
-                bomid: bomid
-            }).sum('bfjs')
-            let kjgjsFirst = await this.model('scglxt_t_gygc').where({
-                bomid: bomid,
-                serial: 0
-            }).getField('kjgjs', true)
-            let yjgjsLast = await this.model('scglxt_t_gygc').where({
-                bomid: bomid,
-                serial: serial
-            }).getField('yjgjs', true)
 
-            if (kjgjsFirst == (bfjs + yjgjsLast)) {
-                await this.model('scglxt_t_bom').where({
-                    id: bomid
-                }).update({
-                    zddzt: '0503'
-                })
-            }
-        }
-        
         return this.success(data)
     }
 
@@ -764,12 +775,12 @@ module.exports = class extends Base {
             bfjs: dhjs,
             sjjs: 0,
             fgcs: count,
-            czryid:null,
-            yjgjs:0,
+            czryid: null,
+            yjgjs: 0,
             status: 1,
-            kssj:null,
-            jssj:null,
-            jyryid:null
+            kssj: null,
+            jssj: null,
+            jyryid: null
         }
 
         await this.model('scglxt_t_gygc').where({
@@ -786,13 +797,13 @@ module.exports = class extends Base {
             infos: JSON.stringify(this.post())
         }
         await this.model('operate_log').add(errorLog)
-        
+
         return this.success(data)
     }
 
     // 工艺排序
-    async orderTopAction(){
+    async orderTopAction() {
         let row = this.post('row')
-        
+
     }
 };

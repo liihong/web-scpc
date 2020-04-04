@@ -53,12 +53,6 @@ module.exports = class extends Base {
         return this.success(deleteData)
     }
 
-    //获取设备类型
-    async getSblxListAction() {
-        let data = await this.model('scglxt_t_sblx').select()
-        return this.success(data)
-    }
-
     // 新增BOM
     async addBomAction() {
         let form = this.post('form')
@@ -439,14 +433,7 @@ module.exports = class extends Base {
                 ckinfo: names.join(',')
             }
             await this.model('scglxt_t_dd_ck').add(ckLog)
-            let errorLog = {
-                id: util.getUUId(),
-                type: '成品出库',
-                infos: JSON.stringify(this.post()),
-                operater: this.header('token')
-            }
-            await this.model('operate_log').add(errorLog)
-
+            
             return this.success(data)
         } catch (ex) {
             let errorLog = {

@@ -14,6 +14,7 @@ let api = {
     getBzList: 'scglxt/sjzd/getBzList',
     getPeopleByBz: 'scglxt/sjzd/getPeopleByBz',
     getSBLXList:'scglxt/sjzd/getSBLXList',
+    updateSblxInfo: 'scglxt/sjzd/updateSblxInfo',
 
     //工艺工序操作
     getJggyList: 'scglxt/gygx/getJggyList',
@@ -25,7 +26,8 @@ let api = {
     orderTop: 'scglxt/gygx/orderTop',
     // 报价单
     addBjd: 'scglxt/bjd/addBjd',
-
+    ht_sptg: 'scglxt/bjd/ht_sptg',
+    
     //订单操作
     getDdDetail: 'scglxt/ddgl/getDdDetail',
     getDdTz: 'scglxt/ddgl/getDdTz',
@@ -46,7 +48,8 @@ let api = {
     getDDKhxxById:'scglxt/ddgl/getDDKhxxById',
     //获取订单BOM信息
     getDdBOMData: 'scglxt/ddgl/getDdBOMData',
-
+    getDdMark:'scglxt/ddgl/getDdMark',
+    setDdMark: 'scglxt/ddgl/setDdMark',
     
     //bom表操作
     addBomData: 'scglxt/bom/addBom',

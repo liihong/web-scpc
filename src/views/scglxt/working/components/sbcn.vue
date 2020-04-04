@@ -1,13 +1,16 @@
 <template>
   <div class="selectPerson">
     <el-dialog v-if="dialogState.show" title="设备产能调整" :visible.sync="dialogState.show" width="30%">
-      <el-button type="primary">批量修改产能</el-button>
+      <el-button style="float:right;" @click="updateClick" type="primary">{{isUpdate?'保存':'批量修改产能'}}</el-button>
       <el-table :data="sblxList">
           <el-table-column align="center" prop="mc" label="类型名称"></el-table-column>
           <el-table-column prop="gymc" label="所属工艺"></el-table-column>
           <!-- <el-table-column prop="sbsl" label="设备数量"> -->
-          <el-table-column prop="bzcn" label="标准产能">
-
+          <el-table-column prop="bzcn" label="标准产能(小时)">
+            <template  slot-scope="scope">
+              <span v-if="!isUpdate">{{scope.row['bzcn']}}</span>
+              <el-input v-else style="width:80px" v-model="scope.row['bzcn']" ></el-input>
+            </template>
           </el-table-column>
       </el-table>
     </el-dialog>
@@ -21,6 +24,7 @@ export default {
   data() {
     return {
       sblxList: [],
+      isUpdate: false
     }
   },
   mounted() {
@@ -34,31 +38,21 @@ export default {
         }
       })
     },
-    changeBz(val) {
-      this.$ajax
-        .post(this.$api.getPeopleByBz, {
-          bzid: val
-        })
+    //修改按钮
+    updateClick(){
+      if(this.isUpdate){//保存
+        this.isUpdate = false
+        this.$ajax
+        .post(this.$api.updateSblxInfo, this.sblxList)
         .then(res => {
           if (res.errno == 0) {
-            this.peopleList = res.data
-          }
-        })
-    },
-    beginWork(worker) {
-      this.$ajax
-        .post(this.$api.beginWork, {
-          worker: worker.id,
-          gyid: this.dialogState.gyid
-        })
-        .then(res => {
-          if (res.errno == 0) {
-            this.$message.success('开始加工,操作成功！')
             this.dialogState.show = false
-            this.$parent.$refs.jgList.getResList()
           }
         })
-    }
+      }else{
+        this.isUpdate = true
+      }
+    },
   }
 }
 </script>

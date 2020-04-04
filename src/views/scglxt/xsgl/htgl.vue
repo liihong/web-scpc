@@ -3,7 +3,11 @@
     <ResList tableId='0101' ref="htgl" @saveAfter="addDd" :query="this.$route.query" noEdit>
       <el-table-column slot="operate" fixed="left" label="操作" min-width="250" align="center">
         <template slot-scope="scope">
-          <el-button-group size="mini">
+          <el-button-group size="mini" v-if="token!='201609101108000012'">
+            <el-button size="mini" @click="bjdClickLook(scope.row)" type="primary">报价单</el-button>
+            <el-button size="mini" @click="spClick(scope.row)" type="success">审批</el-button>
+          </el-button-group>
+          <el-button-group size="mini" v-else>
             <el-button size="mini" @click="bjdClickLook(scope.row)" type="primary">报价单</el-button>
             <el-button size="mini" @click="bjdClick(scope.row)" type="primary">上传</el-button>
             <el-button size="mini" @click="$refs.htgl.handleEdit(scope.row)" type="primary">编辑</el-button>
@@ -20,6 +24,7 @@
     </ResList>
     <bjd :dialogState="dialogState"></bjd>
     <bjdList :dialogState="bjdState" />
+    <htsp :dialogState="spState" />
 
   </div>
 </template>
@@ -27,10 +32,13 @@
 <script>
 import bjdList from '../xsgl/components/bjdList'
 import bjd from './components/bjd'
+import htsp from './components/htsp.vue'
+
 export default {
   components: {
     bjd,
-    bjdList
+    bjdList,
+    htsp
   },
   data() {
     return {
@@ -41,10 +49,23 @@ export default {
       bjdState: {
         show: false,
         query: {}
+      },
+      spState: {
+        show: false,
+        row: {}
       }
     }
   },
+  computed:{
+    token(){
+      return ''
+    }
+  },
   methods: {
+    spClick(row) {
+      this.spState.row = row
+      this.spState.show = true
+    },
     bjdClick(row) {
       this.dialogState.row = row
       this.dialogState.show = true
