@@ -9,6 +9,7 @@ module.exports = class extends Base {
 
     //审批合同
     async ht_sptgAction(){
+        console.log(this.post())
         let htid = this.post('id')
         let htbh = this.post('htbh')
         let spzt = this.post('spzt')
