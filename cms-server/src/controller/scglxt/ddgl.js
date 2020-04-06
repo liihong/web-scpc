@@ -14,16 +14,16 @@ const rename = think.promisify(fs.rename, fs);
 module.exports = class extends Base {
 
     //根据订单ID获取客户信息
-    async getDDKhxxByIdAction(){
+    async getDDKhxxByIdAction() {
         let ssdd = this.get('ssdd')
-        let sql =` select * from scglxt_t_kh where id in (
-            select khid from scglxt_t_ht where id in (select ssht from scglxt_t_dd where id='`+ssdd+`'))`
+        let sql = ` select * from scglxt_t_kh where id in (
+            select khid from scglxt_t_ht where id in (select ssht from scglxt_t_dd where id='` + ssdd + `'))`
         let data = await this.model().query(sql)
 
         return this.success(data[0])
     }
     //根据ID获取某一订单详情
-    async getDdDetailAction(){
+    async getDdDetailAction() {
         let id = this.get('id')
 
         let data = await this.model('scglxt_t_dd').join({
@@ -36,14 +36,18 @@ module.exports = class extends Base {
             as: 'kh',
             join: 'left',
             on: ['ht.khid', 'id']
-        }).alias('t').field('t.id,kh.mc khmc,ht.htbh,ht.jkje,t.xmname,t.starttime,t.endtime,ht.ywlx,ht.htje,fun_yjggs ( t.id ) dqjd,t.zgs,ht.bjdzj,ht.remark').where({'t.id':id}).find()
+        }).alias('t').field('t.id,kh.mc khmc,ht.htbh,ht.jkje,t.xmname,t.starttime,t.endtime,ht.ywlx,ht.htje,fun_yjggs ( t.id ) dqjd,t.zgs,ht.bjdzj,ht.remark').where({
+            't.id': id
+        }).find()
 
         let ddtj = await this.model('scglxt_t_gygc').join({
             table: 'scglxt_t_jggy',
             as: 'gy',
             join: 'left',
             on: ['gynr', 'id']
-        }).alias('t').field('t.ssdd,t.gynr,gy.gymc,sum(bzgs) zgs').where({'t.ssdd':id}).group('gynr').select()
+        }).alias('t').field('t.ssdd,t.gynr,gy.gymc,sum(bzgs) zgs').where({
+            't.ssdd': id
+        }).group('gynr').select()
         data.gstj = ddtj
         return this.success(data)
     }
@@ -54,8 +58,8 @@ module.exports = class extends Base {
         let pageNumber = this.post('pageNumber')
         let queryKey = this.post('queryKey')
         let whereObj = {}
-        if(queryKey && queryKey!= ""){
-            whereObj.XMNAME = ['like', '%'+queryKey+'%']
+        if (queryKey && queryKey != "") {
+            whereObj.XMNAME = ['like', '%' + queryKey + '%']
         }
         let data = await this.model(ddModel).field("ID,XMNAME,DDLEVEL,(SELECT NAME FROM (SELECT id,mc NAME FROM scglxt_tyzd WHERE xh LIKE '04__') tras WHERE tras.id=DDLEVEL) DDLEVEL_TEXT,STARTTIME,ENDTIME").where('id in (select DISTINCT ssdd from scglxt_t_bom where zddzt=\'0502\')').where(whereObj).page(pageNumber, pageSize).countSelect()
 
@@ -65,13 +69,13 @@ module.exports = class extends Base {
     async getNewDDbhAction() {
         let count = await this.model('scglxt_t_dd').query(`SELECT SUBSTRING_INDEX(xmname,'-',-1) AS count FROM scglxt_t_dd   where xmname like '2020%' order by sjcjsj desc limit 1`)
 
-        if(count.length > 0){
+        if (count.length > 0) {
             count = '00000' + (parseInt(count[0].count) + 1);
             count = count.substring(3, count.length);
-        }else{
+        } else {
             count = '00001'
         }
-      
+
         return this.success(count)
     }
     /**
@@ -94,7 +98,7 @@ module.exports = class extends Base {
     async copyDdAction() {
         let id = this.post('primaryKey').value
         let newId = util.getUUId()
-       
+
         let data = this.post('form')
         data.id = newId
         data.ckdate = null
@@ -111,7 +115,7 @@ module.exports = class extends Base {
         if (bomList.length > 0) {
             bomList.map(item => {
                 var newBOMId = util.getUUId()
-                gygcList.map((el,i) => {
+                gygcList.map((el, i) => {
                     if (item.id == el.bomid) {
                         el.id = util.getUUId()
                         el.kjgjs = 0
@@ -124,8 +128,8 @@ module.exports = class extends Base {
                         el.kssj = null
                         el.jssj = null
                         el.ssdd = newId
-                        el.czryid= null
-                        el.jyryid= null
+                        el.czryid = null
+                        el.jyryid = null
                         el.bomid = newBOMId
                         return el
                     }
@@ -187,7 +191,7 @@ module.exports = class extends Base {
             })
         }
         ddId = ddId.substring(0, ddId.length - 1)
-        if(ddId!= ''){
+        if (ddId != '') {
             let deleteJggl = await this.model('scglxt_t_jggl').where(
                 `gygcid in (select id from scglxt_t_gygc where ssdd in (` + ddId + `))`
             ).delete()
@@ -201,7 +205,7 @@ module.exports = class extends Base {
                 ssdd: ['in', ddId]
             }).delete()
         }
-        
+
         let oldData = await this.model(ddModel).where(where).find()
         let deleteDd = await this.model(ddModel).where(where).delete()
 
@@ -240,21 +244,21 @@ module.exports = class extends Base {
         FROM (select @rownum := 0) t,scglxt_t_bom bom  LEFT JOIN scglxt_t_cl t2   ON bom.zddcz = t2.id  WHERE ssdd = '` + ddid + `' order by bom.sjcjsj
         `
 
-        let tjSql="SELECT gymc,ROUND( SUM( bzgs )/ 60,2 ) zgs FROM scglxt_t_gygc gc,`scglxt_t_jggy` gy WHERE gc.`gynr`=gy.id AND bomid IN (SELECT id FROM scglxt_t_bom WHERE ssdd='"+ddid+"') GROUP BY gymc";
+        let tjSql = "SELECT gymc,ROUND( SUM( bzgs )/ 60,2 ) zgs FROM scglxt_t_gygc gc,`scglxt_t_jggy` gy WHERE gc.`gynr`=gy.id AND bomid IN (SELECT id FROM scglxt_t_bom WHERE ssdd='" + ddid + "') GROUP BY gymc";
 
         let tjInfo = {
             info: '工时合计：',
-            zgs:0
+            zgs: 0
         }
-        
+
         let datas = await this.model().query(sql)
         let tjData = await this.model().query(tjSql)
         tjData.forEach(item => {
-            tjInfo.info += item.gymc + '(' + item.zgs+ ')' + '-'
+            tjInfo.info += item.gymc + '(' + item.zgs + ')' + '-'
             tjInfo.zgs += parseFloat(item.zgs)
         });
-        tjInfo.info = tjInfo.info.substring(0,tjInfo.info.length -1) 
-        tjInfo.zgs = "合计：" +  tjInfo.zgs.toFixed(2).toString()
+        tjInfo.info = tjInfo.info.substring(0, tjInfo.info.length - 1)
+        tjInfo.zgs = "合计：" + tjInfo.zgs.toFixed(2).toString()
         let pArr = []
         datas.map(async item => {
             pArr.push(_this.getGygxData(item, item.id))
@@ -262,7 +266,7 @@ module.exports = class extends Base {
         await Promise.all(pArr)
 
         let data = {
-            ddInfo:infos,
+            ddInfo: infos,
             bomInfo: datas,
             tjInfo: tjInfo
         }
@@ -272,12 +276,11 @@ module.exports = class extends Base {
     //批量更新BOM出库状态
     getGygxData(item, bomid) {
         const vm = this
-        let  blsql=`SELECT '1' AS rownum,'备料' AS sbmc,CONCAT(bom.cldx,' ',bom.bljs,' ',cl.clmc ) gynr,NULL AS t,NULL AS edgs,NULL AS zgs,NULL AS jhwcsj,NULL AS sjwcsj, NULL AS czr,
+        let blsql = `SELECT '1' AS rownum,'备料' AS sbmc,CONCAT(bom.cldx,' ',bom.bljs,' ',cl.clmc ) gynr,NULL AS t,NULL AS edgs,NULL AS zgs,NULL AS jhwcsj,NULL AS sjwcsj, NULL AS czr,
         NULL AS jyr FROM scglxt_t_bom bom,scglxt_t_cl cl WHERE bom.zddcz=cl.id AND  bom.id ='${bomid}'
 union all
 SELECT (@rownum:=@rownum+1) AS rownum,gy.gymc sbmc,gc.ZYSX gynr,null as t,edgs,gc.bzgs zgs,gc.zbgs,NULL AS jhwcsj,NULL AS sjwcsj,
-        '' AS czr FROM scglxt_t_sblx sb right JOIN scglxt_t_gygc gc ON sb.id=gc.sbid LEFT JOIN scglxt_t_jggy gy ON gc.gynr = gy.id where  bomid='${bomid}'`
-;
+        '' AS czr FROM scglxt_t_sblx sb right JOIN scglxt_t_gygc gc ON sb.id=gc.sbid LEFT JOIN scglxt_t_jggy gy ON gc.gynr = gy.id where  bomid='${bomid}'`;
         return new Promise(async resolve => {
             let wjData = await this.model().query(blsql)
             item.gygxList = wjData
@@ -295,21 +298,21 @@ SELECT (@rownum:=@rownum+1) AS rownum,gy.gymc sbmc,gc.ZYSX gynr,null as t,edgs,g
         FROM (select @rownum := 0) t,scglxt_t_bom bom  LEFT JOIN scglxt_t_cl t2   ON bom.zddcz = t2.id  WHERE ssdd = '` + ddid + `' order by bom.sjcjsj
         `
 
-        let tjSql="SELECT gymc,ROUND( SUM( bzgs )/ 60,2 ) zgs FROM scglxt_t_gygc gc,`scglxt_t_jggy` gy WHERE gc.`gynr`=gy.id AND bomid IN (SELECT id FROM scglxt_t_bom WHERE ssdd='"+ddid+"') GROUP BY gymc";
+        let tjSql = "SELECT gymc,ROUND( SUM( bzgs )/ 60,2 ) zgs FROM scglxt_t_gygc gc,`scglxt_t_jggy` gy WHERE gc.`gynr`=gy.id AND bomid IN (SELECT id FROM scglxt_t_bom WHERE ssdd='" + ddid + "') GROUP BY gymc";
 
         let tjInfo = {
             info: '工时合计：',
-            zgs:0
+            zgs: 0
         }
-        
+
         let datas = await this.model().query(sql)
         let tjData = await this.model().query(tjSql)
         tjData.forEach(item => {
-            tjInfo.info += item.gymc + '(' + item.zgs+ ')' + '-'
+            tjInfo.info += item.gymc + '(' + item.zgs + ')' + '-'
             tjInfo.zgs += parseFloat(item.zgs)
         });
-        tjInfo.info = tjInfo.info.substring(0,tjInfo.info.length -1) 
-        tjInfo.zgs = "合计：" +  tjInfo.zgs.toFixed(2).toString()
+        tjInfo.info = tjInfo.info.substring(0, tjInfo.info.length - 1)
+        tjInfo.zgs = "合计：" + tjInfo.zgs.toFixed(2).toString()
         exportXls.exportBOMXls(infos[0], datas, tjInfo, res)
     }
     //导出组件
@@ -319,12 +322,12 @@ SELECT (@rownum:=@rownum+1) AS rownum,gy.gymc sbmc,gc.ZYSX gynr,null as t,edgs,g
         let ddsql = `select ht.htbh,dd.xmname,zd.mc ddlevel, starttime,endtime from scglxt_t_dd dd,scglxt_t_ht ht,scglxt_tyzd zd where dd.ssht=ht.id and zd.xh = dd.ddlevel and dd.id = '` + ddid + `'`
         let infos = await this.model().query(ddsql)
 
-        let sql = `select (@i := @i + 1) as xh,id zjid,zjmc ljmc,'' ljcz,'' ljgg,zjkc jgsl,'' ljlx, '' sccj,'0' lx from scglxt_t_zj,(select @i := 0) b where ssdd = '` + ddid + `' union all
+        let sql = `select (@i := @i + 1) as xh,id zjid,zjmc ljmc,'' ljcz,'' ljgg,zjkc jgsl,'' ljlx, '' sccj,'0' lx,0 as zje from scglxt_t_zj,(select @i := 0) b where ssdd = '` + ddid + `' union all
 
-        select '' xh,zjid,bom.zddmc ljmc, cl.clmc ljcz,concat_ws('    ',cldx,concat(bljs,'件'))  ljgg,( bomzj.zjsl * zj.zjkc ) ljsl,'机加工' ljlx,'' sccj,'1' lx from scglxt_t_bom bom,scglxt_t_bom_zj bomzj,scglxt_t_zj zj,scglxt_t_cl cl,( SELECT @i := 0 ) b 
+        select '' xh,zjid,bom.zddmc ljmc, cl.clmc ljcz,concat_ws('    ',cldx,concat(bljs,'件'))  ljgg,( bomzj.zjsl * zj.zjkc ) ljsl,'机加工' ljlx,'' sccj,'1' lx,truncate(clje,2) as zje from scglxt_t_bom bom,scglxt_t_bom_zj bomzj,scglxt_t_zj zj,scglxt_t_cl cl,( SELECT @i := 0 ) b 
         where bom.zddcz=cl.id and bom.id = bomzj.bomid and bomzj.zjid=zj.id and zj.ssdd='` + ddid + `'
         union all
-        select '' xh,zjid,ljmc,ljcz,ljgg,(bzjzj.bzjsl*zj.zjkc) ljsl, ljlx,sccj,'2' lx from scglxt_t_bzj bzj,scglxt_t_bzj_zj bzjzj,scglxt_t_zj zj,( SELECT @i := 0 ) b 
+        select '' xh,zjid,ljmc,ljcz,ljgg,(bzjzj.bzjsl*zj.zjkc) ljsl, ljlx,sccj,'2' lx,truncate((bzjzj.bzjsl * zj.zjkc )*ljdj,2) as  zje from scglxt_t_bzj bzj,scglxt_t_bzj_zj bzjzj,scglxt_t_zj zj,( SELECT @i := 0 ) b 
         where bzj.id = bzjzj.bzjid and bzjzj.zjid=zj.id and zj.ssdd='` + ddid + `'  order by zjid,lx,ljlx,xh desc
         `
         let datas = await this.model().query(sql)
@@ -340,56 +343,56 @@ SELECT (@rownum:=@rownum+1) AS rownum,gy.gymc sbmc,gc.ZYSX gynr,null as t,edgs,g
     }
 
     //根据时间范围，导出对应的工人工时统计数据
-    async exportGRGSTJAction(){
+    async exportGRGSTJAction() {
         let date = this.get('date');
         let bzList = [{
-            id:'759007553955134000002',
+            id: '759007553955134000002',
             name: '铣工班'
-        },{
-            id:'759007553955134000006',
-            name:'钳工班'
-        },{
-            id:'759007553955134000005',
-            name:'车工班'
-        },{
-            id:'759007553955134000001',
-            name:'线切割'
-        },{
-            id:'759007553955134000007',
-            name:'CNC班'
+        }, {
+            id: '759007553955134000006',
+            name: '钳工班'
+        }, {
+            id: '759007553955134000005',
+            name: '车工班'
+        }, {
+            id: '759007553955134000001',
+            name: '线切割'
+        }, {
+            id: '759007553955134000007',
+            name: 'CNC班'
         }]
         console.log(date)
     }
 
     //导出订单备料
-    async exportDdBLAction(){
+    async exportDdBLAction() {
         let ddid = this.get('id')
         const res = this.ctx.res;
-         
+
         let ddsql = `select ht.htbh,dd.xmname,zd.mc ddlevel, starttime,endtime from scglxt_t_dd dd,scglxt_t_ht ht,scglxt_tyzd zd where dd.ssht=ht.id and zd.xh = dd.ddlevel and dd.id = '` + ddid + `'`
         let infos = await this.model().query(ddsql)
 
         let sql = `SELECT  (@rownum := @rownum + 1) AS rownum, bom.id, zddmc,  t2.clmc, cldx, bljs,jgsl,ROUND(IFNULL(clzl,0),2) clzl,IFNULL(cldj,0) cldj, ROUND(IFNULL(clje, 0),2) clje 
-        FROM (select @rownum := 0) t,scglxt_t_bom bom  LEFT JOIN scglxt_t_cl t2   ON bom.zddcz = t2.id  WHERE ssdd = '`+ddid+`' order by sjcjsj`
-       
+        FROM (select @rownum := 0) t,scglxt_t_bom bom  LEFT JOIN scglxt_t_cl t2   ON bom.zddcz = t2.id  WHERE ssdd = '` + ddid + `' order by sjcjsj`
+
 
         let tjInfo = {
             info: '合计：',
             zgs: 0
         }
-        
+
         let datas = await this.model().query(sql)
         datas.forEach(item => {
             tjInfo.zgs += parseFloat(item.clje)
         });
-        tjInfo.info = tjInfo.info.substring(0,tjInfo.info.length -1) 
+        tjInfo.info = tjInfo.info.substring(0, tjInfo.info.length - 1)
         tjInfo.zgs = tjInfo.zgs.toFixed(2).toString()
         exportXls.exportDdBlXls(infos[0], datas, tjInfo, res)
     }
     // 上传订单图纸
     async uploadDrawingAction() {
         let ssdd = this.post('ssdd');
-       
+
         if (!think.isEmpty(this.file('file'))) {
             //进行压缩等处理
             let file = think.extend({}, this.file('file'));
@@ -435,19 +438,27 @@ SELECT (@rownum:=@rownum+1) AS rownum,gy.gymc sbmc,gc.ZYSX gynr,null as t,edgs,g
     }
 
     //修改订单结束时间
-    async updateEndTimeAction(){
+    async updateEndTimeAction() {
         let id = this.post('ddid')
         let endTime = this.post('endTime')
-        let data = await this.model('scglxt_t_dd').where({id:id}).update({endtime:endTime})
+        let data = await this.model('scglxt_t_dd').where({
+            id: id
+        }).update({
+            endtime: endTime
+        })
 
-        await this.model('scglxt_t_bom').where({ssdd:id}).update({endtime:endTime})
+        await this.model('scglxt_t_bom').where({
+            ssdd: id
+        }).update({
+            endtime: endTime
+        })
 
         let log = {
-            id:util.getUUId(),
-            type:'修改订单结束时间',
-            error:'',
-            infos:this.post(),
-            operater:this.header('token')
+            id: util.getUUId(),
+            type: '修改订单结束时间',
+            error: '',
+            infos: this.post(),
+            operater: this.header('token')
         }
 
         await this.model('operate_log').add(log)
@@ -455,17 +466,38 @@ SELECT (@rownum:=@rownum+1) AS rownum,gy.gymc sbmc,gc.ZYSX gynr,null as t,edgs,g
     }
 
     //获取订单标注
-    async getDdMarkAction(){
+    async getDdMarkAction() {
         let id = this.post('id')
-        let data = await this.model(ddModel).field('mark').where({id:id}).find()
+        let data = await this.model(ddModel).field('mark').where({
+            id: id
+        }).find()
         return this.success(data)
     }
     //设置订单标注
-    async setDdMarkAction(){
+    async setDdMarkAction() {
         let id = this.post('id')
         let mark = this.post('mark')
 
-        let data = await this.model(ddModel).where({id:id}).update({mark:mark})
+        let data = await this.model(ddModel).where({
+            id: id
+        }).update({
+            mark: mark
+        })
+
+        return this.success(data)
+    }
+
+    //更新所有订单的零件可以开始备料了
+    async updateAllDdBLZTAction() {
+        let id = this.post('ssdd')
+
+        let data = await this.model('scglxt_t_bom').where({
+            ssdd: id,
+            clzt: null
+        }).update({
+            clzt: 3,
+            blkssj:util.getNowTime()
+        })
 
         return this.success(data)
     }

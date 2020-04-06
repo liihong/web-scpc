@@ -18,7 +18,6 @@ event:{
         <el-form-item>
           <el-button size="mini" @click="handleExport" type="primary" icon="el-icon-download">导出</el-button>
         </el-form-item>
-        <slot name="toolBar"></slot>
         <el-form-item>
           <el-input
             size="small"
@@ -29,7 +28,9 @@ event:{
         </el-form-item>
         <el-form-item>
           <el-button size="mini" @click="queryResList" type="primary" icon="el-icon-search">查询</el-button>
+          <el-button size="mini" @click="reset" type="primary" icon="el-icon-refresh">重置</el-button>
         </el-form-item>
+        <slot name="toolBar"></slot>
       </el-form>
     </el-col>
 
@@ -42,6 +43,7 @@ event:{
       @selection-change="selsChange"
       @row-click="rowClick"
       :data="resDatas"
+      :row-class-name="tableRowClassName"
       v-loading="listLoading"
       header-cell-class-name="table_th"
       border
@@ -69,12 +71,12 @@ event:{
         v-if="row.PROPERTY_TYPE != '10'"
         v-for="(row,index) in resRows"
         :key="index"
-        :filters="row.PROPERTY_TYPE =='2'?[]:selectObj[row.COLUMN_NAME] "
         :prop="row.COLUMN_NAME"
         :fixed="(row.IS_FROZEN == 1?'left':false)"
         :label="row.COLUMN_CNAME"
         :min-width="(row.COLUMNLENGTH != '')?row.COLUMNLENGTH:150"
       >
+        <!-- :filters="row.PROPERTY_TYPE =='2'?[]:selectObj[row.COLUMN_NAME] " -->
         <template slot-scope="scope">
           <span v-if="row.PROPERTY_TYPE == '2'">
             <slot :name="row.COLUMN_NAME" v-bind:row="scope.row">
@@ -138,6 +140,9 @@ export default {
     query: {
       type: Object,
       String
+    },
+    num: {
+      type: Number
     }
   },
   components: {
@@ -186,9 +191,10 @@ export default {
     }
   },
   methods: {
+    //获取过滤数据
     getSelectQuery() {
       this.resRows.map(item => {
-        if(item.PROPERTY_TYPE == '2'){
+        if (item.PROPERTY_TYPE == "2") {
           this.getSjzdData(item.COLUMN_NAME, item.TYPESQL);
         }
       });
@@ -210,7 +216,7 @@ export default {
       if (this.query != undefined) {
         this.queryParams.query = this.query;
       }
-      this.queryParams.pageNumber=1
+      this.queryParams.pageNumber = 1;
       this.$ajax.get(this.$api.queryTableData, this.queryParams).then(res => {
         if (res.data) {
           this.resDatas = res.data.data;
@@ -222,6 +228,10 @@ export default {
         }
       });
       this.$emit("getResList");
+    },
+    reset() {
+      this.queryParams.queryKey = "";
+      this.queryResList()
     },
     //获取表格数据
     getResList: function() {
@@ -378,9 +388,9 @@ export default {
           typesql: sql
         })
         .then(res => {
-          let infos = res.data.map(item=>{
-            return {text:item.NAME,value:item.id}
-          })
+          let infos = res.data.map(item => {
+            return { text: item.NAME, value: item.id };
+          });
           this.$set(this.selectObj, attr, infos);
         });
     },
@@ -425,6 +435,12 @@ export default {
         });
       });
       return data;
+    },
+    tableRowClassName({ row, rowIndex }) {
+      if (row.SPZT && row.SPZT == 0) {
+        return "warning-row";
+      }
+      return "";
     }
   },
   create() {
@@ -439,22 +455,13 @@ export default {
     this.$destory();
   },
   watch: {
-    // queryParams: {
-    //   deep: true,
-    //   handler() {
-    //     let columns = this.resRows.map(item => {
-    //       if (item.ISQUERY == '1') return item.COLUMN_NAME
-    //     })
-    //     columns = columns.filter(item => {
-    //       return item != undefined
-    //     })
-    //     this.queryParams.queryColumn = columns.join(',')
-    //     // if(this.queryParams.queryKey != '') {
-    //     //   this.queryParams.pageNumber = 1
-    //     // }
-    //     this.getResList()
-    //   }
-    // },
+    num() {
+      if (this.query != undefined) {
+        this.queryParams.query = this.query;
+      }
+      this.getConfig();
+      this.getResList();
+    },
     dialogState: {
       deep: true,
       handler() {
@@ -490,5 +497,12 @@ export default {
 }
 .el-table--striped .el-table__body tr.el-table__row--striped td {
   background: #f5f4f4;
+}
+.el-table .warning-row {
+  background: oldlace;
+}
+
+.el-table .success-row {
+  background: #f0f9eb;
 }
 </style>

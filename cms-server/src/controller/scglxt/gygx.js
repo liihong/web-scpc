@@ -356,7 +356,7 @@ module.exports = class extends Base {
             let bomData = await this.model('scglxt_t_gygc').where({
                 id: gyid
             }).update({
-                sjjs: parseInt(jgjs) + parseInt(oldSjjs),
+                sjjs: parseFloat(jgjs) + parseFloat(oldSjjs),
                 // czryid: null
             })
 

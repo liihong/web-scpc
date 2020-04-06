@@ -1,6 +1,6 @@
 <template>
-  <el-dialog title="合同审批" :visible.sync="dialogState.show" width="20%">
-    <el-form style="text-align:center">
+  <el-dialog :title="`【${dialogState.row.HTBH}】合同审批`" :visible.sync="dialogState.show" width="20%">
+    <el-form style="text-align:center"  label-position="top">
       <el-form-item label="审批状态">
         <el-radio-group v-model="form.spzt">
           <el-radio :label="1">通过</el-radio>
@@ -34,13 +34,14 @@ export default {
   },
   methods: {
     onSaveClick() {
-      this.form.htid = this.dialogState.row.id;
-      this.form.htbh = this.dialogState.row.htbh;
+      this.form.htid = this.dialogState.row.ID;
+      this.form.htbh = this.dialogState.row.HTBH;
 
       this.$ajax.post(this.$api.ht_sptg, this.form).then(res => {
         if (res && res.errno == 0) {
           this.$message.success("合同审批成功");
           this.dialogState.show = false;
+          this.$parent.num++
         }
       });
     }

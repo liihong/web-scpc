@@ -1,99 +1,40 @@
 <template>
   <div class="ddgl">
-    <ResList
-      tableId='0104'
-      :query="query"
-      noEdit
-      ref="resList"
-      @selectChange="getChecks"
-    >
-      <span
-        slot="toolBar"
-        class="autoDD"
-      >
-        <el-button
-          icon="el-icon-box"
-          type="primary"
-          @click="beginBl"
-        >开始备料</el-button>
-        <el-button
-          type="primary"
-          @click="htBjd"
-        >报价单</el-button>
+    <ResList tableId="0104" :query="query" noEdit ref="resList" @selectChange="getChecks">
+      <span slot="toolBar" class="autoDD">
+        <el-button icon="el-icon-box" type="success" @click="beginBl">发往备料</el-button>
+        <el-button type="warning" @click="htBjd">报价单</el-button>
       </span>
-      <el-table-column
-        slot="operate"
-        fixed="left"
-        label="操作"
-        width="250"
-        align="center"
-      >
+      <el-table-column slot="operate" fixed="left" label="操作" width="250" align="center">
         <template slot-scope="scope">
           <el-button-group size="mini">
-            <el-button
-              size="mini"
-              type="primary"
-              @click="setJGgy(scope.row)"
-            >工艺</el-button>
-            <el-button
-              size="mini"
-              type="primary"
-              @click="copyBomRow(scope.row)"
-            >复制</el-button>
-            <el-button
-              size="mini"
-              type="primary"
-              @click="editBomRow(scope.row)"
-            >编辑</el-button>
-            <el-button
-              size="mini"
-              type="danger"
-              @click="handleDelete(scope.row)"
-            >删除</el-button>
+            <el-button size="mini" type="primary" @click="setJGgy(scope.row)">工艺</el-button>
+            <el-button size="mini" type="primary" @click="copyBomRow(scope.row)">复制</el-button>
+            <el-button size="mini" type="primary" @click="editBomRow(scope.row)">编辑</el-button>
+            <el-button size="mini" type="danger" @click="handleDelete(scope.row)">删除</el-button>
           </el-button-group>
         </template>
       </el-table-column>
-      <template
-        slot="SSDD"
-        slot-scope="scope"
-      >
+      <template slot="SSDD" slot-scope="scope">
         <span>{{scope.row.SSDD_TEXT}}</span>
       </template>
-      <template
-        slot="CLZT"
-        slot-scope="scope"
-      >
-        <span>{{scope.row.CLZT == '1' ? '已备料' : '未备料'}}</span>
+      <template slot="CLZT" slot-scope="scope">
+        <span>{{scope.row.CLZT == '1' ? '已备料' : scope.row.CLZT == '2'?'自备料':'未备料'}}</span>
       </template>
-      <template
-        slot="ZDDJB"
-        slot-scope="scope"
-      >
+      <template slot="ZDDJB" slot-scope="scope">
         <el-tag
           v-show="scope.row.ZDDJB"
-          effect='dark'
+          effect="dark"
           :type="scope.row.ZDDJB == '0402' ? 'warning' : scope.row.ZDDJB == '0403' ? '' : 'danger'"
         >{{scope.row.ZDDJB_TEXT}}</el-tag>
       </template>
-      <template
-        slot="DQJQ"
-        slot-scope="scope"
-      >
-        <div
-          style="text-align:left;"
-          v-html="scope.row.DQJQ"
-        ></div>
+      <template slot="DQJQ" slot-scope="scope">
+        <div style="text-align:left;" v-html="scope.row.DQJQ"></div>
       </template>
     </ResList>
-    <gygxDialog
-      :dialogState="dialogState"
-      ref="gygx"
-    />
+    <gygxDialog :dialogState="dialogState" ref="gygx" />
     <editBom :dialogState="bomForm" />
-    <bjdList
-      noBom
-      :dialogState="bjdState"
-    />
+    <bjdList noBom :dialogState="bjdState" />
   </div>
 </template>
 
@@ -141,6 +82,13 @@ export default {
       } else {
         return {};
       }
+    },
+    ssdd(){
+      if (this.$route.query.SSDD) {
+        return this.$route.query.SSDD
+      } else {
+        return '';
+      }
     }
   },
   methods: {
@@ -169,20 +117,9 @@ export default {
     },
     //标记备料状态开始备料，将所有多选的Id的clzt=0
     beginBl() {
-      if (this.selectRows.length == 0) {
-        this.$message("请先选中零件再进行备料！");
-        return;
-      }
-      let ids = "";
-      this.selectRows.map(item => {
-        ids += item.ID + ",";
-      });
-      this.$message.confirm("是否发送选中零件到仓库备料?", () => {
+      this.$message.confirm("是否发送该订单零件到仓库备料?", () => {
         this.$ajax
-          .post(this.$api.updateBLZT, {
-            id: ids,
-            clzt: 0
-          })
+          .post(this.$api.updateAllDdBLZT, {ssdd:this.ssdd})
           .then(res => {
             if (res.errno == 0) {
               this.$message.success("已发送仓库开始备料");

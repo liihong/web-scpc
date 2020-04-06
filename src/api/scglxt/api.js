@@ -27,7 +27,7 @@ let api = {
     // 报价单
     addBjd: 'scglxt/bjd/addBjd',
     ht_sptg: 'scglxt/bjd/ht_sptg',
-    
+    getHtSpyy: 'scglxt/bjd/getHtSpyy',
     //订单操作
     getDdDetail: 'scglxt/ddgl/getDdDetail',
     getDdTz: 'scglxt/ddgl/getDdTz',
@@ -46,6 +46,8 @@ let api = {
     deleteDdTz: 'scglxt/ddgl/deleteDdTz',
     updateEndTime: 'scglxt/ddgl/updateEndTime',
     getDDKhxxById:'scglxt/ddgl/getDDKhxxById',
+    updateAllDdBLZT: 'scglxt/ddgl/updateAllDdBLZT',//修改订单所有零件备料状态
+
     //获取订单BOM信息
     getDdBOMData: 'scglxt/ddgl/getDdBOMData',
     getDdMark:'scglxt/ddgl/getDdMark',

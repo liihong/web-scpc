@@ -62,7 +62,7 @@
         </el-col>
         <el-col :span="12">
           <el-form-item prop="CLTJ" label="材料体积">
-            <el-input style="width: 88%;" readonly placeholder="材料体积" v-model="formData.CLTJ"></el-input>
+            <el-input style="width: 88%;" placeholder="材料体积" v-model="formData.CLTJ"></el-input>
           </el-form-item>
         </el-col>
         <el-col :span="24">
@@ -98,7 +98,7 @@
                   :min="0"
                 ></el-input-number>
               </el-col>
-              <el-col :span="8">
+              <el-col v-if="formData.CLXZ !== 3" :span="8">
                 <span>高(mm)</span>
                 <el-input-number
                   @blur="calculateVolume"
@@ -108,6 +108,9 @@
                   :min="0"
                 ></el-input-number>
               </el-col>
+               <el-col v-if="formData.CLXZ == 3" :span="8">
+                <el-input placeholder="材料大小" v-model="formData.CLDX"></el-input>
+               </el-col>
             </template>
           </el-form-item>
         </el-col>
@@ -118,7 +121,7 @@
         </el-col>
         <el-col :span="12">
           <el-form-item prop="CLJE" label="材料金额">
-            <el-input readonly v-model="formData.CLJE" placeholder="材料金额"></el-input>
+            <el-input v-model="formData.CLJE" placeholder="材料金额"></el-input>
           </el-form-item>
         </el-col>
         <el-col :span="12">

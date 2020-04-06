@@ -9,8 +9,7 @@ module.exports = class extends Base {
 
     //审批合同
     async ht_sptgAction(){
-        console.log(this.post())
-        let htid = this.post('id')
+        let htid = this.post('htid')
         let htbh = this.post('htbh')
         let spzt = this.post('spzt')
         let bhly = this.post('bhly')
@@ -19,18 +18,26 @@ module.exports = class extends Base {
         let data = await this.model('scglxt_t_ht').where({id:htid}).update({
             spzt:spzt
         })
-
+        console.log(this.post())
         //增加审批日志
         let logData = {
             id:util.getUUId(),
-            htid:htid,
+            htid:this.post('htid'),
             htbh:htbh,
             spzt:spzt,
-            bhly:bhly
+            spr:this.header('token'),
+            spyj:bhly
         }
 
         await this.model('scglxt_t_ht_splog').add(logData)
 
+        return this.success(data)
+    }
+
+    //根据ID获取某合同驳回理由
+    async getHtSpyyAction(){
+        let id = this.post('htid');
+        let data = await this.model('scglxt_t_ht_splog').where({htid:id}).getField('spyj', true)
         return this.success(data)
     }
     /**

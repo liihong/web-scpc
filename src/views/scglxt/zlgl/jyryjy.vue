@@ -3,7 +3,6 @@
     <div class="tool_desc">提示：点击零件名称查看加工记录</div>
     <DataResList @refreshData="refreshData" @selectChange="getChecks" :tableData="checkList" tableId='010403' noEdit noAdd>
       <el-form-item slot="toolBar">
-        <el-button size="mini" @click="refreshData" type="primary">查询</el-button>
         <el-button type="primary" icon="el-icon-s-unfold" @click="passMany"  :label="1">批量通过</el-button>
       </el-form-item>
       <el-table-column slot="operate" fixed="left" label="操作" width="250" align="center">
@@ -155,7 +154,7 @@ export default {
 <style lang="scss" scoped>
 .tool_desc{
   position: absolute;
-  left: 500px;
+  left: 600px;
   top:20px;
   color:red;
 }

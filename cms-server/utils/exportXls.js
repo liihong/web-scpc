@@ -41,7 +41,7 @@ _exports.exportXls = function (data, list, res) {
         }
     }; //<====设置xlsx单元格样式
 
-    var keyMap = ["xh", "ljmc", "ljcz", "ljgg", "jgsl", "ljlx", "sccj", "jhrq", "yjdhrq", "sjdhrq", "bz"];
+    var keyMap = ["xh", "ljmc", "ljcz", "ljgg", "jgsl", "ljlx", "sccj", "zje", "yjdhrq", "sjdhrq", "bz"];
 
     var dataList = xlsxUtils.format2Sheet(list, 0, 7, keyMap); //偏移8行按keyMap顺序转换
     var dataKeys = Object.keys(dataList);

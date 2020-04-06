@@ -14,6 +14,7 @@
             :label="2"
           >自备料</el-radio>
           <el-radio
+            v-show="scope.row.CLZT != '0'"
             @change="changeRadio(scope.row)"
             class="radio"
             :label="0"
@@ -56,7 +57,8 @@ export default {
       clztData: {
         0: "待采购",
         1: "完成备料",
-        2: "自备料"
+        2: "自备料",
+        // 3: "开始备料"
       },
       dialogState: {
         show: false,

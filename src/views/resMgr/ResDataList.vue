@@ -6,12 +6,16 @@
     <!--工具条-->
     <el-col :span="24" class="toolbar">
       <el-form :inline="true">
-        <el-col :span="4">
+        <el-col :span="7">
           <el-form-item>
             <el-input size="small" v-model="queryParams.queryKey" placeholder="模糊查询"></el-input>
           </el-form-item>
+          <el-form-item>
+            <el-button size="mini" @click="refreshData" type="primary">查询</el-button>
+            <el-button size="mini" @click="reset" type="primary" icon="el-icon-refresh">重置</el-button>
+          </el-form-item>
         </el-col>
-        <el-col :span="20">
+        <el-col :span="17">
           <slot name="toolBar" />
           <el-form-item v-show="!noAdd">
             <el-button size="mini" @click="handleAdd" type="primary" icon="el-icon-circle-plus">新增</el-button>
@@ -165,7 +169,13 @@ export default {
           this.listLoading = false
         })
     },
-    
+    refreshData(params) {
+      this.$emit('refreshData', this.queryParams)
+    },
+    reset(){
+      this.queryParams.queryKey = ''
+      this.$emit('refreshData', this.queryParams)
+    },
     //导出
     handleExport() {
       let params = {

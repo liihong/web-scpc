@@ -64,7 +64,7 @@ module.exports = class extends Base {
         let sql = `SELECT any_value(gygc.id) id,
         any_value(gygc.ssdd) ssdd, any_value(xmname) ddmc, any_value(bomid) bomid,
         any_value(zddmc) bommc, any_value(gynr) gynr,any_value(jgsl) jgsl,
-        any_value(czryid) czryid, any_value(ry.rymc) rymc, (gygc.edgs*jgsl) edgs
+        any_value(czryid) czryid, any_value(ry.rymc) rymc, (gygc.zbgs+gygc.edgs*jgsl) edgs
     FROM scglxt_t_gygc gygc, scglxt_t_dd dd, scglxt_t_bom bom, scglxt_t_ry ry 
     WHERE
         gygc.ssdd = dd.id  AND gygc.bomid = bom.id 
