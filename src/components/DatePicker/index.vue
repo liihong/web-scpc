@@ -24,9 +24,10 @@ export default {
   },
   data() {
     let o = {}
-    o.selectValue = this.getDa(-6)
+    o.selectValue = this.getDa(-0)
     o.per = [
-      { name: '近7天', id: 1, value: this.getDa(-6), active: true },
+      { name: '实时', id: 0, value: this.getDa(-0), active: true },
+      { name: '近7天', id: 1, value: this.getDa(-6), active: false },
       { name: '近1月', id: 2, value: this.getDa(-30), active: false },
       { name: '近半年', id: 3, value: this.getDa(-182), active: false }
     ]

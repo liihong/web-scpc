@@ -16,7 +16,7 @@
         </template>
       </el-table-column>
       <template slot="SSDD" slot-scope="scope">
-        <span>{{scope.row.SSDD_TEXT}}</span>
+        <router-link style="color:#48b884;" :to="{path: 'ddgl', query: {ID: scope.row.SSDD}}"><span>{{scope.row.SSDD_TEXT}}</span></router-link>
       </template>
       <template slot="CLZT" slot-scope="scope">
         <span>{{scope.row.CLZT == '1' ? '已备料' : scope.row.CLZT == '2'?'自备料':'未备料'}}</span>
@@ -29,12 +29,13 @@
         >{{scope.row.ZDDJB_TEXT}}</el-tag>
       </template>
       <template slot="DQJQ" slot-scope="scope">
-        <div style="text-align:left;" v-html="scope.row.DQJQ"></div>
+        <div @click="openJgjl(scope.row.ID)" style="text-align:left;" v-html="scope.row.DQJQ"></div>
       </template>
     </ResList>
     <gygxDialog :dialogState="dialogState" ref="gygx" />
     <editBom :dialogState="bomForm" />
     <bjdList noBom :dialogState="bjdState" />
+    <jgjlDialog :dialogState="dialogJgjl" />
   </div>
 </template>
 
@@ -42,15 +43,21 @@
 import gygxDialog from "./components/gygx";
 import editBom from "./components/editBom";
 import bjdList from "../xsgl/components/bjdList";
+import jgjlDialog from "../zlgl/components/jgjlDialog";
 export default {
   name: "bomgl",
   components: {
     gygxDialog,
     editBom,
-    bjdList
+    bjdList,
+    jgjlDialog
   },
   data() {
     return {
+      dialogJgjl:{
+        show: false,
+        query:{}
+      },
       dialogState: {
         row: {},
         show: false,
@@ -92,6 +99,10 @@ export default {
     }
   },
   methods: {
+    openJgjl(bomid){
+      this.dialogJgjl.query = {BOMID:bomid}
+      this.dialogJgjl.show = true
+    },
     //报价单
     htBjd() {
       this.$ajax

@@ -241,15 +241,6 @@ export default {
       this.$ajax.get(this.$api.queryTableData, this.queryParams).then(res => {
         if (res.data) {
           this.resDatas = res.data.data;
-          // 给table赋值，重新遍历新增rowSpan属性，checkRoom，appointmentTime为table里面需要合并的属性名称
-          // this.resDatas = this.mergeTableRow(res.data.data, [
-          //   'SSDD_TEXT',
-          //   'SSDD',
-          //   'BOMID',
-          //   'BOMID_TEXT',
-          //   'ssdd',
-          //   'ssdd_TEXT'
-          // ])
           this.total = parseInt(res.data.count);
           this.listLoading = false;
           this.$nextTick(() => {

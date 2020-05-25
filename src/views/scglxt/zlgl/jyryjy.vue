@@ -8,9 +8,10 @@
       <el-table-column slot="operate" fixed="left" label="操作" width="250" align="center">
         <template slot-scope="scope">
           <el-button-group>
-            <el-button type="primary" @click="changeRadio(scope.row)" class="radio" :label="1">通过</el-button>
-            <el-button type="warning" @click="passSection(scope.row)" class="radio" :label="2">部分通过</el-button>
+            <el-button type="success" @click="changeRadio(scope.row)" class="radio" :label="1">通过</el-button>
+            <el-button type="primary" @click="passSection(scope.row)" class="radio" :label="4">让步接收</el-button>
             <el-button type="danger" @click="noPass(scope.row)" class="radio" :label="3">返工</el-button>
+            <el-button type="warning" @click="passSection(scope.row)" class="radio" :label="2">报废</el-button>
           </el-button-group>
         </template>
       </el-table-column>
@@ -22,7 +23,7 @@
       </template>
     </DataResList>
     <passPart :dialogState="dialogState" />
-    <jgjlDialog :dialogState="dialogJgjl" />
+    <jgjlDialog :isBF=isBF :dialogState="dialogJgjl" />
   </div>
 </template>
 
@@ -37,6 +38,7 @@ export default {
   data() {
     return {
       checkList: {},
+      isBF:false,
       dialogJgjl:{
         show: false,
         query:{}
@@ -87,7 +89,6 @@ export default {
     },
     passMany() {
       const vm = this
-      console.log(this.selectRows)
       this.$message.confirm('是否确定检验通过当前选中行', () => {
         let arr = []
         this.selectRows.map(item => {
@@ -113,13 +114,16 @@ export default {
     },
     //部分通过
     passSection(row) {
-      this.dialogState.type = 'part'
+      this.dialogState.type = 'noPass'
+      this.dialogState.sjzt = '2202'
       this.dialogState.row = row
       this.dialogState.show = true
+      this.isBF = true
     },
     noPass(row) {
       this.dialogState.row = row
       this.dialogState.show = true
+      this.dialogState.sjzt = '2201'
       this.dialogState.type = 'noPass'
     },
     changeRadio(row) {

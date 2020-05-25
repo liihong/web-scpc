@@ -3,7 +3,6 @@
     <el-dialog
       v-if="dialogState.show"
       append-to-body
-      :modal="false"
       width="50%"
       size="small"
       title="出库单预览"

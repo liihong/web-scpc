@@ -80,6 +80,11 @@ let api = {
     deleteZjById: 'scglxt/zj/deleteZjById',
     getZJTreeList: 'scglxt/zj/getZJTreeList',
     getZJListBySSDd: 'scglxt/zj/getZJListBySSDd',
+    bzj:{
+      getBzjKCByName:'scglxt/bzj/getBzjKCByName',//根据零件名称获取标准件库存
+      inStoreBzj:'scglxt/bzj/inStoreBzj', //标准件入库
+      outStoreBzj:'scglxt/bzj/outStoreBzj'
+    },
     
     //工艺流程标准管理
     getGyByBzId: 'scglxt/gybz/getGyByBzId',
@@ -91,7 +96,10 @@ let api = {
     getCheckList: 'scglxt/gygx/getCheckList',// 获取检验列表
     gygxCheckPassAll: 'scglxt/gygx/gygxCheckPassAll',
     gygxCheckPassPart: 'scglxt/gygx/gygxCheckPassPart',
-    gygxCheckNoPass: 'scglxt/gygx/gygxCheckNoPass'
+    gygxCheckNoPass: 'scglxt/gygx/gygxCheckNoPass',
     
+    //人工修改加工记录
+    updateJGJL: 'scglxt/gygx/updateJGJL',
+    deleteJGJL: 'scglxt/gygx/deleteJGJL'
   }
   export default api

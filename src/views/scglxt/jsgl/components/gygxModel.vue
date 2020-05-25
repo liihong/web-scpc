@@ -1,13 +1,20 @@
 <template>
   <div>
     <el-button type="primary" v-print="'#printTest'">打印出库单</el-button>
+    <el-button type="primary" @click="exportExcel">导出Excel</el-button>
     <div id="printTest">
-      <table class="gygc" border="1" v-for="(item,i) in bomList" :key="i">
+      <table id="out-table" class="gygc" border="1" v-for="(item,i) in bomList" :key="i">
         <thead>
           <th style="text-align:left;position:relative;" colspan="9">
+            <barcode
+              fontSize="12px"
+              style="float: right;"
+              width="1px"
+              height="10px"
+              :options="options"
+              v-bind:value="item.id"
+            >Show this if the rendering fails.</barcode>
             <span>订单：{{ddData.xmname}}</span>
-            <!-- <svg style="position:absolute;margin-right:0;" :class="`barcode${item.id}`" /> -->
-            <barcode fontSize="14px" style="float: right;"  width="1px" height="15px" :options="options" v-bind:value="item.id">Show this if the rendering fails.</barcode>
           </th>
         </thead>
         <tr>
@@ -29,9 +36,18 @@
           <td>序号</td>
           <td>所属设备</td>
           <td>工艺内容</td>
-          <td>额定工时<br/>(分钟/件)</td>
-          <td>总工时<br/>(分钟/件)</td>
-          <td>准备工时<br/>(分钟/件)</td>
+          <td>
+            额定工时
+            <br />(分钟/件)
+          </td>
+          <td>
+            总工时
+            <br />(分钟/件)
+          </td>
+          <td>
+            准备工时
+            <br />(分钟/件)
+          </td>
           <td>完成日期</td>
           <td>操作者</td>
           <td style="width:60px;">检验</td>
@@ -42,18 +58,20 @@
           <td style="width:210px;">{{el.gynr}}</td>
           <td>{{el.edgs}}</td>
           <td>{{el.zgs}}</td>
-          <td></td>
+          <td>{{el.zbgs}}</td>
           <td></td>
           <td></td>
           <td></td>
         </tr>
         <tr>
-          <td style="font-size: 12px;text-align:left;"
+          <td
+            style="font-size: 12px;text-align:left;"
             colspan="9"
           >标准会签：&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;工艺会签：&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; 质量会签：&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 工艺编制：李勇 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;校对：</td>
         </tr>
         <tr>
-          <td style="font-size: 12px;text-align:left;"
+          <td
+            style="font-size: 12px;text-align:left;"
             colspan="9"
           >审 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 定：&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 批 &nbsp;&nbsp;&nbsp;&nbsp; 准：&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;临时更改：&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;更改批准：</td>
         </tr>
@@ -70,6 +88,9 @@
 
 <script>
 import VueBarcode from "vue-barcode";
+import FileSaver from "file-saver";
+import XLSX from "xlsx";
+
 export default {
   components: {
     barcode: VueBarcode
@@ -89,8 +110,8 @@ export default {
       ddData: {},
       options: {
         width: "1px", //单个条形码的宽度
-        height: "55px",
-        fontSize: "22px"
+        height: "35px",
+        fontSize: "12px"
       }
     };
   },
@@ -101,7 +122,7 @@ export default {
     initData() {
       this.$ajax
         .get(this.$api.getDdBOMData, {
-          id: "202003191021209878208"
+          id: "202005091456332119318"
         })
         .then(res => {
           if (res.errno == 0) {
@@ -109,6 +130,25 @@ export default {
             this.bomList = res.data.bomInfo;
           }
         });
+    },
+    exportExcel() {
+      /* generate workbook object from table */
+      var wb = XLSX.utils.table_to_book(document.querySelector("#out-table"));
+      /* get binary string as output */
+      var wbout = XLSX.write(wb, {
+        bookType: "xlsx",
+        bookSST: true,
+        type: "array"
+      });
+      try {
+        FileSaver.saveAs(
+          new Blob([wbout], { type: "application/octet-stream" }),
+          "车间生产工时.xlsx"
+        );
+      } catch (e) {
+        if (typeof console !== "undefined") console.log(e, wbout);
+      }
+      return wbout;
     }
   },
   watch: {}

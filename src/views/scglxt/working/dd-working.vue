@@ -27,7 +27,8 @@
             >{{scope.row.xmname}}</router-link>
           </template>
         </el-table-column>
-        <el-table-column min-width="100" prop="starttime" label="结束时间" align="center"></el-table-column>
+        <el-table-column min-width="150" prop="mark" label="标注" align="center"></el-table-column>
+        <el-table-column min-width="100" prop="starttime" label="开始时间" align="center"></el-table-column>
         <el-table-column min-width="100" prop="endtime" label="结束时间" align="center">
           <template slot-scope="scope">
             <span :class="checkTime(scope.row['endtime'])?'': 'red'">

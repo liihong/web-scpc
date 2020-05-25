@@ -1,6 +1,6 @@
 <template>
     <div class="cgjy">
-        <el-dialog append-to-body :modal=false width="50%" size="small" title="填写采购建议" :visible.sync="dialogState.show" :close-on-click-modal="false">
+        <el-dialog append-to-body width="50%" size="small" title="填写采购建议" :visible.sync="dialogState.show" :close-on-click-modal="false">
             <el-row>
                 <el-row>
                     <el-col>

@@ -58,17 +58,17 @@ module.exports = class extends Base {
         let time = this.post('date')
 
         let bomSql =`SELECT bom.id,ssdd,dd.xmname ddmc,bom.jgsl,zddmc bommc FROM scglxt_t_bom bom,scglxt_t_dd dd WHERE  bom.ssdd=dd.id and bom.id IN (
-            SELECT bomid FROM scglxt_t_gygc WHERE STATUS=2 AND jssj BETWEEN "`+time.split(' ')[0]+` 00:00:00" AND "`+time.split(' ')[1]+`  23:59:59") order by bom.endtime`
+            SELECT bomid FROM scglxt_t_gygc WHERE STATUS=2 AND jssj BETWEEN "`+time.split(' ')[0]+` 00:00:00" AND "`+time.split(' ')[1]+`  23:59:59") order by bom.endtime,bom.ssdd desc`
 
         let bomData  = await this.model().query(bomSql)
         let sql = `SELECT any_value(gygc.id) id,
         any_value(gygc.ssdd) ssdd, any_value(xmname) ddmc, any_value(bomid) bomid,
         any_value(zddmc) bommc, any_value(gynr) gynr,any_value(jgsl) jgsl,
-        any_value(czryid) czryid, any_value(ry.rymc) rymc, (gygc.zbgs+gygc.edgs*jgsl) edgs
-    FROM scglxt_t_gygc gygc, scglxt_t_dd dd, scglxt_t_bom bom, scglxt_t_ry ry 
+        any_value(jggl.jgryid) czryid, any_value(ry.rymc) rymc,(ifnull( gygc.zbgs, 0 )/(SELECT count(*) from scglxt_t_jggl where gygcid=gygc.id))+(gygc.edgs*jggl.jgjs) edgs
+    FROM scglxt_t_gygc gygc left join scglxt_t_jggl jggl on gygc.id=jggl.gygcid, scglxt_t_dd dd, scglxt_t_bom bom, scglxt_t_ry ry 
     WHERE
         gygc.ssdd = dd.id  AND gygc.bomid = bom.id 
-        AND gygc.czryid = ry.id  AND STATUS = 2  AND jssj BETWEEN "`+time.split(' ')[0]+` 00:00:00" 
+        AND jggl.jgryid = ry.id   AND jggl.jgjssj BETWEEN "`+time.split(' ')[0]+` 00:00:00" 
         AND "`+time.split(' ')[1]+`  23:59:59"   order by ddmc,bomid`
         
         let data = await this.model().query(sql)
@@ -76,7 +76,11 @@ module.exports = class extends Base {
         bomData.map(item=>{
             data.map(el=>{
                 if(item.id == el.bomid){
-                    item[el.rymc] = el.edgs
+                    if(item[el.rymc]){
+                        item[el.rymc] += el.edgs
+                    }else{
+                        item[el.rymc] = el.edgs
+                    }
                 }
             })
         })

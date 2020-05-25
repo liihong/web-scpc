@@ -4,9 +4,11 @@
     <el-col :span="24" class="toolbar">
       <el-input @keyup.enter.native="getSjzdData"  @change="getSjzdData" style="width:200px;" size="small" v-model="query.xmname" placeholder="模糊查询"></el-input>
       <el-button size="mini" @click="getSjzdData" type="primary">查询</el-button>
+      <el-button size="mini" @click="reset" type="primary">重置</el-button>
+
       <el-button size="mini" @click="lookDDWorking" type="primary">订单生产实时看板</el-button>
     </el-col>
-    <el-table class="el-table" :expand-row-keys="$route.query.ddid" row-key="id" header-cell-class-name="table_th" @expand-change="initData" :data="clList" v-loading="listLoading" stripe border :max-height="tableHeight" style="width: 100%;">
+    <el-table class="el-table" :expand-row-keys="$route.query.ddid" row-key="id" header-cell-class-name="table_th" @expand-change="initData" :data="initList.slice((query.pageNumber-1)*query.pageSize,query.pageNumber*query.pageSize)" v-loading="listLoading" stripe border :max-height="tableHeight" style="width: 100%;">
       <el-table-column fixed="left" label="操作" min-width="180" align="center">
         <template slot-scope="scope">
           <el-button-group size="mini">
@@ -74,16 +76,16 @@ export default {
           name: '订单名称'
         },
         {
+          id:'mark',
+          name:'标注'
+        },
+        {
           id: 'starttime',
           name: '开始时间'
         },
         {
           id: 'endtime',
           name: '结束时间'
-        },
-        {
-          id:'mark',
-          name:'标注'
         },
         {
           id:'xqg',
@@ -207,6 +209,10 @@ export default {
     bomClick(row) {
       this.$refs.bomTable.toggleRowSelection(row)
     },
+    reset(){
+      this.query.xmname = ''
+      this.getSjzdData()
+    },
     //修改某一个订单的交货时间
     uploadEndTime(row){
       this.dialogState.row = row
@@ -236,14 +242,16 @@ export default {
     //翻页
     handleCurrentChange(page) {
       this.query.pageNumber = page
-      let data = [...this.initList]
-      this.clList = data.slice(this.query.pageNumber,this.query.pageSize)
+      // let data = [...this.initList]
+      // this.clList = data.slice(this.query.pageNumber,this.query.pageSize)
+      // console.log(this.clList)
+
     },
     sizeChange(size) {
       this.query.pageNumber = 1
       this.query.pageSize = size
-      let data = [...this.initList]
-      this.clList = data.slice(this.query.pageNumber,this.query.pageSize)
+      // let data = [...this.initList]
+      // this.clList = data.slice(this.query.pageNumber,this.query.pageSize)
   
     },
     initData(row) {

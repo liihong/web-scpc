@@ -106,10 +106,10 @@ var xlsxUtils = {
         r = r || 0;
         var tmpdata = {}; //用来保存转换好的json 
         var t1 = json.map((v, i) => keyMap.map((k, j) => Object.assign({}, {
-            v: v[k],
+            v: v[k] == undefined ? '' : v[k],
             position: ((j + n) > 25 ? xlsxUtils.getCharCol((j + n)) : String.fromCharCode(65 + (j + n))) + (i + 1 + r),
         }))).reduce((prev, next) => prev.concat(next)).forEach((v, i) => tmpdata[v.position] = {
-            v: v.v,
+            v: v.v == undefined ? '' : v.v,
             t: types ? types(v.v) : "s",
             s: {
                 alignment: {

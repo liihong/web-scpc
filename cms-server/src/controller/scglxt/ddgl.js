@@ -276,11 +276,11 @@ module.exports = class extends Base {
     //批量更新BOM出库状态
     getGygxData(item, bomid) {
         const vm = this
-        let blsql = `SELECT '1' AS rownum,'备料' AS sbmc,CONCAT(bom.cldx,' ',bom.bljs,' ',cl.clmc ) gynr,NULL AS t,NULL AS edgs,NULL AS zgs,NULL AS jhwcsj,NULL AS sjwcsj, NULL AS czr,
+        let blsql = `SELECT '1' AS rownum,'备料' AS sbmc,CONCAT(bom.cldx,' ',bom.bljs,' ',cl.clmc ) gynr,NULL AS t,NULL AS edgs,'' as zbgs,NULL AS zgs,NULL AS jhwcsj,NULL AS sjwcsj, NULL AS czr,
         NULL AS jyr FROM scglxt_t_bom bom,scglxt_t_cl cl WHERE bom.zddcz=cl.id AND  bom.id ='${bomid}'
 union all
 SELECT (@rownum:=@rownum+1) AS rownum,gy.gymc sbmc,gc.ZYSX gynr,null as t,edgs,gc.bzgs zgs,gc.zbgs,NULL AS jhwcsj,NULL AS sjwcsj,
-        '' AS czr FROM scglxt_t_sblx sb right JOIN scglxt_t_gygc gc ON sb.id=gc.sbid LEFT JOIN scglxt_t_jggy gy ON gc.gynr = gy.id where  bomid='${bomid}'`;
+        '' AS czr,'' as jyr FROM scglxt_t_sblx sb right JOIN scglxt_t_gygc gc ON sb.id=gc.sbid LEFT JOIN scglxt_t_jggy gy ON gc.gynr = gy.id where  bomid='${bomid}'`;
         return new Promise(async resolve => {
             let wjData = await this.model().query(blsql)
             item.gygxList = wjData
@@ -319,27 +319,44 @@ SELECT (@rownum:=@rownum+1) AS rownum,gy.gymc sbmc,gc.ZYSX gynr,null as t,edgs,g
     async exportDdByZjAction() {
         let ddid = this.get('id')
         const res = this.ctx.res;
+        let type = this.get('type')
+        console.log(this.get())
         let ddsql = `select ht.htbh,dd.xmname,zd.mc ddlevel, starttime,endtime from scglxt_t_dd dd,scglxt_t_ht ht,scglxt_tyzd zd where dd.ssht=ht.id and zd.xh = dd.ddlevel and dd.id = '` + ddid + `'`
         let infos = await this.model().query(ddsql)
 
-        let sql = `select (@i := @i + 1) as xh,id zjid,zjmc ljmc,'' ljcz,'' ljgg,zjkc jgsl,'' ljlx, '' sccj,'0' lx,0 as zje from scglxt_t_zj,(select @i := 0) b where ssdd = '` + ddid + `' union all
+        let sql = `select (@i := @i + 1) as xh,id zjid,zjmc ljmc,'' ljcz,'' ljgg,zjkc jgsl,'' ljlx, '' sccj,'0' lx,TRUNCATE(zjdj,2) dj,TRUNCATE(zjdj*zjkc,2) as zje from scglxt_t_zj,(select @i := 0) b where ssdd = '` + ddid + `' union all
 
-        select '' xh,zjid,bom.zddmc ljmc, cl.clmc ljcz,concat_ws('    ',cldx,concat(bljs,'件'))  ljgg,( bomzj.zjsl * zj.zjkc ) ljsl,'机加工' ljlx,'' sccj,'1' lx,truncate(clje,2) as zje from scglxt_t_bom bom,scglxt_t_bom_zj bomzj,scglxt_t_zj zj,scglxt_t_cl cl,( SELECT @i := 0 ) b 
+        select '' xh,zjid,bom.zddmc ljmc, cl.clmc ljcz,concat_ws('    ',cldx,concat(bljs,'件'))  ljgg,( bomzj.zjsl * zj.zjkc ) ljsl,'机加工' ljlx,'' sccj,'1' lx,TRUNCATE(clje,2) dj,TRUNCATE ( clje*jgsl, 2 ) AS zje  from scglxt_t_bom bom,scglxt_t_bom_zj bomzj,scglxt_t_zj zj,scglxt_t_cl cl,( SELECT @i := 0 ) b 
         where bom.zddcz=cl.id and bom.id = bomzj.bomid and bomzj.zjid=zj.id and zj.ssdd='` + ddid + `'
         union all
-        select '' xh,zjid,ljmc,ljcz,ljgg,(bzjzj.bzjsl*zj.zjkc) ljsl, ljlx,sccj,'2' lx,truncate((bzjzj.bzjsl * zj.zjkc )*ljdj,2) as  zje from scglxt_t_bzj bzj,scglxt_t_bzj_zj bzjzj,scglxt_t_zj zj,( SELECT @i := 0 ) b 
+        select '' xh,zjid,ljmc,ljcz,ljgg,(bzjzj.bzjsl*zj.zjkc) ljsl, ljlx,sccj,'2' lx,ljdj dj,truncate((bzjzj.bzjsl * zj.zjkc )*ljdj,2) as  zje from scglxt_t_bzj bzj,scglxt_t_bzj_zj bzjzj,scglxt_t_zj zj,( SELECT @i := 0 ) b 
         where bzj.id = bzjzj.bzjid and bzjzj.zjid=zj.id and zj.ssdd='` + ddid + `'  order by zjid,lx,ljlx,xh desc
         `
         let datas = await this.model().query(sql)
-
+        let tjData = {
+            jjg:0,
+            wg:0,
+            bzj:0
+        }
         let _data = datas.map((item, i) => {
             item.jhrq = ''
             item.yjdhrq = ''
             item.sjdhrq = ''
             item.bz = ''
+            if(item.ljlx=='机加工'){
+                tjData.jjg += parseFloat(item.zje)
+            }else if(item.ljlx=='外购'){
+                tjData.wg += parseFloat(item.zje)
+            }else if(item.ljlx=='标准件'){
+                tjData.bzj += parseFloat(item.zje)
+            }
             return item
         })
-        exportXls.exportXls(infos[0], datas, res)
+
+        tjData.zgs = "机加工合计：" + tjData.jjg.toFixed(2).toString() + '    '
+        tjData.zgs += "外购合计：" + tjData.wg.toFixed(2).toString() + '    '
+        tjData.zgs += "标准件合计：" + tjData.bzj.toFixed(2).toString()
+        exportXls.exportXls(infos[0], _data, res,type, tjData)
     }
 
     //根据时间范围，导出对应的工人工时统计数据
@@ -372,7 +389,7 @@ SELECT (@rownum:=@rownum+1) AS rownum,gy.gymc sbmc,gc.ZYSX gynr,null as t,edgs,g
         let ddsql = `select ht.htbh,dd.xmname,zd.mc ddlevel, starttime,endtime from scglxt_t_dd dd,scglxt_t_ht ht,scglxt_tyzd zd where dd.ssht=ht.id and zd.xh = dd.ddlevel and dd.id = '` + ddid + `'`
         let infos = await this.model().query(ddsql)
 
-        let sql = `SELECT  (@rownum := @rownum + 1) AS rownum, bom.id, zddmc,  t2.clmc, cldx, bljs,jgsl,ROUND(IFNULL(clzl,0),2) clzl,IFNULL(cldj,0) cldj, ROUND(IFNULL(clje, 0),2) clje 
+        let sql = `SELECT  (@rownum := @rownum + 1) AS rownum, bom.id, zddmc,  t2.clmc, cldx, bljs,jgsl,ROUND(IFNULL(clzl*(1+sh),0),2) clzl,IFNULL(cldj,0) cldj, ROUND(IFNULL(clje, 0),2) clje 
         FROM (select @rownum := 0) t,scglxt_t_bom bom  LEFT JOIN scglxt_t_cl t2   ON bom.zddcz = t2.id  WHERE ssdd = '` + ddid + `' order by sjcjsj`
 
 

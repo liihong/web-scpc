@@ -19,7 +19,7 @@
           </el-select>
         </el-form-item>
         <el-form-item prop="dhjs" label="打回件数">
-          <el-input-number :disabled="dialogState.type == 'noPass'" v-model="params.dhjs" :min="1" label="打回件数"></el-input-number><br/>
+          <el-input-number  v-model="params.dhjs" :min="1" label="打回件数"></el-input-number><br/>
         </el-form-item>
         <el-form-item prop="dhyy" label="打回原因">
           <el-input v-model="params.dhyy" />
@@ -38,6 +38,10 @@ export default {
   props: {
     dialogState: {
       type: Object
+    },
+    isBF:{
+      type: Boolean,
+      default:false
     }
   },
   data() {
@@ -74,7 +78,6 @@ export default {
           this.params.jgjs = this.row.SJJS
           this.params.yjgjs = this.row.YJGJS
           this.params.serial = this.row.serial
-          console.log(this.row)
           if (this.dialogState.type == 'part') {
             this.$ajax
               .post(this.$api.gygxCheckPassPart, this.params)
@@ -106,8 +109,13 @@ export default {
       handler() {
         if (this.dialogState.show) {
           this.params.dhjs = this.dialogState.row.SJJS
-          console.log(this.dialogState)
+          this.params.sjzt = this.dialogState.sjzt
         }
+      }
+    },
+    isBF(){
+      if(this.isBF){
+        this.params.sjzt = '2202'
       }
     }
   }

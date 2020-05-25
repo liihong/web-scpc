@@ -11,12 +11,31 @@ module.exports = class extends Base {
      */
     async addZjAction() {
         try {
+            const vm = this
             let form = this.post('form')
             let bzj = this.post('bzj')
             let jgj = this.post('jgj')
 
             let data = await this.model(zjModel).add(form);
             if (bzj.length > 0) {
+                // let ckLog = []
+                // let ckslUpdate =[]
+                // bzj.map(item=>{
+                //     let log = {
+                //         id:util.getUUId(),
+                //         ljmc:item.bzjmc,
+                //         ljsl:item.bzjsl,
+                //         type:'out',
+                //         rjr:vm.header('token')
+                //     }
+                //     ckLog.push(log)
+                //     let cksl={
+                //         id:item.bzjid,
+                //         dqkc:'(select dqkc from scglxt_t_bzj where id='+item.bzjid+')-'+item.bzjsl
+                //     }
+                //     ckslUpdate.push(cksl)
+                // })
+                
                 let bzjData = await this.model('scglxt_t_bzj_zj').addMany(bzj, {
                     pk: 'ID'
                 });

@@ -6,7 +6,7 @@
         </el-option>
       </el-select>
       <div class="names">
-        <el-button @click="beginWork(item)" class="namesBtn" type="primary" v-for="(item,i) in peopleList" :key="i">{{item.rymc}}</el-button>
+        <el-button :disabled="isDisable" @click="beginWork(item)" class="namesBtn" type="primary" v-for="(item,i) in peopleList" :key="i">{{item.rymc}}</el-button>
       </div>
     </el-dialog>
   </div>
@@ -21,7 +21,8 @@ export default {
     return {
       activeBz: '',
       bzList: [],
-      peopleList: []
+      peopleList: [],
+      isDisable:false
     }
   },
   computed: {
@@ -52,6 +53,11 @@ export default {
         })
     },
     beginWork(worker) {
+       this.isDisable=true
+       setTimeout(()=>{
+           this.isDisable=false   //点击一次时隔两秒后才能再次点击
+       },3000)
+       
       this.$ajax
         .post(this.$api.beginWork, {
           worker: worker.id,

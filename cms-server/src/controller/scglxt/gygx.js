@@ -80,12 +80,18 @@ module.exports = class extends Base {
                     })
                     //修改bom显示的工艺内容
 
-                    await this.model('scglxt_t_bom').where({
-                        id: form[0].bomid
-                    }).update({
+                    let bomUpdate = {
                         gxnr: gynr.join('-'),
                         gs: gs
-                    });
+                    }
+                    console.log(form[form.length-1])
+                    if(form[form.length-1].gynr=='20170424203607219'){
+                        bomUpdate.bmcl = form[form.length-1].zysx
+                    }
+
+                    await this.model('scglxt_t_bom').where({
+                        id: form[0].bomid
+                    }).update(bomUpdate);
 
                     // 更新订单总工时
                     let zgs = await this.model('scglxt_t_bom').where({
@@ -115,12 +121,18 @@ module.exports = class extends Base {
                 })
                 //修改bom显示的工艺内容
 
-                await this.model('scglxt_t_bom').where({
-                    id: form[0].bomid
-                }).update({
+                //如果最后一道工序是表面处理则自动更新BOM的表面处理字段
+                
+                let bomUpdate = {
                     gxnr: gynr.join('-'),
                     gs: gs
-                });
+                }
+                if(form[form.length-1].gynr=='20170424203607219'){
+                    bomUpdate.bmcl = form[form.length-1].zysx
+                }
+                await this.model('scglxt_t_bom').where({
+                    id: form[0].bomid
+                }).update(bomUpdate);
 
                 // 更新订单总工时
                 let zgs = await this.model('scglxt_t_bom').where({
@@ -132,6 +144,7 @@ module.exports = class extends Base {
                 }).update({
                     zgs: zgs
                 });
+
             }
 
             // 新增日志
@@ -600,7 +613,6 @@ module.exports = class extends Base {
         }
         let gygcUpdate = {
             yjgjs: jgjs - dhjs,
-            bfjs: dhjs,
             sfjy: '1',
             jyryid: this.header('token'),
             status: 2,
@@ -611,9 +623,7 @@ module.exports = class extends Base {
             id: id
         }).field('jgryid,jgjs,jyryid,jgkssj,jgjssj,jysj,sbid,gygcid,id jgglid').find()
 
-        await this.model('scglxt_t_gygc').where({
-            id: gygcid
-        }).update(gygcUpdate)
+      
 
         //生成打回记录
         let tmpLogData = jgglData
@@ -631,12 +641,22 @@ module.exports = class extends Base {
         let data = {}
         //返工
         if (sjzt == '2201') {
+
+            await this.model('scglxt_t_gygc').where({
+                id: gygcid
+            }).update(gygcUpdate)
+
             gygcUpdate.fgcs = "(select count(*) from scglxt_t_jggl_tmp where jgglid='" + id + " and sjzt='2201')+1"
             data = await this.model('scglxt_t_jggl').where({
                 id: id
             }).update(jgglUpdate)
 
         } else { //报废，重新生成BOM从头开始加工
+            gygcUpdate.bfjs = dhjs
+            await this.model('scglxt_t_gygc').where({
+                id: gygcid
+            }).update(gygcUpdate)
+
             let newbomid = util.getUUId()
 
             data = await this.model('scglxt_t_bom').where({
@@ -648,7 +668,7 @@ module.exports = class extends Base {
             bomData.zddmc = bomData.zddmc + '_报废重做'
             bomData.zddzt = '0501'
             bomData.jgsl = dhjs
-            bomData.clzt = null
+            bomData.clzt = '3'
             bomData.rksj = null
             bomData.cksj = null
             bomData.blkssj = null
@@ -668,6 +688,7 @@ module.exports = class extends Base {
                     item.kjgjs = 0
                     item.yjgjs = 0
                     item.sjjs = 0
+                    item.bfjs = 0
                     item.sfjy = null
                     item.czryid = null
                     item.kssj = null
@@ -715,7 +736,7 @@ module.exports = class extends Base {
 
             let errorLog = {
                 id: util.getUUId(),
-                type: '质检报废',
+                type: '质检报废成功',
                 infos: JSON.stringify(this.post()),
                 operater: this.header('token')
             }
@@ -772,7 +793,6 @@ module.exports = class extends Base {
         }).count()
 
         let gygcUpdate = {
-            bfjs: dhjs,
             sjjs: 0,
             fgcs: count,
             czryid: null,
@@ -793,7 +813,8 @@ module.exports = class extends Base {
 
         let errorLog = {
             id: util.getUUId(),
-            type: '质检打回',
+            type: '删除加工记录成功',
+            operater: this.header('token'),
             infos: JSON.stringify(this.post())
         }
         await this.model('operate_log').add(errorLog)
@@ -805,5 +826,39 @@ module.exports = class extends Base {
     async orderTopAction() {
         let row = this.post('row')
 
+    }
+
+    //人工手动调整加工记录表，如若出现错误，可手动调整
+    async updateJGJLAction(){
+        let id = this.post('id')
+        let form = this.post('form')
+        let data = await this.model('scglxt_t_jggl').where({id:id}).update(form)
+        
+        let errorLog = {
+            id: util.getUUId(),
+            type: '加工记录修正',
+            operater: this.header('token'),
+            infos: JSON.stringify(this.post())
+        }
+        await this.model('operate_log').add(errorLog)
+
+
+        return this.success(data)
+    }
+
+    async deleteJGJLAction(){
+        let id = this.post('id')
+
+        let data = await this.model('scglxt_t_jggl').where({id:id}).delete()
+
+        let errorLog = {
+            id: util.getUUId(),
+            type: '删除加工记录',
+            operater: this.header('token'),
+            infos: JSON.stringify(this.post())
+        }
+        await this.model('operate_log').add(errorLog)
+
+        return this.success(data)
     }
 };

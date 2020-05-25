@@ -10,6 +10,9 @@ import '@/styles/reset.css' // global cs
 import message from '@/utils/message'
 import * as util from '@/utils'
 
+import directive from '@/directive/index'
+
+
 import '@/icons' // icon
 import '@/permission' // permission control
 import api from '@/api/index'

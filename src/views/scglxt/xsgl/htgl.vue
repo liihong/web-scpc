@@ -35,6 +35,12 @@
           :to="{path: 'ddgl', query: {SSHT: scope.row.ID}}"
         >{{scope.row.HTBH}}</router-link>
       </template>
+       <template slot="SSDD" slot-scope="scope">
+        <router-link
+          style="color:#48b884;"
+          :to="{path: 'ddgl', query: {XMNAME: scope.row.SSDD}}"
+        >{{scope.row.SSDD}}</router-link>
+      </template>
        <template slot="SPZT" slot-scope="scope">
         <span v-if="scope.row.SPZT == 0"
           style="color:red;"

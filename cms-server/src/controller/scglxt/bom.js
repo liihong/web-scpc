@@ -14,21 +14,7 @@ module.exports = class extends Base {
         let data = await this.model(bomModel).select()
         return this.success(data)
     }
-    /**
-     * 保存工艺
-     * 1.删除原有bom工艺 2.保存新增的工艺 3.修改bom中显示的工艺内容 4.更新第一条记录到备料信息
-     * @returns 
-     */
-    async saveGygxInfoAction() {
-        let form = this.post('form')
-        let affectedRows = await this.model(gyModel).where({
-            bomid: form[0].bomid
-        }).delete();
-        let data = await this.model(gyModel).addMany(form, {
-            pk: 'ID'
-        });
-        return this.success(data)
-    }
+    
 
     //删除
     async deleteBOMAction() {
@@ -227,7 +213,7 @@ module.exports = class extends Base {
                 })
 
                 let arrs = id.split(',')
-                if (clzt != 0 && clzt != 2) {
+                if (clzt != 0) {
                     //     arrs.map(async item => {
                     //         updateSql = `UPDATE scglxt_t_gygc gygc SET status=0,kjgjs= (SELECT bom.jgsl FROM  scglxt_t_bom bom  WHERE  bom.id = gygc.bomid)
                     // WHERE gygc.bomid = '` + item + `' AND gygc.serial = '0'`
@@ -256,7 +242,7 @@ module.exports = class extends Base {
                 if (cgyj != undefined && cgyj != null && cgyj != '') {
                     return this.success(data)
                 } else {
-                    if (clzt != 0 && clzt != 2) {
+                    if (clzt != 0) {
                         updateSql = `UPDATE scglxt_t_gygc gygc SET status=0,kjgjs= (SELECT bom.jgsl FROM  scglxt_t_bom bom  WHERE  bom.id = gygc.bomid)
                         WHERE gygc.bomid = '` + id + `' AND gygc.serial = '0'`
                         let updated = await this.model().execute(updateSql)
@@ -393,7 +379,7 @@ module.exports = class extends Base {
                 if (pArr.length > 0) {
                     await Promise.all(pArr).then(async () => {
                         if (updateList.length > 0) {
-                            let sql = `update scglxt_t_dd set ckzt='完成',ckdate=DATE_FORMAT(NOW(), '%Y-%m-%d %H:%i:%s') where id in (` + updateList.join(',') + `))`
+                            let sql = `update scglxt_t_dd set ckzt='完成',ckdate=DATE_FORMAT(NOW(), '%Y-%m-%d %H:%i:%s') where id in (` + updateList.join(',') + `)`
                             let ddData = await this.model().execute(sql)
                         }
                     })

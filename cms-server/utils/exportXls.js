@@ -8,10 +8,15 @@ const xlsxUtils = require('./xlsxUtils')
 var _exports = {};
 module.exports = _exports;
 
-_exports.exportXls = function (data, list, res) {
+_exports.exportXls = function (data, list, res,type,tjInfo) {
     let models = new Buffer(255);
     // 打开文件
     let PUBLIC_PATH = path.resolve(__dirname, 'zjModel.xlsx');
+    if(type == '1'){//如果type==1说明是默认导出带金额的
+        PUBLIC_PATH = path.resolve(__dirname, 'zjModel1.xlsx');
+    }else{
+        PUBLIC_PATH = path.resolve(__dirname, 'zjModel.xlsx');
+    }
 
     const workbook2 = XLSX.readFile(PUBLIC_PATH, {
         cellStyles: true
@@ -41,12 +46,34 @@ _exports.exportXls = function (data, list, res) {
         }
     }; //<====设置xlsx单元格样式
 
-    var keyMap = ["xh", "ljmc", "ljcz", "ljgg", "jgsl", "ljlx", "sccj", "zje", "yjdhrq", "sjdhrq", "bz"];
-
+    var keyMap = ["xh", "ljmc", "ljcz", "ljgg", "jgsl", "ljlx", "sccj", "zjee", "yjdhrq", "sjdhrq", "bz"];
+    if(type == '1'){
+        keyMap = ["xh", "ljmc", "ljcz", "ljgg", "jgsl", "ljlx", "sccj", "dj", "zje", "sjdhrq", "bz"];
+    }
     var dataList = xlsxUtils.format2Sheet(list, 0, 7, keyMap); //偏移8行按keyMap顺序转换
+    
+    //dd
+    if(type == '1'){
+        var d2 = xlsxUtils.format2Sheet([tjInfo], 0, list.length + 7, ["zgs","","","","","","","","","",""]);
+        dataList = Object.assign(dataList, d2);
+    }
     var dataKeys = Object.keys(dataList);
+    //ddd
     for (var k in header) dataList[k] = header[k]; //追加列头
+    //合并统计行
+    dataList["!merges"].push({
+        s: { //s为开始
+            c: 0, //开始列
+            r: list.length + 7 //可以看成开始行,实际是取值范围
+        },
+        e: { //e结束
+            c: 7, //结束列
+            r: list.length + 7 //结束行
+        }
+    });
+
     var wb = xlsxUtils.format2WB(dataList, data.xmname, undefined, "A1:" + dataKeys[dataKeys.length - 1]);
+
 
     // 浏览器端和node共有的API,实际上node可以直接使用xlsx.writeFile来写入文件,但是浏览器没有该API
     const result = XLSX.write(wb, {

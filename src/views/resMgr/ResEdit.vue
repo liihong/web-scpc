@@ -107,7 +107,6 @@ export default {
             }
             params.type = 'edit'
             params.data = params.form
-            this.$emit('saveAfter', params)
 
             this.dialogState.show = false
           } else {

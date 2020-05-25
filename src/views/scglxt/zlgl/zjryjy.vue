@@ -1,4 +1,5 @@
 <template>
+<div>
   <ResList tableId='010407' :query="this.$route.query" noEdit noAdd @selectChange="getChecks" ref="zjryjy">
     <el-form-item slot="toolBar">
       <el-button type="primary" icon="el-icon-s-unfold" @click="passMany" class="radio" :label="1">批量通过</el-button>
@@ -20,13 +21,25 @@
       </el-badge>
     </template>
   </ResList>
+   <passPart isBF :dialogState="dialogState" />
+   </div>
 </template>
 
 <script>
+import passPart from './components/passPart'
+
 export default {
+  components:{
+    passPart
+  },
   data() {
     return {
-      selectRows: []
+      selectRows: [],
+      dialogState: {
+        show: false,
+        type: 'part',
+        row: {}
+      },
     }
   },
   methods: {
@@ -64,6 +77,14 @@ export default {
             })
         }
       })
+    },
+    //终检不通过
+    passSection(row){
+      this.dialogState.row = row
+      this.dialogState.row.SJJS = row.JGSL
+      this.dialogState.row.BOMID_TEXT = row.ZDDMC
+      
+      this.dialogState.show = true
     }
   }
 }
