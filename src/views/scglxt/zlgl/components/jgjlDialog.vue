@@ -24,7 +24,7 @@
           {{activeRow.GYNR}}
         </el-form-item>
         <el-form-item prop="jgryid" label="加工人员">
-          <el-radio-group v-model="formData.jgryid">
+          <el-radio-group v-model="radioValue">
           <el-radio
             class="namesBtn"
             type="primary"
@@ -66,7 +66,8 @@ export default {
       query: {},
       peopleList: [],
       formData:{},
-      isUpdate: false
+      isUpdate: false,
+      radioValue:''
     };
   },
    computed: {
@@ -77,7 +78,7 @@ export default {
     updateJGJL(row) {
       this.activeRow = row
       this.formData.jgjs = row.JGJS
-      this.formData.jgryid = row.JGRYID
+      this.radioValue = row.JGRYID
       this.isUpdate = true;
       this.$ajax
         .post(this.$api.getPeopleByBz, {
@@ -91,6 +92,7 @@ export default {
     },
     updateSaveJGJL() {
       let vm = this
+      vm.formData.jgryid=this.radioValue
       this.$message.confirm("是否确认修改记录？修改将影响工人工时统计",() => {
         this.$ajax
           .post(this.$api.updateJGJL, {
@@ -98,6 +100,8 @@ export default {
             form:vm.formData
           })
           .then(function() {
+            vm.isUpdate = false
+            vm.$refs.bjdList.getResList();
             vm.$message.success("修改成功！");
           });
       });
