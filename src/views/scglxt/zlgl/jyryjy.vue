@@ -9,9 +9,9 @@
         <template slot-scope="scope">
           <el-button-group>
             <el-button type="success" @click="changeRadio(scope.row)" class="radio" :label="1">通过</el-button>
-            <el-button type="primary" @click="passSection(scope.row)" class="radio" :label="4">让步接收</el-button>
-            <el-button type="danger" @click="noPass(scope.row)" class="radio" :label="3">返工</el-button>
-            <el-button type="warning" @click="passSection(scope.row)" class="radio" :label="2">报废</el-button>
+            <el-button type="primary" @click="rbjsSection(scope.row)" class="radio" :label="4">让步接收</el-button>
+            <el-button type="warning" @click="noPass(scope.row)" class="radio" :label="3">返工</el-button>
+            <el-button type="danger" @click="passSection(scope.row)" class="radio" :label="2">报废</el-button>
           </el-button-group>
         </template>
       </el-table-column>
@@ -24,6 +24,7 @@
     </DataResList>
     <passPart :dialogState="dialogState" />
     <jgjlDialog :isBF=isBF :dialogState="dialogJgjl" />
+    <rbjsDialog :dialogState="dialogRbjs" />
   </div>
 </template>
 
@@ -31,6 +32,7 @@
 import DataResList from '../../resMgr/ResDataList'
 import passPart from './components/passPart'
 import jgjlDialog from './components/jgjlDialog'
+import rbjsDialog from './components/rbjsDialog'
 
 import { mapGetters } from 'vuex'
 
@@ -52,13 +54,20 @@ export default {
       query: {
         pageSize: 30,
         pageNumber: 1
+      },
+      dialogRbjs:{
+        show: false,
+        type:'rbjs',
+        sjzt: '2203',
+        row:{}
       }
     }
   },
   components: {
     DataResList,
     passPart,
-    jgjlDialog
+    jgjlDialog,
+    rbjsDialog
   },
   computed: {
     ...mapGetters(['token'])
@@ -111,6 +120,10 @@ export default {
           })
         }
       })
+    },
+    rbjsSection(row){
+      this.dialogRbjs.row = row
+      this.dialogRbjs.show = true
     },
     //部分通过
     passSection(row) {

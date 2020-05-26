@@ -486,21 +486,8 @@ module.exports = class extends Base {
         }
         return this.success(info)
     }
-
-    //质检全部通过
-    //如果是最后一道工序则更新BOM的状态
-    async gygxCheckPassAllAction() {
-        let {
-            id,
-            gygcid,
-            jgryid,
-            bomid,
-            bfjs,
-            serial
-        } = this.post()
-
-        try {
-            let jyryid = this.header('token');
+    async gygxCheckPass(id,bomid,gygcid,serial,bfjs){
+        let jyryid = this.header('token');
 
             let updateJggl = {
                 jysj: util.getNowTime(),
@@ -578,6 +565,22 @@ module.exports = class extends Base {
                 }
             }
 
+            return data
+    }
+    //质检全部通过
+    //如果是最后一道工序则更新BOM的状态
+    async gygxCheckPassAllAction() {
+        let {
+            id,
+            gygcid,
+            jgryid,
+            bomid,
+            bfjs,
+            serial
+        } = this.post()
+
+        try {
+            let data = this.gygxCheckPass(id,bomid,gygcid,serial,bfjs)
             return this.success(data)
         } catch (ex) {
             let errorLog = {
@@ -822,6 +825,39 @@ module.exports = class extends Base {
         return this.success(data)
     }
 
+    //质检让步接收
+    //先通过质检再生成让步接收日志
+    async gygxCheckRBJSAction(){
+        let {
+            id,
+            bomid,
+            gygcid,
+            serial,
+            bfjs,
+            dhjs,
+            dhyy,
+            sjzt
+        } = this.post()
+        let data = this.gygxCheckPass(id,bomid,gygcid,serial,bfjs)
+        
+        if(data){
+            let jgglData = await this.model('scglxt_t_jggl').where({
+                id: id
+            }).field('jgryid,jgjs,jyryid,jgkssj,jgjssj,jysj,sbid,gygcid,id jgglid').find()
+    
+            //生成打回记录
+            let tmpLogData = jgglData
+            tmpLogData.id = util.getUUId()
+            tmpLogData.sjzt = sjzt
+            tmpLogData.dhjs = dhjs
+            tmpLogData.dhyy = dhyy
+            tmpLogData.jyryid = this.header('token')
+            tmpLogData.jysj = util.getNowTime()
+    
+            await this.model('scglxt_t_jggl_tmp').add(tmpLogData)
+        }
+        return this.success(data)
+    }
     // 工艺排序
     async orderTopAction() {
         let row = this.post('row')

@@ -2,9 +2,9 @@
   <el-dialog :title="`检验${dialogState.type =='part' ? '部分' : '全部'}打回`" :visible.sync="dialogState.show" width="30%">
     <div class="title">
       <span>
-        当前订单：
+        订单号：
         <span style="color:#42b983">{{row.SSDD_TEXT}} </span>
-        当前BOM：
+        零件名称：
         <span style="color:#42b983">{{row.BOMID_TEXT}} </span>
       </span>
     </div>
