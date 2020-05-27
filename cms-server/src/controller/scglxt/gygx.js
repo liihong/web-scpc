@@ -698,7 +698,6 @@ module.exports = class extends Base {
                     item.jssj = null
                     item.status = null
                     item.jyryid = null
-                    item.bfjs = null
                     item.fgcs = null
                     item.sjcjsj = util.getNowTime()
                     return item

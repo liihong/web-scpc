@@ -133,7 +133,7 @@ export default {
     },
     exportExcel() {
       /* generate workbook object from table */
-      var wb = XLSX.utils.table_to_book(document.querySelector("#out-table"));
+      var wb = XLSX.utils.table_to_book(document.querySelector("#printTest"));
       /* get binary string as output */
       var wbout = XLSX.write(wb, {
         bookType: "xlsx",

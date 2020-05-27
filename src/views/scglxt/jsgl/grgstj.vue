@@ -1,5 +1,5 @@
 <template>
-  <div class="ddgl">
+  <div class="grgstj">
     <div class="newToolBar">
       <datePicker @sureBtnClick="sureBtnClick" v-model="selectDate" />
       <el-button
@@ -148,5 +148,8 @@ export default {
 .newToolBar {
   display: flex;
   margin: 0 0 10px 0;
+}
+.grgstj{
+  margin:10px;
 }
 </style>

@@ -127,7 +127,7 @@ export default {
     },
     //部分通过
     passSection(row) {
-      this.dialogState.type = 'noPass'
+      this.dialogState.type = 'part'
       this.dialogState.sjzt = '2202'
       this.dialogState.row = row
       this.dialogState.show = true
@@ -137,7 +137,7 @@ export default {
       this.dialogState.row = row
       this.dialogState.show = true
       this.dialogState.sjzt = '2201'
-      this.dialogState.type = 'noPass'
+      this.dialogState.type = 'part'
     },
     changeRadio(row) {
       this.$message.confirm('是否确定全部检验通过', () => {

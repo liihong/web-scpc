@@ -172,7 +172,7 @@ _exports.exportBOMXls = function (data, list, tjInfo, res) {
 
 
     res.setHeader('Content-Type', 'application/vnd.openxmlformats;charset=utf-8');
-    res.setHeader("Content-Disposition", "filename=" + data.xmname + ".xlsx");
+    res.setHeader("Content-Disposition", "filename=1111.xlsx");
     res.end(result, 'buffer');
 };
 
