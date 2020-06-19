@@ -98,6 +98,8 @@ let api = {
     gygxCheckPassPart: 'scglxt/gygx/gygxCheckPassPart',
     gygxCheckNoPass: 'scglxt/gygx/gygxCheckNoPass',
     gygxCheckRBJS: 'scglxt/gygx/gygxCheckRBJS',//质检让步接收
+    sureManualScrap: 'scglxt/gygx/sureManualScrap',//手工增加报废流程
+    
     //人工修改加工记录
     updateJGJL: 'scglxt/gygx/updateJGJL',
     deleteJGJL: 'scglxt/gygx/deleteJGJL'

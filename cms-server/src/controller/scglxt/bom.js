@@ -97,6 +97,8 @@ module.exports = class extends Base {
     async editBomAction() {
         let form = this.post('form')
         let primaryKey = this.post('primaryKey')
+        let oldData = await this.model(bomModel).where(primaryKey).find()
+
         let data = await this.model(bomModel).where(primaryKey).update(form)
 
         await this.model('scglxt_t_gygc').where({
@@ -104,7 +106,17 @@ module.exports = class extends Base {
         }).update({
             ssdd: form.ssdd
         })
-
+        
+        //编辑BOM时，查询是否有已开始加工的工艺，确认是否修改加工数量，如果有同步更新工艺，如果没有则不处理
+        if(oldData.jgsl !=form.jgsl){
+            await this.model('scglxt_t_gygc').where({
+                bomid: primaryKey.id,
+                kjgjs: ['!=',0]
+            }).update({
+                kjgjs: form.jgsl
+            })
+        }
+        
         return this.success(data)
     }
 

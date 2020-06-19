@@ -6,7 +6,7 @@
           <template slot-scope="scope">
             <el-button-group>
               <el-button type="primary" @click="updateJGJL(scope.row)" class="radio" :label="1">修正</el-button>
-              <!-- <el-button type="primary" @click="deleteJGJL(scope.row)" class="radio" :label="1">删除</el-button> -->
+              <el-button type="primary" @click="deleteJGJL(scope.row)" class="radio" :label="1">删除</el-button>
             </el-button-group>
           </template>
         </el-table-column>

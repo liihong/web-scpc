@@ -6,7 +6,7 @@ function resolve(dir) {
 
 // vue.config.js
 module.exports = {
-    baseUrl: '/',
+    publicPath: '/',
     outputDir: 'dist',
     devServer: {
         port: 8080, // 端口号

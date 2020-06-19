@@ -56,9 +56,10 @@ module.exports = class extends Base {
     // 根据时间范围返回工人工时统计
     async getPeopleHourAction(){
         let time = this.post('date')
+        let zddmc = this.post('zddmc')
 
         let bomSql =`SELECT bom.id,ssdd,dd.xmname ddmc,bom.jgsl,zddmc bommc FROM scglxt_t_bom bom,scglxt_t_dd dd WHERE  bom.ssdd=dd.id and bom.id IN (
-            SELECT bomid FROM scglxt_t_gygc WHERE STATUS=2 AND jssj BETWEEN "`+time.split(' ')[0]+` 00:00:00" AND "`+time.split(' ')[1]+`  23:59:59") order by bom.endtime,bom.ssdd desc`
+            SELECT bomid FROM scglxt_t_gygc WHERE STATUS=2 AND jssj BETWEEN "`+time.split(' ')[0]+` 00:00:00" AND "`+time.split(' ')[1]+`  23:59:59") And (zddmc like '%`+zddmc+`%' or xmname like '%`+zddmc+`%') order by bom.endtime,bom.ssdd desc`
 
         let bomData  = await this.model().query(bomSql)
         let sql = `SELECT any_value(gygc.id) id,
@@ -68,6 +69,7 @@ module.exports = class extends Base {
     FROM scglxt_t_gygc gygc left join scglxt_t_jggl jggl on gygc.id=jggl.gygcid, scglxt_t_dd dd, scglxt_t_bom bom, scglxt_t_ry ry 
     WHERE
         gygc.ssdd = dd.id  AND gygc.bomid = bom.id 
+        And (zddmc like '%`+zddmc+`%' or xmname like '%`+zddmc+`%')
         AND jggl.jgryid = ry.id   AND jggl.jgjssj BETWEEN "`+time.split(' ')[0]+` 00:00:00" 
         AND "`+time.split(' ')[1]+`  23:59:59"   order by ddmc,bomid`
         

@@ -56,7 +56,8 @@ export default {
        this.isDisable=true
        setTimeout(()=>{
            this.isDisable=false   //点击一次时隔两秒后才能再次点击
-       },3000)
+       },5000)
+      this.dialogState.show = false
        
       this.$ajax
         .post(this.$api.beginWork, {
@@ -66,7 +67,6 @@ export default {
         .then(res => {
           if (res.errno == 0) {
             this.$message.success('开始加工,操作成功！')
-            this.dialogState.show = false
             this.$parent.$refs.jgList.getResList()
           }
         })

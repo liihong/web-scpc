@@ -23,7 +23,8 @@ event:{
             size="small"
             v-model="queryParams.queryKey"
             placeholder="模糊查询"
-            @keyup.enter.native="queryResList"
+            @input="debounceQuery"
+            @change="queryResList"
           ></el-input>
         </el-form-item>
         <el-form-item>
@@ -176,7 +177,8 @@ export default {
         pageSize: 30,
         queryColumn: "",
         queryKey: ""
-      }
+      },
+      timer: null
     };
   },
   computed: {
@@ -212,6 +214,14 @@ export default {
           this.listLoading = false;
         });
     },
+    debounceQuery() {
+      if (this.timer !== null) {
+        clearTimeout(this.timer);
+      }
+      this.timer = setTimeout(() => {
+        this.queryResList();
+      }, 1500);
+    },
     queryResList() {
       if (this.query != undefined) {
         this.queryParams.query = this.query;
@@ -231,7 +241,7 @@ export default {
     },
     reset() {
       this.queryParams.queryKey = "";
-      this.queryResList()
+      this.queryResList();
     },
     //获取表格数据
     getResList: function() {
@@ -282,6 +292,7 @@ export default {
     },
     //新增按钮
     handleAdd() {
+      console.log(this.$parent.handleAdd);
       if (
         this.noEdit &&
         this.$parent.handleAdd &&
@@ -427,7 +438,7 @@ export default {
       });
       return data;
     },
-    tableRowClassName({ row, rowIndex }) {
+    tableRowClassName({ row }) {
       if (row.SPZT && row.SPZT == 0) {
         return "warning-row";
       }

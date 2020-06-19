@@ -51,5 +51,13 @@ module.exports = {
             day = '0' + day
         }
         return now.getFullYear().toString() +'-' +  month.toString() +'-'+ day+'-' + hour+':' + minutes+':' + seconds
+    },
+    // 小写转换
+    lowerJSONKey(jsonObj){
+        for (var key in jsonObj){
+            jsonObj[key.toLowerCase()] = jsonObj[key];
+            delete(jsonObj[key]);
+        }
+        return jsonObj;
     }
 }

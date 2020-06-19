@@ -1,6 +1,7 @@
 <template>
   <div class="grgstj">
     <div class="newToolBar">
+      <div style="display:flex;">
       <datePicker @sureBtnClick="sureBtnClick" v-model="selectDate" />
       <el-button
         style="margin-left:10px;"
@@ -9,6 +10,10 @@
         type="primary"
         icon="el-icon-s-promotion"
       >导出</el-button>
+      </div>
+      <div>
+      名称：<el-input style="width:150px;" v-model="queryValue"/><el-button @click="getTableData" type="primary">搜索</el-button>
+      </div>
     </div>
     <el-table
       ref="elTable"
@@ -43,7 +48,6 @@
       </el-table-column>
     </el-table>
     <jgjlDialog :dialogState="dialogJgjl" />
-
   </div>
 </template>
 
@@ -62,11 +66,12 @@ export default {
     return {
       tableHeight: 600,
       selectDate: "",
+      queryValue:'',
       bzList: [],
       tableData: [],
-      dialogJgjl:{
-        show:false,
-        query:{}
+      dialogJgjl: {
+        show: false,
+        query: {}
       }
     };
   },
@@ -83,13 +88,14 @@ export default {
     });
   },
   methods: {
-    openJgjl(bomid){
-      this.dialogJgjl.query = {BOMID:bomid}
-      this.dialogJgjl.show = true
+    openJgjl(bomid) {
+      this.dialogJgjl.query = { BOMID: bomid };
+      this.dialogJgjl.show = true;
     },
     async getTableData() {
       let resDatas = await this.$ajax.post(this.$api.getPeopleHour, {
-        date: this.selectDate
+        date: this.selectDate,
+        zddmc: this.queryValue
       });
       if (resDatas.errno == 0) {
         this.tableData = resDatas.data;
@@ -146,10 +152,10 @@ export default {
 </script>
 <style lang="scss" scoped>
 .newToolBar {
-  display: flex;
+  // display: flex;
   margin: 0 0 10px 0;
 }
-.grgstj{
-  margin:10px;
+.grgstj {
+  margin: 10px;
 }
 </style>

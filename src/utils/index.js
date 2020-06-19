@@ -206,3 +206,36 @@ export  function addDate(date, days) {
   var val = d.getFullYear() + "-" + month + "-" + day
   return val
 }
+
+/**
+ * 函数防抖
+ * @param {*} fn 
+ * @param {*} time 
+ */
+export function debounce(fn,time = 1000){
+  var timer;
+  return function(){
+    if(timer !== null){
+      clearTimeout(timer);
+    }
+    timer = setTimeout(()=>{
+      fn.apply(this, arguments);
+    },time);
+  }
+}
+
+/**
+ * 函数节流,基于时间戳
+ * @param {*} fn 
+ * @param {*} time 
+ */
+export function throttle(fn,time = 1000){
+  let timestamp = 0;
+  return function(){
+    let now = Date.now()
+    if(now-timestamp > time){
+      fn.apply(this,arguments)
+      timestamp = now
+    }
+  }
+}

@@ -142,8 +142,9 @@ module.exports = class extends Base {
             temp = {}
         if (query && query != '{}' && JSON.stringify(query) != '{}') {
             query = JSON.parse(query)
-            let key = Object.keys(query)[0]
-            whereObj[key] = ['=', `${query[key]}`]
+            Object.keys(query).map(key=>{
+                whereObj[key] = ['=', `${query[key]}`]
+            })
         }
         if (!!queryKey) {
             whereObj = await this.model('tableData').getWhereObj(query, queryColumn, queryKey, tableId)

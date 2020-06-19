@@ -20,7 +20,7 @@ module.exports = class extends Base {
                 let affectedRows = await model.where({
                     id: data.id
                 }).update({
-                    lastlogintime: new Date().toLocaleString(),
+                    lastlogintime: util.getNowTime(),
                     token: data.id,
                     ip: ip.split(':')[3]
                 });
