@@ -1,12 +1,24 @@
 <template>
   <div class="selectPerson">
-    <el-dialog title="选择人员" :visible.sync="dialogState.show" width="30%">
-      <el-select @change="changeBz" v-model="activeBz" placeholder="请选择">
-        <el-option v-for="item in bzList" :key="item.id" :label="item.bzmc" :value="item.id">
+    <el-dialog title="选择人员"
+               :visible.sync="dialogState.show"
+               width="30%">
+      <el-select @change="changeBz"
+                 v-model="activeBz"
+                 placeholder="请选择">
+        <el-option v-for="item in bzList"
+                   :key="item.id"
+                   :label="item.bzmc"
+                   :value="item.id">
         </el-option>
       </el-select>
       <div class="names">
-        <el-button :disabled="isDisable" @click="beginWork(item)" class="namesBtn" type="primary" v-for="(item,i) in peopleList" :key="i">{{item.rymc}}</el-button>
+        <el-button :disabled="isDisable"
+                   @click="beginWork(item)"
+                   class="namesBtn"
+                   type="primary"
+                   v-for="(item,i) in peopleList"
+                   :key="i">{{item.rymc}}</el-button>
       </div>
     </el-dialog>
   </div>
@@ -22,7 +34,7 @@ export default {
       activeBz: '',
       bzList: [],
       peopleList: [],
-      isDisable:false
+      isDisable: false
     }
   },
   computed: {
@@ -53,23 +65,22 @@ export default {
         })
     },
     beginWork(worker) {
-       this.isDisable=true
-       setTimeout(()=>{
-           this.isDisable=false   //点击一次时隔两秒后才能再次点击
-       },5000)
+      this.isDisable = true
       this.dialogState.show = false
-       
-      this.$ajax
-        .post(this.$api.beginWork, {
-          worker: worker.id,
-          gyid: this.dialogState.gyid
-        })
-        .then(res => {
-          if (res.errno == 0) {
-            this.$message.success('开始加工,操作成功！')
-            this.$parent.$refs.jgList.getResList()
-          }
-        })
+      if (this.isDisable) {
+        this.$ajax
+          .post(this.$api.beginWork, {
+            worker: worker.id,
+            gyid: this.dialogState.gyid
+          })
+          .then(res => {
+            if (res.errno == 0) {
+              this.$message.success('开始加工,操作成功！')
+              this.$parent.$refs.jgList.getResList()
+              this.isDisable = false
+            }
+          })
+      }
     }
   }
 }

@@ -4,7 +4,7 @@ import Router from 'vue-router'
 Vue.use(Router)
 
 /* Layout */
-// import Layout from '../views/layout/Layout'
+import Layout from '../views/layout/Layout'
 
 /**
 * hidden: true                   if `hidden:true` will not show in the sidebar(default is false)
@@ -49,24 +49,24 @@ export const constantRouterMap = [{
       import ('@/views/scglxt/jsgl/ddDetail.vue'),
     hidden: true
   },
-  // {
-  //   path: '/',
-  //   component: Layout,
-  //   redirect: '/dashboard',
-  //   hidden: true,
-  //   children: [
-  //     {
-  //       path: '/dashboard',
-  //       name: 'dashboard',
-  //       meta: {
-  //         title: '工作台',
-  //         icon: 'component'
-  //       },
-  //       component: () =>
-  //         import ('@/views/dashboard/index')
-  //     },
-  //   ]
-  // }
+  {
+    path: '/',
+    component: Layout,
+    redirect: '/dashboard',
+    hidden: true,
+    children: [
+      {
+        path: '/dashboard',
+        name: 'dashboard',
+        meta: {
+          title: '工作台',
+          icon: 'component'
+        },
+        component: () =>
+          import ('@/views/dashboard/index')
+      },
+    ]
+  }
 ]
 
 export default new Router({

@@ -482,7 +482,7 @@ export default {
   }
 };
 </script>
-<style>
+<style lang="scss">
 .toolbar {
   /* text-align: right; */
   padding-top: 10px;
@@ -496,6 +496,12 @@ export default {
   text-align: right;
   display: flex;
   justify-content: space-between;
+}
+.el-table{
+   // 表头不对齐bug
+    .gutter {
+      display: table-cell !important;
+    }
 }
 .el-table--striped .el-table__body tr.el-table__row--striped td {
   background: #f5f4f4;

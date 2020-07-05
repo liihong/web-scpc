@@ -30,7 +30,7 @@ exports.cache = {
 exports.model = {
   type: 'mysql',
   common: {
-    logConnect: isDev,  
+    logConnect: isDev,
     logSql: isDev,
     logger: msg => think.logger.info(msg)
   },
@@ -40,13 +40,13 @@ exports.model = {
     // prefix: 'cms_',
     encoding: 'utf8',
     // host: '127.0.0.1',
-    host: '223.72.116.212',
+    host: '223.72.9.132',
     port: '12304',
     // port:'3306',
     user: 'root',
     password: 'root@123',
     dateStrings: true
-  },
+  }
 };
 
 exports.websocket = {
@@ -57,15 +57,15 @@ exports.websocket = {
   socketio: {
     handle: socketio,
     // allowOrigin: '',  // 默认所有的域名都允许访问
-    path: '/socket.io',             // 默认 '/socket.io'
-    adapter: null,                  // 默认无 adapter
+    path: '/socket.io', // 默认 '/socket.io'
+    adapter: null, // 默认无 adapter
     messages: {
       open: '/websocket/open',
-      close: '/websocket/close',     // 关闭连接时处理的 Action
+      close: '/websocket/close', // 关闭连接时处理的 Action
       getTableData: '/websocket/getTableData'
     }
   }
-}
+};
 
 /**
  * session adapter config
