@@ -1,58 +1,68 @@
 <template>
   <div class="resEdit">
-    <el-dialog
-      append-to-body
-      width="65%"
-      size="small"
-      :title="optionList[optionType] + 'BOM'"
-      :visible.sync="dialogState.show"
-      :close-on-click-modal="false"
-    >
-      <el-form class="form" :rules="rules" ref="rulesForm" :model="formData" label-width="120px">
+    <el-dialog append-to-body
+               width="65%"
+               size="small"
+               :title="optionList[optionType] + 'BOM'"
+               :visible.sync="dialogState.show"
+               :close-on-click-modal="false">
+      <el-form class="form"
+               :rules="rules"
+               ref="rulesForm"
+               :model="formData"
+               label-width="120px">
         <el-col :span="12">
-          <el-form-item prop="ZDDMC" label="零件名称">
-            <el-input @blur="getBYKC" v-model="formData.ZDDMC" placeholder="零件名称"></el-input>
+          <el-form-item prop="ZDDMC"
+                        label="零件名称">
+            <el-input @blur="getBYKC"
+                      v-model="formData.ZDDMC"
+                      placeholder="零件名称"></el-input>
           </el-form-item>
         </el-col>
         <el-col :span="12">
-          <el-form-item prop="SSDD" label="所属订单">
-            <el-select filterable v-model="formData.SSDD" placeholder="所属订单">
-              <el-option
-                v-for="(item,key) in dropDownListData['ssdd']"
-                :key="key"
-                :label="item.NAME"
-                :value="item.id"
-              ></el-option>
+          <el-form-item prop="SSDD"
+                        label="所属订单">
+            <el-select filterable
+                       v-model="formData.SSDD"
+                       placeholder="所属订单">
+              <el-option v-for="(item,key) in dropDownListData['ssdd']"
+                         :key="key"
+                         :label="item.NAME"
+                         :value="item.id"></el-option>
             </el-select>
           </el-form-item>
         </el-col>
         <el-col :span="12">
-          <el-form-item prop="JGSL" label="加工数量">
-            <el-input-number
-              v-if="formData.ZDDZT =='0501'"
-              :controls="false"
-              v-model="formData.JGSL"
-              :min="1"
-              label="加工数量"
-            ></el-input-number>
+          <el-form-item prop="JGSL"
+                        label="加工数量">
+            <el-input-number v-if="formData.ZDDZT =='0501' || optionType!= 'edit'"
+                             :controls="false"
+                             v-model="formData.JGSL"
+                             :min="1"
+                             label="加工数量"></el-input-number>
             <span v-else>{{formData.JGSL}} (订单已开始加工，不能修改加工数量)</span>
-            <span style="color:red;" v-if="dialogByk.sysl!=0&&dialogByk.isAdd">已使用备用库存 {{dialogByk.sysl}} 件</span>
+            <span style="color:red;"
+                  v-if="dialogByk.sysl!=0&&dialogByk.isAdd">已使用备用库存 {{dialogByk.sysl}} 件</span>
           </el-form-item>
         </el-col>
         <el-col :span="12">
-          <el-form-item prop="ZDDCZ" label="材质">
-            <el-select @change="changeCZ" filterable v-model="formData.ZDDCZ" placeholder="材质">
-              <el-option
-                v-for="(item,key) in dropDownListData['clmc']"
-                :key="key"
-                :label="item.name"
-                :value="item.id"
-              ></el-option>
+          <el-form-item prop="ZDDCZ"
+                        label="材质">
+            <el-select @change="changeCZ"
+                       filterable
+                       v-model="formData.ZDDCZ"
+                       placeholder="材质">
+              <el-option v-for="(item,key) in dropDownListData['clmc']"
+                         :key="key"
+                         :label="item.name"
+                         :value="item.id"></el-option>
             </el-select>
           </el-form-item>
         </el-col>
         <el-col :span="12">
-          <el-form-item prop="CLXZ" @change="changeRaido" label="材料形状">
+          <el-form-item prop="CLXZ"
+                        @change="changeRaido"
+                        label="材料形状">
             <el-radio-group v-model="formData.CLXZ">
               <el-radio :label="1">长方体</el-radio>
               <el-radio :label="2">圆柱体</el-radio>
@@ -61,108 +71,114 @@
           </el-form-item>
         </el-col>
         <el-col :span="12">
-          <el-form-item prop="CLTJ" label="材料体积">
-            <el-input style="width: 88%;" placeholder="材料体积" v-model="formData.CLTJ"></el-input>
+          <el-form-item prop="CLTJ"
+                        label="材料体积">
+            <el-input style="width: 88%;"
+                      placeholder="材料体积"
+                      v-model="formData.CLTJ"></el-input>
           </el-form-item>
         </el-col>
         <el-col :span="24">
-          <el-form-item prop="CLDX" label="材料大小">
+          <el-form-item prop="CLDX"
+                        label="材料大小">
             <template>
-              <el-col v-if="formData.CLXZ == 1" :span="8">
+              <el-col v-if="formData.CLXZ == 1"
+                      :span="8">
                 <span>长(mm)</span>
-                <el-input-number
-                  @blur="calculateVolume"
-                  size="mini"
-                  :controls="false"
-                  v-model="volume.l"
-                  :min="0"
-                ></el-input-number>
+                <el-input-number @blur="calculateVolume"
+                                 size="mini"
+                                 :controls="false"
+                                 v-model="volume.l"
+                                 :min="0"></el-input-number>
               </el-col>
-              <el-col v-if="formData.CLXZ == 1" :span="8">
+              <el-col v-if="formData.CLXZ == 1"
+                      :span="8">
                 <span>宽(mm)</span>
-                <el-input-number
-                  @blur="calculateVolume"
-                  size="mini"
-                  :controls="false"
-                  v-model="volume.w"
-                  :min="0"
-                ></el-input-number>
+                <el-input-number @blur="calculateVolume"
+                                 size="mini"
+                                 :controls="false"
+                                 v-model="volume.w"
+                                 :min="0"></el-input-number>
               </el-col>
-              <el-col v-if="formData.CLXZ == 2" :span="12">
+              <el-col v-if="formData.CLXZ == 2"
+                      :span="12">
                 <span>直径(mm)</span>
-                <el-input-number
-                  @blur="calculateVolume"
-                  size="mini"
-                  :controls="false"
-                  v-model="volume.d"
-                  :min="0"
-                ></el-input-number>
+                <el-input-number @blur="calculateVolume"
+                                 size="mini"
+                                 :controls="false"
+                                 v-model="volume.d"
+                                 :min="0"></el-input-number>
               </el-col>
-              <el-col v-if="formData.CLXZ !== 3" :span="8">
+              <el-col v-if="formData.CLXZ !== 3"
+                      :span="8">
                 <span>高(mm)</span>
-                <el-input-number
-                  @blur="calculateVolume"
-                  size="mini"
-                  :controls="false"
-                  v-model="volume.h"
-                  :min="0"
-                ></el-input-number>
+                <el-input-number @blur="calculateVolume"
+                                 size="mini"
+                                 :controls="false"
+                                 v-model="volume.h"
+                                 :min="0"></el-input-number>
               </el-col>
-               <el-col v-if="formData.CLXZ == 3" :span="8">
-                <el-input placeholder="材料大小" v-model="formData.CLDX"></el-input>
-               </el-col>
+              <el-col v-if="formData.CLXZ == 3"
+                      :span="8">
+                <el-input placeholder="材料大小"
+                          v-model="formData.CLDX"></el-input>
+              </el-col>
             </template>
           </el-form-item>
         </el-col>
         <el-col :span="12">
-          <el-form-item prop="BLJS" label="备料件数">
-            <el-input-number size="mini" v-model="formData.BLJS" :min="0" placeholder="备料件数"></el-input-number>
+          <el-form-item prop="BLJS"
+                        label="备料件数">
+            <el-input-number size="mini"
+                             v-model="formData.BLJS"
+                             :min="0"
+                             placeholder="备料件数"></el-input-number>
           </el-form-item>
         </el-col>
         <el-col :span="12">
-          <el-form-item prop="CLJE" label="材料金额">
-            <el-input v-model="formData.CLJE" placeholder="材料金额"></el-input>
+          <el-form-item prop="CLJE"
+                        label="材料金额">
+            <el-input v-model="formData.CLJE"
+                      placeholder="材料金额"></el-input>
           </el-form-item>
         </el-col>
         <el-col :span="12">
-          <el-form-item prop="STARTTIME" label="开始时间">
-            <el-date-picker
-              value-format="yyyy-MM-dd"
-              v-model="formData.STARTTIME"
-              type="date"
-              placeholder="开始时间"
-            ></el-date-picker>
+          <el-form-item prop="STARTTIME"
+                        label="开始时间">
+            <el-date-picker value-format="yyyy-MM-dd"
+                            v-model="formData.STARTTIME"
+                            type="date"
+                            placeholder="开始时间"></el-date-picker>
           </el-form-item>
         </el-col>
         <el-col :span="12">
-          <el-form-item prop="ENDTIME" label="结束时间">
-            <el-date-picker
-              value-format="yyyy-MM-dd"
-              v-model="formData.ENDTIME"
-              type="date"
-              placeholder="结束时间"
-            ></el-date-picker>
+          <el-form-item prop="ENDTIME"
+                        label="结束时间">
+            <el-date-picker value-format="yyyy-MM-dd"
+                            v-model="formData.ENDTIME"
+                            type="date"
+                            placeholder="结束时间"></el-date-picker>
           </el-form-item>
         </el-col>
         <el-col :span="24">
-          <el-form-item prop="BMCL" label="表面处理">
-            <el-input v-model="formData.BMCL" placeholder="表面处理"></el-input>
+          <el-form-item prop="BMCL"
+                        label="表面处理">
+            <el-input v-model="formData.BMCL"
+                      placeholder="表面处理"></el-input>
           </el-form-item>
         </el-col>
         <el-col :span="12">
-          <el-form-item prop="DDTZ" label="选择图纸">
-            <el-select v-model="formData.DDTZ" placeholder="请选择">
-              <el-option
-                v-for="(item,i) in dropDownListData['tz']"
-                :key="i"
-                :label="item.tzmc"
-                :value="item.id"
-              >
+          <el-form-item prop="DDTZ"
+                        label="选择图纸">
+            <el-select v-model="formData.DDTZ"
+                       placeholder="请选择">
+              <el-option v-for="(item,i) in dropDownListData['tz']"
+                         :key="i"
+                         :label="item.tzmc"
+                         :value="item.id">
                 <span style="float: left">{{ item.tzmc }}</span>
-                <span
-                  @click="showImage(item)"
-                  style="float: right; color: #8492a6; font-size: 13px"
-                >
+                <span @click="showImage(item)"
+                      style="float: right; color: #8492a6; font-size: 13px">
                   <i class="el-icon-zoom-in"></i>
                 </span>
               </el-option>
@@ -170,12 +186,16 @@
           </el-form-item>
         </el-col>
       </el-form>
-      <el-col :span="24" :offset="9" class="footer">
-        <el-button type="primary" @click="onSave">保存</el-button>
+      <el-col :span="24"
+              :offset="9"
+              class="footer">
+        <el-button type="primary"
+                   @click="onSave">保存</el-button>
         <el-button @click="onCancel">取消</el-button>
       </el-col>
     </el-dialog>
-    <selectByk :dialogState="dialogByk" :data="dialogState.data" />
+    <selectByk :dialogState="dialogByk"
+               :data="dialogState.data" />
   </div>
 </template>
 <script>
@@ -251,7 +271,7 @@ export default {
   },
   methods: {
     getBYKC() {
-      if (this.formData.ZDDMC.length > 0) {
+      if (this.formData.ZDDMC && this.formData.ZDDMC!= '') {
         this.$ajax
           .post(this.$api.getBOMBykc, { name: this.formData.ZDDMC })
           .then(res => {
@@ -374,7 +394,8 @@ export default {
     },
     // 获取表单数据，如果是编辑进行数据回填
     getFormData() {
-      this.primaryKey.id = this.resId;
+      return new Promise((resolve,reject) => {
+      this.primaryKey.id = this.resId;  
       this.$ajax
         .get(this.$api.queryDataById, {
           tableId: this.tableId,
@@ -397,8 +418,13 @@ export default {
               this.volume.h = dx[1];
             }
             this.changeCZ(this.formData.ZDDCZ);
+            resolve()
           }
+        }).catch(()=>{
+          reject()
         });
+      })
+      
     },
     // 获取数据字典数据
     getSjzdData(attr, sql) {
@@ -414,10 +440,13 @@ export default {
   watch: {
     dialogState: {
       deep: true,
-      handler() {
+      async handler() {
         if (this.dialogState.show) {
           if (this.optionType == "edit" || this.optionType == "copy") {
-            this.getFormData();
+            await this.getFormData();
+            if(this.optionType == 'copy') {
+              this.getBYKC()
+            }
           } else {
             let obj = {
               ID: this.$util.getUUId(),
@@ -472,7 +501,7 @@ export default {
   height: 100%;
   display: inline-block;
   &:after {
-    content: ".";
+    content: '.';
     display: block;
     height: 0;
     clear: both;

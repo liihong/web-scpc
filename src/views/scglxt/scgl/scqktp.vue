@@ -1,174 +1,170 @@
 <template>
-  <div class="zjgl">
-    <!--工具条-->
-    <el-col :span="24" class="toolbar">
-      <el-input @keyup.enter.native="queryData" style="width:200px;" size="small" v-model="query.queryKey" placeholder="模糊查询"></el-input>
-      <el-button size="mini" @click="queryData" type="primary">查询</el-button>
-      <el-button size="mini" @click="lookDDWorking" type="primary">订单生产实时看板</el-button>
-    </el-col>
-    <el-table class="el-table" @expand-change="expandChange" :data="ddList" stripe border style="width: 100%;">
-      <el-table-column fixed="left" label="操作" min-width="50" align="center">
-        <template slot-scope="scope">
-          <el-button-group size="mini">
-            <el-button size="mini" type="primary" @click="exportZj(scope.row)">导出</el-button>
-            <!-- <el-button size="mini" type="primary" @click="editBomRow(scope.row)">编辑</el-button> -->
-            <!-- <el-button size="mini" type="danger" @click="handleDelete(scope.row)">删除</el-button> -->
-          </el-button-group>
-        </template>
-      </el-table-column>
-      <el-table-column type="expand">
-        <template slot-scope="props">
-          <el-table stripe ref="bomTable" :data="props.row.bomList">
-            <el-table-column :align="el.align ? el.align : 'center'" v-for="(el,index) in zjColumns" :key="index" :prop="el.id" :label="el.name" :min-width="(el.length != '')?el.length:150">
-              <template slot-scope="scope">
-                <div v-if="el.id == 'ddjd'" v-html="scope.row[el.id]"></div>
-                <el-date-picker style="width:150px;" v-else-if="el.id == 'endtime'" size="mini" v-model="scope.row[el.id]" type="date" placeholder="选择结束日期">
-                </el-date-picker>
-                <span v-else>{{scope.row[el.id]}}</span>
-              </template>
-            </el-table-column>
-          </el-table>
-        </template>
-      </el-table-column>
-      <el-table-column v-for="(el,index) in columnDatas" :key="index" :prop="el.id" align="center" :fixed="(el.frozen == 1?'left':false)" :label="el.name" :min-width="(el.length != '')?el.length:150">
-        <template slot-scope="scope">
-          <el-tag v-if="el.id == 'DDLEVEL'" effect='dark' :type="scope.row.DDLEVEL == '0402' ? 'warning' : scope.row.DDLEVEL == '0403' ? '' : 'danger'">{{scope.row.DDLEVEL_TEXT}}</el-tag>
-          <span v-else>{{scope.row[el.id]}}</span>
-        </template>
-      </el-table-column>
-    </el-table>
-    <el-pagination style="text-align:center;" background @current-change="handleCurrentChange" :current-page="query.pageNumber" :page-sizes="[10, 20, 30, 50]" :page-size="query.pageSize" layout="total, sizes, prev, pager, next, jumper" :total="query.total" @size-change="sizeChange">
-    </el-pagination>
+  <div class="scqktp scqktp-main">
+    <el-tabs v-model="activeName"
+             tab-position="left">
+      <el-tab-pane label="1.定制实时看板内容"
+                   name="first">
+        <el-transfer v-model="myArray"
+                     filterable
+                     :props="{
+                      key: 'id',
+                      label: 'xmname'
+                    }"
+                     :titles="['当前进行中订单', '实时看板']"
+                     :data="sourceTree">
+          <span slot-scope="{ option }">{{ option.xmname }} {{ option.mark==null ? ''  : `(${option.mark})`}}</span>
+
+          <el-button class="transfer-footer"
+                     slot="right-footer"
+                     type="primary"
+                     @click="handlerSaveConfig"
+                     size="small">保存</el-button>
+        </el-transfer>
+      </el-tab-pane>
+      <el-tab-pane label="2.对订单进行排序"
+                   name="second">
+        <div class="scqktp-table">
+          <span>注意：点击拖动下列订单列表进行排序
+             <el-button class="transfer-footer"
+                     style="margin-left:200px;"
+                     size="mini"
+                     type="primary"
+                     @click="handlerSaveDdOrder"
+                     >排序完成，点击保存</el-button>
+              <el-button size="mini"
+                   @click="lookDDWorking"
+                   type="primary">查看实时看板</el-button>
+          </span>
+         <div class="scqktp-table-list__header">
+              <span style="flex:0.3">订单名称</span>
+              <span style="flex:0.4">结束时间</span>
+              <span style="flex:0.3">备注</span>
+            </div>
+          <ul class="scqktp-table-list"
+              id="scqktp-table-list">
+            <li class="scqktp-table-list__item"
+                v-for="item in customData"
+                :key="item.id">
+              <div class="scqktp-table-list__item-span">
+                <span style="flex:0.3">{{item.xmname}}</span>
+                <span style="flex:0.3">{{item.endtime}}</span>
+                <span style="flex:0.4">{{item.mark}}</span>
+              </div>
+
+            </li>
+          </ul>
+        </div>
+      </el-tab-pane>
+    </el-tabs>
   </div>
 </template>
 
 <script>
-import ResTreeList from '@/views/resMgr/ResTreeList'
+import draggable from 'vuedraggable'
+import Sortable from 'sortablejs'
+
 export default {
-  name: 'scqktp',
   components: {
-    ResTreeList
+    draggable
   },
+  name: 'scqktp',
   data() {
     return {
-      dialogState: {
-        show: false,
-        type: 'add',
-        formData: {
-          id: this.$util.getUUId(),
-          zjmc: ''
-        }
-      },
-      ddList: [],
-      tableId: '0117',
-      zjColumns: [
-        {
-          id: 'zddmc',
-          name: '零件名称'
-        },
-        {
-          id: 'zddztmc',
-          name: 'BOM状态'
-        },
-        {
-          id: 'starttime',
-          name: '开始时间'
-        },
-        {
-          id: 'endtime',
-          name: '结束时间',
-          length: 150
-        },
-        {
-          id: 'jgsl',
-          name: '加工数量',
-          length: 80
-        },
-        {
-          id: 'ddjd',
-          name: '订单进度(报废件数/已加工件数/可加工件数)',
-          align: 'left',
-          length: 200
-        }
-      ],
-      activeRow: {},
-      columnDatas: [
-        {
-          id: 'XMNAME',
-          name: '订单名称'
-        },
-        {
-          id: 'DDLEVEL',
-          name: '订单级别'
-        },
-        {
-          id: 'STARTTIME',
-          name: '开始时间'
-        },
-        {
-          id: 'ENDTIME',
-          name: '结束时间'
-        }
-      ],
-      query: {
-        pageSize: 10,
-        pageNumber: 1,
-        total: 0
-      }
+      activeName: 'first',
+      myArray: [],
+      sourceTree: [],
+      customData: []
     }
   },
-  mounted() {
-    let _this = this
+  async mounted() {
     this.initData()
-
-    this.$socket.on('getTableData', () => {
-      _this.initData()
-    })
+    this.getData()
+    await this.$nextTick()
+    this.rowDrop()
   },
   methods: {
     async initData() {
-      let res = await this.$ajax.post(this.$api.getWorkingDDList, this.query)
-      if (res.errno == 0) {
-        this.ddList = res.data.data.map(item => {
-          item.bomList = []
-          return item
-        })
-        this.query.total = res.data.count
-      }
+      this.$ajax.post(this.$api.getDDWorkSpeed,{
+        isCustom: true
+      }).then(res => {
+        if (res.errno == 0) {
+          this.sourceTree = res.data
+        }
+      })
     },
-    queryData(){
-      this.query.pageNumber = 1
-      this.initData()
+    getData() {
+      this.$ajax.get(this.$api.getCustomDDWorkData).then(res => {
+        if (res.errno == 0) {
+          this.customData = res.data
+          if (res.data.length > 0) {
+            this.customData.map(item => {
+              this.myArray.push(item.id)
+            })
+          }
+        }
+      })
     },
-    //翻页
-    handleCurrentChange(page) {
-      this.query.pageNumber = page
-      this.initData()
-    },
-    sizeChange(size) {
-      this.query.pageNumber = 1
-      this.query.pageSize = size
-      this.initData()
-    },
-    // 展开执行
-    expandChange(row) {
-      this.activeRow = row
-      this.getData(row)
-    },
-    getData(row) {
+    handlerSaveConfig() {
       this.$ajax
-        .post(this.$api.BOMSpeedProgress, {
-          ssdd: row.ID
+        .post(this.$api.setDDWorkData, {
+          ids: this.myArray
         })
         .then(res => {
           if (res.errno == 0) {
-            row.bomList = res.data
+            this.getData()
+            this.$message.success('保存成功，可进行排序！')
+          }
+        })
+    },
+    handlerSaveDdOrder() {
+      const form = this.customData.map((item, index) => {
+        return {
+          id: item.id,
+          ddorder: index * 1 + 1
+        }
+      })
+      this.$ajax
+        .post(this.$api.setDdOrderData, {
+          form: form
+        })
+        .then(res => {
+          if (res.errno == 0) {
+            this.getData()
+            this.$message.success('排序成功，可查看实时看板信息！')
           }
         })
     },
     //查看订单实时看板
     lookDDWorking() {
       window.open('/dd-working')
+    },
+    //行拖拽
+    rowDrop() {
+      var _this = this
+      var $ul = document.getElementById('scqktp-table-list')
+      new Sortable($ul, {
+        onUpdate: function(event) {
+          //修改items数据顺序
+          var newIndex = event.newIndex,
+            oldIndex = event.oldIndex,
+            $li = $ul.children[newIndex],
+            $oldLi = $ul.children[oldIndex]
+          // 先删除移动的节点
+          $ul.removeChild($li)
+          // 再插入移动的节点到原有节点，还原了移动的操作
+          if (newIndex > oldIndex) {
+            $ul.insertBefore($li, $oldLi)
+          } else {
+            $ul.insertBefore($li, $oldLi.nextSibling)
+          }
+          // 更新items数组
+          const item = _this.customData.splice(oldIndex, 1)
+          console.log(item)
+          _this.customData.splice(newIndex, 0, item[0])
+          // 下一个tick就会走patch更新
+        },
+        animation: 150
+      })
     }
   },
   watch: {
@@ -176,9 +172,69 @@ export default {
   }
 }
 </script>
-<style>
-.toolbar {
-  margin-bottom: 15px;
-  display: flex;
+<style lang="scss">
+.scqktp {
+  &-main {
+    margin: 20px;
+    &-box {
+      border: 1px solid gray;
+      &__list-item {
+        position: relative;
+        display: block;
+        cursor: move;
+        padding: 0.75rem 1.25rem;
+        margin-bottom: -1px;
+        background-color: #fff;
+        border: 1px solid rgba(0, 0, 0, 0.125);
+        &:first-child {
+          border-top-left-radius: 0.25rem;
+          border-top-right-radius: 0.25rem;
+        }
+      }
+    }
+  }
+  &-table {
+    width: 700px;
+    margin:10px;
+    &-list {
+      &__header{
+        height: 40px;
+        line-height: 40px;
+        background: #F5F7FA;
+        margin: 0;
+        padding-left: 15px;
+        border-top: 1px solid #EBEEF5;
+        border-left: 1px solid #EBEEF5;
+        border-right: 1px solid #EBEEF5;
+        display: flex;
+        justify-content: space-around;
+        -webkit-box-sizing: border-box;
+        box-sizing: border-box;
+        color: #000000;
+        font-weight: 600;
+      }
+      &__item {
+        position: relative;
+        display: block;
+        padding: 0.75rem 1.25rem;
+        margin-bottom: -1px;
+        background-color: #fff;
+        border: 1px solid rgba(0, 0, 0, 0.125);
+        &-span {
+          display: flex;
+          justify-content: space-between;
+        }
+      }
+      // li:nth-child(odd){ background:#c1cacc;}
+      li:nth-child(even){ background:#f4f5f7;}
+      &:first-child {
+        border-top-left-radius: 0.25rem;
+        border-top-right-radius: 0.25rem;
+      }
+    }
+  }
+  .el-transfer-panel {
+    width: 400px;
+  }
 }
 </style>

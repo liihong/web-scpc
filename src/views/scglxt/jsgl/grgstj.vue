@@ -60,6 +60,7 @@
                            align="center"
                            v-for="(el,index) in item.peopleList"
                            :key="index"
+                           width="60px"
                            :label="el.rymc"></el-table-column>
         </el-table-column>
       </template>

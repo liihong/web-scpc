@@ -158,7 +158,7 @@ export default {
           this.isSureScrap = false;
           this.dialogState.show = false
           this.$message.success(`成功报废零件!`);
-          this.$parent.bflist.getResList();
+          this.$parent.$refs.bflist.getResList();
         }
       });
     }

@@ -47,7 +47,10 @@ let api = {
     updateEndTime: 'scglxt/ddgl/updateEndTime',
     getDDKhxxById:'scglxt/ddgl/getDDKhxxById',
     updateAllDdBLZT: 'scglxt/ddgl/updateAllDdBLZT',//修改订单所有零件备料状态
-
+    setDDWorkData: 'scglxt/ddgl/setDDWorkData', // 定制实时看板的订单信息
+    getCustomDDWorkData: 'scglxt/ddgl/getCustomDDWorkData', //获取定制的订单信息
+    setDdOrderData: 'scglxt/ddgl/setDdOrderData',// 订单排序
+    
     //获取订单BOM信息
     getDdBOMData: 'scglxt/ddgl/getDdBOMData',
     getDdMark:'scglxt/ddgl/getDdMark',
@@ -90,6 +93,7 @@ let api = {
     getGyByBzId: 'scglxt/gybz/getGyByBzId',
     addGyBzMany: 'scglxt/gybz/addGyBzMany',
     getGyBzList: 'scglxt/gybz/getGyBzList',
+    addBzGyByBomId: 'scglxt/gybz/addBzGyByBomId',
 
     beginWork: 'scglxt/gygx/beginWork',
     overWork: 'scglxt/gygx/overWork',

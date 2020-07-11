@@ -12,13 +12,12 @@
       <el-table
         id="out-table"
         class="working-table"
-        height="500px"
         :cell-class-name="getCellStyle"
         header-cell-class-name="header-style"
         :data="tableData"
       >
         <el-table-column type="index" width="25" align="center"></el-table-column>
-        <el-table-column min-width="150" prop="xmname" label="项目名称" align="center">
+        <el-table-column min-width="200" prop="xmname" label="项目名称" align="left">
           <template slot-scope="scope">
             <router-link
               style="color:#48b884;"
@@ -27,9 +26,9 @@
             >{{scope.row.xmname}}</router-link>
           </template>
         </el-table-column>
-        <el-table-column min-width="150" prop="mark" label="标注" align="center"></el-table-column>
-        <el-table-column min-width="100" prop="starttime" label="开始时间" align="center"></el-table-column>
-        <el-table-column min-width="100" prop="endtime" label="结束时间" align="center">
+        <el-table-column min-width="250" prop="mark" label="标注" align="left"></el-table-column>
+        <el-table-column min-width="110" prop="starttime" label="开始时间" align="center"></el-table-column>
+        <el-table-column min-width="110" prop="endtime" label="结束时间" align="center">
           <template slot-scope="scope">
             <span :class="checkTime(scope.row['endtime'])?'': 'red'">
               {{scope.row['endtime']}}
@@ -264,8 +263,15 @@ export default {
 .dd-working {
   background: #00233a;
   overflow: hidden;
+  // 表头不对齐bug
+    .gutter {
+      display: table-cell !important;
+    }
   .working {
     padding: 20px;
+  }
+  .header-style{
+    border-bottom: 0 !important;
   }
 }
 .header-button {

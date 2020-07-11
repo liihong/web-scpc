@@ -5,9 +5,9 @@
       <!-- <router-view :key="key"></router-view> -->
       <!-- <router-view :route="$route" /> -->
       <keep-alive v-if="$route.meta.keepAlive">
-        <router-view  :route="$route"></router-view>
+        <router-view  :key="key" :route="$route"></router-view>
       </keep-alive>
-      <router-view v-else :route="$route"></router-view>
+      <router-view v-else  :key="key" :route="$route"></router-view>
     </transition>
   </section>
 </template>
