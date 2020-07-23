@@ -292,7 +292,6 @@ export default {
     },
     //新增按钮
     handleAdd() {
-      console.log(this.$parent.handleAdd);
       if (
         this.noEdit &&
         this.$parent.handleAdd &&
@@ -478,7 +477,14 @@ export default {
       }
       this.getConfig();
       this.getResList();
-    }
+    },
+    "query.ID"() {
+      if (this.query != undefined) {
+        this.queryParams.query = this.query;
+      }
+      this.getConfig();
+      this.getResList();
+    },
   }
 };
 </script>

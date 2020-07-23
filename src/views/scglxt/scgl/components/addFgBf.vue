@@ -142,6 +142,10 @@ export default {
     },
     //手工报废
     onManualScrap() {
+      if(this.selectRows.length == 0) {
+        this.$message({message:'请打钩选择报废工艺！',type:'warning'})
+        return
+      }
       this.isSureScrap = true;
     },
     sureManualScrap(isAdd) {
@@ -149,6 +153,7 @@ export default {
       if (isAdd) {
         params.isAdd = 1;
       }
+      
       params.jggl = this.selectRows[0];
       params.bomid = this.query.BOMID
       this.$ajax.post(this.$api.sureManualScrap, params).then(res => {

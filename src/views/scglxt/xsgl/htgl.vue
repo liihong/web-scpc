@@ -89,7 +89,7 @@ export default {
       return this.$store.getters.roles;
     }
   },
-  mounted(){
+  activated(){
     if(this.$route.query){
       this.query = this.$route.query
     }
@@ -179,6 +179,10 @@ export default {
           this.$message.addError(res.errmsg);
         }
       });
+    }
+  },
+  watch:{
+    query(){
     }
   }
 };

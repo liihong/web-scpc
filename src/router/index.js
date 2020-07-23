@@ -49,24 +49,33 @@ export const constantRouterMap = [{
       import ('@/views/scglxt/jsgl/ddDetail.vue'),
     hidden: true
   },
-  // {
-  //   path: '/',
-  //   component: Layout,
-  //   redirect: '/dashboard',
-  //   hidden: true,
-  //   children: [
-  //     {
-  //       path: '/dashboard',
-  //       name: 'dashboard',
-  //       meta: {
-  //         title: '工作台',
-  //         icon: 'component'
-  //       },
-  //       component: () =>
-  //         import ('@/views/dashboard/index')
-  //     },
-  //   ]
-  // }
+  {
+    path: '/layout',
+    component: Layout,
+    hidden: true,
+    children: [
+      {
+        path: '/dashboard',
+        name: 'dashboard',
+        meta: {
+          title: '工作台',
+          icon: 'component'
+        },
+        component: () =>
+          import ('@/views/dashboard/index')
+      },
+      {
+        path: '/personal',
+        name: 'personal',
+        meta: {
+          title: '个人中心',
+          icon: 'component'
+        },
+        component: () =>
+          import ('@/views/scglxt/jbxx/personal/index')
+      },
+    ]
+  }
 ]
 
 export default new Router({

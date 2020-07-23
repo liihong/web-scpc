@@ -86,6 +86,7 @@ export default {
     },
     // 结束加工
     endWork(row) {
+      this.overState.gynr = row.GYNR
       this.overState.gyid = row.ID
       this.overState.worker = row.CZRYID
       this.overState.kjgjs = row.DJGJS * 1

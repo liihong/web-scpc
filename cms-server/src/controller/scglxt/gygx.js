@@ -340,11 +340,10 @@ module.exports = class extends Base {
       sbid,
       jgjs,
       ddjs,
-      kjgjs,
-      worker
+      worker,
+      gynr
     } = this.post();
 
-    // let worker = this.header('token')
     const jgjlData = {
       jgjssj: util.getNowTime(),
       jgjs: jgjs,
@@ -352,7 +351,7 @@ module.exports = class extends Base {
     };
 
     try {
-      const updateData = await this.model('scglxt_t_jggl').where({
+      await this.model('scglxt_t_jggl').where({
         gygcid: gyid,
         jgryid: worker,
         jgjssj: null
@@ -365,29 +364,18 @@ module.exports = class extends Base {
         id: gyid
       }).update({
         sjjs: parseFloat(jgjs) + parseFloat(oldSjjs)
-        // czryid: null
       });
 
       const gygcData = await this.model('scglxt_t_gygc').where({
         id: gyid
       }).find();
-
-      if (ddjs != (gygcData.yjgjs + gygcData.sjjs)) // 如果加工未完成自动再开始一条加工记录
-      {
+      // 如果加工未完成自动再开始一条加工记录
+      if (ddjs !== (gygcData.yjgjs + gygcData.sjjs)) {
         await this.model('scglxt_t_gygc').where({
           id: gyid
         }).update({
           czryid: null
         });
-
-        // let jgjlData = {
-        //     id: util.getUUId(),
-        //     jgryid: worker,
-        //     jgkssj: util.getNowTime(),
-        //     gygcid: gyid
-        // }
-
-        // await this.model('scglxt_t_jggl').add(jgjlData)
       } else {
         const updateInfo = {
           status: 2,
@@ -404,15 +392,27 @@ module.exports = class extends Base {
         }).update(updateInfo);
       }
 
+      // 操作完成后判断该工序是否是最后一道工序，并且免检
+      const nextData = await this.model('scglxt_t_gygc').where({bomid: gygcData.bomid, serial: gygcData.serial + 1}).select();
+      if (nextData.length === 0) {
+        const gyInfo = await this.model('scglxt_t_jggy').where({id: gynr}).find();
+        if (gyInfo.gxsx !== '' && gyInfo.gxsx != null) {
+          await this.model('scglxt_t_bom').where({id: gygcData.bomid}).update({
+            zddzt: gyInfo.gxsx
+          });
+        }
+      }
+
       return this.success(bomData, '操作成功');
     } catch (ex) {
       const errorLog = {
         id: util.getUUId(),
-        type: '结束加工',
+        type: '结束加工出错',
         error: JSON.stringify(ex),
         infos: JSON.stringify(this.post())
       };
       await this.model('operate_log').add(errorLog);
+      return this.fail('加工出错，请稍后重试');
     }
   }
 
@@ -903,7 +903,6 @@ module.exports = class extends Base {
     const dhyy = this.post('dhyy');
     const isAdd = this.post('isAdd');
 
-    console.log(this.post());
     const bomData = await this.model('scglxt_t_bom').where({
       id: bomid
     }).find();
@@ -991,7 +990,7 @@ module.exports = class extends Base {
     }
 
     // 如果需要生成新的加工单，则自动录入数据
-    if (isAdd === '1') {
+    if (isAdd === 1) {
       const newbomid = util.getUUId();
 
       bomData.id = newbomid;

@@ -8,6 +8,7 @@
       </div>
       <div>
         <el-button type="primary" @click="exportExecel">导出表格</el-button>
+        <el-button type="primary" @click="queryWeek">本周</el-button>
       </div>
       <el-table
         id="out-table"
@@ -144,7 +145,7 @@ export default {
         return "cell-style";
       }
     },
-    initData() {
+    initData(isCustom = true) {
       this.$ajax.get(this.$api.getGygsPc).then(res => {
         if (res.errno == 0) {
           let xAxis = [],
@@ -157,7 +158,9 @@ export default {
           this.option.series[0].data = datas;
         }
       });
-      this.$ajax.get(this.$api.getDDWorkSpeed).then(res => {
+      this.$ajax.post(this.$api.getDDWorkSpeed,{
+        isCustom: isCustom
+      }).then(res => {
         if (res.errno == 0) {
           this.tableData = res.data;
           let sums = [],sums2= [],sums3= [];
@@ -197,6 +200,9 @@ export default {
           this.tableData.push(sums3)
         }
       });
+    },
+    queryWeek(){
+      this.initData(false)
     },
     cntzClick() {
       this.dialogState.show = true;

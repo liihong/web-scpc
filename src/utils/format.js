@@ -18,7 +18,7 @@ format.menuRouterData = function (menuData) {
         return doc.parentId != '0'
     });
 
-    parentArr.map((item, i) => {
+    parentArr.map((item) => {
         let routerObj = {
             path: item.resKey,
             meta: {
@@ -29,26 +29,6 @@ format.menuRouterData = function (menuData) {
             children: [],
             component: () =>
                 import ('@/views/layout/Layout.vue')
-        }
-        if (i == 0) {
-            router.addRoutes([{
-                path: '/',
-                redirect: '/' + childArr[0].resKey,
-                component: () =>
-                    import ('@/views/layout/Layout.vue'),
-                children: [{
-                    path: childArr[0].resKey,
-                    meta: {
-                        title: childArr[0].resName,
-                        icon: childArr[0].icon,
-                        keepAlive: true
-                    },
-                    hidden: true,
-                    name: childArr[0].resKey,
-                    component: () =>
-                        import (`@/views/${childArr[0].path}`)
-                }]
-            }])
         }
         childArr.forEach(child => {
             if (item.resId == child.parentId) {
@@ -68,6 +48,25 @@ format.menuRouterData = function (menuData) {
         })
         menuRouter.push(routerObj)
     })
+
+    router.addRoutes([{
+        path: '/',
+        redirect: '/' + childArr[0].resKey,
+        component: () =>
+            import ('@/views/layout/Layout.vue'),
+        children: [{
+            path: childArr[0].resKey,
+            meta: {
+                title: childArr[0].resName,
+                icon: childArr[0].icon,
+                keepAlive: true
+            },
+            hidden: true,
+            name: childArr[0].resKey,
+            component: () =>
+                import (`@/views/${childArr[0].path}`)
+        }]
+    }])
     return menuRouter
 }
 export function renderTreeData(result) {

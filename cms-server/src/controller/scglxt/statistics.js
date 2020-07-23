@@ -3,6 +3,7 @@
  */
 const Base = require('../base.js');
 const ddModel = 'scglxt_t_dd';
+
 module.exports = class extends Base {
   async indexAction() {
     const data = {
@@ -111,8 +112,9 @@ module.exports = class extends Base {
       whereObj = `1=1 and dd.id='` + query.ddid + `'`;
     }
     if (!query.isCustom) {
-      whereObj = ' dd.ddorder is not null ';
+      whereObj = ' dd.isshow=1 ';
     }
+
     const sql = `  
         SELECT
             dd.id,
@@ -138,5 +140,17 @@ module.exports = class extends Base {
     const data = await this.model().query(sql);
 
     return this.success(data);
+  }
+
+  // 获取当前登录用户当天的工作记录
+  async getPersonalDayAction() {
+    const token = this.header('token');
+
+    const data = await this.model('scglxt_t_jggl').where({jgryid: token}).select();
+
+    return this.success(data);
+  }
+
+  async exportPersonalStatAction() {
   }
 };

@@ -8,7 +8,8 @@ let api = {
     getGygsPc: 'scglxt/statistics/getGygsPc',
     getDDWorkSpeed: 'scglxt/statistics/getDDWorkSpeed',//获取订单动态工时
     getPeopleHour: 'scglxt/statistics/getPeopleHour', //工人工时统计
-    
+    exportPersonalStat: 'scglxt/statistics/exportPersonalStat', //导出工人工时统计
+
     //数据字典操作
     getSjzdById: 'scglxt/sjzd/getSjzdById',
     getBzList: 'scglxt/sjzd/getBzList',

@@ -98,7 +98,8 @@ export default {
           ddjs: this.dialogState.ddjs,
           kjgjs: this.dialogState.kjgjs,
           jgjs: this.jgjs,
-          sbid: this.activeSb
+          sbid: this.activeSb,
+          gynr: this.dialogState.gynr
         })
         .then(res => {
           if (res.errno == 0) {

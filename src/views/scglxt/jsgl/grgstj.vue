@@ -140,7 +140,6 @@ export default {
       this.getTableData()
     },
     //导出
-    handleExport() {},
     exportExcel() {
       /* generate workbook object from table */
       var wb = XLSX.utils.table_to_book(document.querySelector('#out-table'))
@@ -159,6 +158,26 @@ export default {
         if (typeof console !== 'undefined') console.log(e, wbout)
       }
       return wbout
+
+      //  this.$ajax.getBolb(this.$api.exportPersonalStat, {
+      //    date: this.selectDate
+      //  }).then(res => {
+      //   if (res.data) {
+      //     let url = URL.createObjectURL(res.data)
+      //     let fileName = res.headers['content-disposition'].split('=')[1]
+      //     fileName = decodeURI(fileName)
+      //     let link = document.createElement('a')
+      //     link.style.display = 'none'
+      //     link.href = url
+      //     link.setAttribute('id', 'downloadLink')
+      //     link.setAttribute('download', fileName)
+      //     document.body.appendChild(link)
+      //     link.click()
+      //     // 删除添加的a链接
+      //     let objLink = document.getElementById('downloadLink')
+      //     document.body.removeChild(objLink)
+      //   }
+      // })
     }
   }
 }
