@@ -1,8 +1,11 @@
 <template>
   <div class="echarts-container">
     <div class="wrap-container">
-      <div v-show="isDisplay" class="echarts" :id="randomId"></div>
-      <div class="echarts noNum" v-if="!isDisplay">
+      <div v-show="isDisplay"
+           class="echarts"
+           :id="randomId"></div>
+      <div class="echarts noNum"
+           v-if="!isDisplay">
         <span>暂无数据</span>
       </div>
     </div>
@@ -14,8 +17,9 @@ import $echarts from 'echarts'
 export default {
   props: {
     option: {
-      default() {
-        return {}
+      default () {
+        return {
+        }
       }
     },
     /**
@@ -25,7 +29,7 @@ export default {
       default: null
     }
   },
-  data() {
+  data () {
     return {
       /**
        * 为该组件生成具有唯一 ID DOM
@@ -33,7 +37,7 @@ export default {
       randomId: 'bar-dom' + Date.now() + Math.random()
     }
   },
-  mounted() {
+  mounted () {
     /**
      * 获取 ehcarts 挂载元素
      */
@@ -70,7 +74,7 @@ export default {
     )
   },
   methods: {
-    _initCharts() {
+    _initCharts () {
       let baseOption = {
         title: {
           text: '',
@@ -91,8 +95,12 @@ export default {
             color: '#919cb5'
           }
         },
+        grid:{
+          top: 20,
+          bottom: 20
+        },
         tooltip: {
-          show: false, // 不显示鼠标hover事件的线
+          show: true, // 不显示鼠标hover事件的线
           trigger: 'axis',
           axisPointer: {
             type: 'shadow',
@@ -114,7 +122,7 @@ export default {
           }
         },
         barWidth: '18',
-        color: ['#48b884', '#7F7D91'],
+        color: ['#ff862f', '#851dd1','#ff4e6d','#4f89ef','#ffc642', '#0040a3','#00bed1','#00d543'],
         xAxis: [
           {
             type: 'category',
@@ -125,7 +133,7 @@ export default {
               show: false
             },
             axisLine: {
-              show: true,
+              show: false,
               lineStyle: {
                 color: '#919CB5'
               }
@@ -148,7 +156,7 @@ export default {
               show: false
             },
             axisLine: {
-              show: true,
+              show: false,
               lineStyle: {
                 color: '#919CB5'
               }
@@ -169,7 +177,7 @@ export default {
      * 检测窗口滚动位置
      * 用以进行延迟加载
      */
-    checkPosition() {
+    checkPosition () {
       let windowHeight =
         document.documentElement.clientHeight || window.innerHeight
       let scrollTop =
@@ -188,7 +196,7 @@ export default {
      * 对 option 进行检测
      * 并进行 setOption
      */
-    checkAndSetOption(option) {
+    checkAndSetOption (option) {
       if (this.isPositionReady !== true) return
       if (!this.isValidOption(option)) {
         this.myEcharts.clear()
@@ -198,7 +206,7 @@ export default {
         this.isOptionAbnormal = true
       }
     },
-    isValidOption(option) {
+    isValidOption (option) {
       let flag = true
       if (
         Object.keys(option).length === 0 ||
@@ -215,7 +223,7 @@ export default {
      * 获取可滚动的 DOM 元素
      * @returns {Window}
      */
-    onScrollDOM() {
+    onScrollDOM () {
       let scrollDom = window
       if (this.scrollDomId !== null) {
         let tempDom = document.querySelector('#' + this.scrollDomId)
@@ -225,10 +233,10 @@ export default {
       }
       return scrollDom
     },
-    isChartVisible() {
+    isChartVisible () {
       return !this.isLoading && !this.isOptionAbnormal
     },
-    isDisplay() {
+    isDisplay () {
       if (this.option.series && this.option.series.length > 0) {
         return true
       } else {
@@ -239,11 +247,11 @@ export default {
   watch: {
     option: {
       deep: true,
-      handler() {
+      handler () {
         const that = this
-        that.$nextTick(function() {
+        that.$nextTick(function () {
           this._initCharts()
-          setTimeout(function() {
+          setTimeout(function () {
             that.myEcharts.resize()
           }, 400)
         })

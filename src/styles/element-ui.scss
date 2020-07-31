@@ -1,10 +1,9 @@
-
 /* 改变 icon 字体路径变量，必需 */
 $--font-path: '~element-ui/lib/theme-chalk/fonts';
 $--color-primary: #42b983;
 @import "~element-ui/packages/theme-chalk/src/index";
 
- //to reset element-ui default css
+//to reset element-ui default css
 .el-upload {
   input[type="file"] {
     display: none !important;
@@ -14,41 +13,49 @@ $--color-primary: #42b983;
 .el-upload__input {
   display: none;
 }
-.el-form .el-select{
+
+.el-form .el-select {
   width: 100%;
 }
+
 // 修改table样式
-.el-table .table_th{
+.el-table .table_th {
   text-align: center;
-  padding:5px 0 !important;
+  padding: 5px 0 !important;
   background: rgba(98, 98, 99, 0.14) !important;
   background-clip: padding-box;
   font-weight: 900;
 }
+
 // 修改table样式
-.el-table .table_th2{
+.el-table .table_th2 {
   text-align: center;
-  padding:5px 0 !important;
+  padding: 5px 0 !important;
   background: rgba(35, 35, 40, 0.14) !important;
   background-clip: padding-box;
 }
-.el-table .header-style{
+
+.el-table .header-style {
   font-size: 18px;
-  color:#00D5FF;
+  color: #00D5FF;
   background-color: #234a66;
 }
-.el-table .el-table__footer td{
+
+.el-table .el-table__footer td {
   font-size: 18px;
-  color:#00D5FF;
+  color: #00D5FF;
   background-color: #234a66;
 }
-.el-table .cell{
+
+.el-table .cell {
   overflow: inherit !important;
   padding: 0 !important;
 }
-.el-table-column--selection .cell{
+
+.el-table-column--selection .cell {
   padding: 0 !important;
 }
+
 //暂时性解决diolag 问题 https://github.com/ElemeFE/element/issues/2461
 .el-dialog {
   transform: none;
@@ -61,13 +68,25 @@ $--color-primary: #42b983;
 .upload-container {
   .el-upload {
     width: 100%;
+
     .el-upload-dragger {
       width: 100%;
       height: 200px;
     }
   }
 }
-.el-dialog__body{
-  padding:5px 20px 30px 20px;
+
+.el-dialog__body {
+  padding: 5px 20px 30px 20px;
 }
 
+.el-table-gray-header {
+  th {
+    color: #999;
+    font-weight: 900;
+    background-color: #F6F6F6;
+    border-color: #E8E8E8;
+    border-style: solid;
+    border-width: 1px 0 1px 0;
+  }
+}

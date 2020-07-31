@@ -7,6 +7,8 @@ const getters = {
   roles: state => state.user.roles,
   routers: state => state.user.routers,
   roleNames: state => state.user.roleNames,
-  fzgy: state => state.user.fzgy
+  fzgy: state => state.user.fzgy,
+  isfzr: state => state.user.isfzr,
+  component: state => state.user.component
 }
 export default getters

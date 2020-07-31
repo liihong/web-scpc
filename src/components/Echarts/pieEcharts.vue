@@ -8,6 +8,8 @@
 </template>
 
 <script>
+import $echarts from 'echarts'
+
 export default {
   name: 'pieEcharts',
   props: ['title', 'option', 'pieData'],
@@ -36,13 +38,7 @@ export default {
         (this.pieData && this.pieData.length > 0) ||
         (this.option && this.option.series && this.option.series.length > 0)
       ) {
-        if (
-          this.option.series[0].data &&
-          this.option.series[0].data.length > 0
-        ) {
-          return true
-        }
-        return false
+        return true
       } else {
         return false
       }
@@ -51,7 +47,7 @@ export default {
   methods: {
     initEcharts() {
       let $echartsDOM = document.getElementById(this.randomId)
-      let myEcharts = this.$echarts.init($echartsDOM)
+      let myEcharts = $echarts.init($echartsDOM)
       let options = {
         title: {
           text: this.title,
@@ -91,17 +87,6 @@ export default {
       myEcharts.setOption(options, true)
       this.myEcharts = myEcharts
       myEcharts.resize()
-      const that = this
-      if(this.option.series[0].name == '涉华关注领域') {
-          this.myEcharts.on('click', function(params) {
-          let name = params.name
-          let id = params.data.properties
-          that.$router.push({
-            path: '/textTableFac',
-            query: { field: name,peopleId: id,peopleName: params.data.peopleName }
-          })
-        })
-      }
     }
   },
   watch: {
@@ -126,7 +111,7 @@ export default {
   }
 }
 </script>
-<style lang="less" scoped>
+<style lang="scss" scoped>
 .pieEcharts {
   position: relative;
   display: flex;

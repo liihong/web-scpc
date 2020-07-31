@@ -294,7 +294,10 @@ module.exports = class extends Base {
     }).find();
 
     try {
-      const upData = await this.model('scglxt_t_gygc').where({
+      if (gyData.czryid && gyData.czryid !== '') {
+        return this.fail(500, '正在加工，请先结束！');
+      }
+      await this.model('scglxt_t_gygc').where({
         id: gyid
       }).update({
         czryid: worker,
@@ -302,7 +305,7 @@ module.exports = class extends Base {
         kssj: util.getNowTime()
       });
       if (gyData.serial == 0) {
-        const updateData = await this.model('scglxt_t_bom').where({
+        await this.model('scglxt_t_bom').where({
           id: gyData.bomid
         }).update({
           zddzt: '0502'
@@ -322,7 +325,7 @@ module.exports = class extends Base {
     } catch (ex) {
       const errorLog = {
         id: util.getUUId(),
-        type: '开始加工',
+        type: '加工报错',
         error: JSON.stringify(ex),
         infos: JSON.stringify(this.post())
       };

@@ -94,7 +94,7 @@ export default {
       this.exportId = row.ssdd
       this.dialogVisible = true
     },
-    exportClick(row) {
+    exportClick() {
       //   let params = {
       //   id: row.ssdd
       // }

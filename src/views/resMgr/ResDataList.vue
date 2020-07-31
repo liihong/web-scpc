@@ -45,7 +45,7 @@
           </el-button-group>
         </template>
       </el-table-column>
-      <el-table-column v-if="row.PROPERTY_TYPE != '10'" align="center" v-for="(row,index) in resRows" :key="index" :prop="row.COLUMN_NAME" :fixed="(row.IS_FROZEN == 1?'left':false)" :label="row.COLUMN_CNAME" :min-width="(row.COLUMNLENGTH != '')?row.COLUMNLENGTH:150">
+      <el-table-column align="center" v-for="(row,index) in resRows" :key="index" :prop="row.COLUMN_NAME" :fixed="(row.IS_FROZEN == 1?'left':false)" :label="row.COLUMN_CNAME" :min-width="(row.COLUMNLENGTH != '')?row.COLUMNLENGTH:150">
         <template slot-scope="scope">
           <span v-if="row.PROPERTY_TYPE == '2' || row.PROPERTY_TYPE == '4'">
             <slot :name="row.COLUMN_NAME" v-bind:row="scope.row">
@@ -169,7 +169,7 @@ export default {
           this.listLoading = false
         })
     },
-    refreshData(params) {
+    refreshData() {
       this.$emit('refreshData', this.queryParams)
     },
     reset(){
@@ -328,9 +328,6 @@ export default {
 }
 </script>
 <style scoped>
-.toolbar {
-  /* text-align: right; */
-}
 .el-form-item {
   margin-bottom: 0px;
 }

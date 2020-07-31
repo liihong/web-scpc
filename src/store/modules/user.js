@@ -6,6 +6,8 @@ const user = {
     name: '',
     avatar: '',
     fzgy: '',
+    isfzr: '',
+    component: null,
     roles: [],
     roleNames: []
   },
@@ -31,6 +33,12 @@ const user = {
     },
     SET_ROUTERS: (state, routers) => {
       state.routers = routers
+    },
+    SET_ISFZR: (state, data) => {
+      state.isfzr = data
+    },
+    SET_COMPONET: (state, data) => {
+      state.component = data
     }
   },
 
@@ -60,6 +68,9 @@ const user = {
             commit('SET_ROLES', data.roles)
             commit('SET_FZGY', data.fzgy)
             commit('SET_ROLENAMES', data.rolesNames)
+            commit('SET_ISFZR', data.isfzr)
+            commit('SET_COMPONET', data.component)
+            
           } else {
             reject('获取权限信息有误!')
           }

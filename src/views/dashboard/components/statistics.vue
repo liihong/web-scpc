@@ -5,7 +5,7 @@
                 <div class="card-panel-icon-wrapper icon-money">
                     <svg-icon icon-class="documentation" class-name="card-panel-icon" />
                     <div class="card-panel-description">
-                        <div class="card-panel-text">订单总数</div>
+                        <div class="card-panel-text"></div>
                         <count-to :start-val="0" :end-val="basicInfo.ddTotal" :duration="400" class="card-panel-num" />
                     </div>
                 </div>
@@ -80,7 +80,6 @@ export default {
           this.$ajax.get(this.$api.getStatistics).then(res=>{
               if(res.errno == 0){
                   this.basicInfo = res.data
-                  console.log(this.basicInfo)
               }
           })
       }

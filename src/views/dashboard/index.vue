@@ -1,45 +1,34 @@
 <template>
     <div class="dashboard-container">
-        <statistics />
-        <el-row :gutter="20">
-            <el-col :xs="24" :sm="14" :lg="12">
-                <el-card class="box-card">
-                    <div slot="header" class="clearfix">
-                        <span>订单进度</span>
-                    </div>
-                    <ddTable/>
-                </el-card>
-            </el-col>
-            <el-col :xs="24" :sm="14" :lg="12" >
-                <el-card class="box-card">
-                    <div slot="header" class="clearfix">
-                        <span>BOM状态</span>
-                    </div>
-                    <ddTable/>
-                </el-card>
-            </el-col>
-        </el-row>
+        <component :is="activeComp"></component>
     </div>
 </template>
 
 <script>
 import { mapGetters } from 'vuex'
-import statistics from './components/statistics.vue'
-import ddTable from './components/ddTable.vue'
+import mainWork from './mainWork.vue'
+import teamWork from './teamWork.vue'
 export default {
   name: 'Dashboard',
   components: {
-    statistics,
-    ddTable
+    mainWork:mainWork,
+    teamWork:teamWork
   },
   computed: {
-    ...mapGetters(['name', 'roles'])
+    ...mapGetters(['name', 'roles','component'])
   },
   data() {
     return {
+      activeComp:null
     }
   },
-  mounted() {},
+  mounted() {
+    if(this.component === 'teamWork'){
+      this.activeComp = teamWork
+    }else{
+      this.activeComp = mainWork
+    }
+  },
   methods: {}
 }
 </script>
@@ -47,8 +36,6 @@ export default {
 <style rel="stylesheet/scss" lang="scss" scoped>
 .dashboard {
   &-container {
-    padding: 30px;
-    background-color: #f0f2f5;
     .projectAll {
       display: flex;
     }

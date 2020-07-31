@@ -6,55 +6,173 @@ KISSY CSS Reset
 3. reset 期望提供一套普适通用的基础样式。但没有银弹，推荐根据具体需求，裁剪和修改后再使用。
 特色：1. 适应中文；2. 基于最新主流浏览器。
  */
- body, h1, h2, h3, h4, h5, h6, hr, p, blockquote, dl, dt, dd, ul, ol, li, pre, form, fieldset, legend, button, input, textarea, th, td { margin:0; padding:0; }
- body, button, input, select, textarea {
-   font:14px/1.5 "Microsoft YaHei","微软雅黑","Helvetica Neue",Helvetica,"PingFang SC","Hiragino Sans GB",Arial,sans-serif,tahoma, arial, \5b8b\4f53;
+ body,
+ h1,
+ h2,
+ h3,
+ h4,
+ h5,
+ h6,
+ hr,
+ p,
+ blockquote,
+ dl,
+ dt,
+ dd,
+ ul,
+ ol,
+ li,
+ pre,
+ form,
+ fieldset,
+ legend,
+ button,
+ input,
+ textarea,
+ th,
+ td {
+   margin: 0;
+   padding: 0;
  }
- h1, h2, h3, h4, h5, h6{ font-size:100%; font-weight: normal;}
- strong,b,th{font-weight:normal;}
- address, cite, dfn, em, var,i { font-style:normal; }
- code, kbd, pre, samp { font-family:couriernew, courier, monospace; }
- small{ font-size:14px; }
- ul, ol { list-style:none; }
- a { text-decoration:none; color: #65A5EE;}
- a:hover { text-decoration:none; }
- sup { vertical-align:text-top; }
- sub{ vertical-align:text-bottom; }
- legend { color:#000; }
- fieldset, img { border:0; }
- input,button,select,textarea{outline:none; background: none;}
- button, input, select, textarea { font-size:100%; -webkit-appearance: none;border:0}
- table { border-collapse:collapse; border-spacing:0; }
- blockquote, q {
+
+ body,
+ button,
+ input,
+ select,
+ textarea {
+   font: 14px/1.5 "Microsoft YaHei", "微软雅黑", "Helvetica Neue", Helvetica, "PingFang SC", "Hiragino Sans GB", Arial, sans-serif, tahoma, arial, \5b8b\4f53;
+ }
+
+ h1,
+ h2,
+ h3,
+ h4,
+ h5,
+ h6 {
+   font-size: 100%;
+   font-weight: normal;
+ }
+
+ address,
+ cite,
+ dfn,
+ em,
+ var,
+ i {
+   font-style: normal;
+ }
+
+ code,
+ kbd,
+ pre,
+ samp {
+   font-family: couriernew, courier, monospace;
+ }
+
+ small {
+   font-size: 14px;
+ }
+
+ ul,
+ ol {
+   list-style: none;
+ }
+
+ a {
+   text-decoration: none;
+   color: #65A5EE;
+ }
+
+ a:hover {
+   text-decoration: none;
+ }
+
+ sup {
+   vertical-align: text-top;
+ }
+
+ sub {
+   vertical-align: text-bottom;
+ }
+
+ legend {
+   color: #000;
+ }
+
+ fieldset,
+ img {
+   border: 0;
+ }
+
+ input,
+ button,
+ select,
+ textarea {
+   outline: none;
+   background: none;
+ }
+
+ button,
+ input,
+ select,
+ textarea {
+   font-size: 100%;
+   -webkit-appearance: none;
+   border: 0
+ }
+
+ table {
+   border-collapse: collapse;
+   border-spacing: 0;
+ }
+
+ blockquote,
+ q {
    quotes: none;
  }
- div{box-sizing:border-box;}
- blockquote:before, blockquote:after,
- q:before, q:after {
+
+ div {
+   box-sizing: border-box;
+ }
+
+ blockquote:before,
+ blockquote:after,
+ q:before,
+ q:after {
    content: none;
  }
- input:-webkit-autofill, textarea:-webkit-autofill, select:-webkit-autofill {
+
+ input:-webkit-autofill,
+ textarea:-webkit-autofill,
+ select:-webkit-autofill {
    -webkit-box-shadow: 0 0 0px 100px #123174 inset;
-   background: rgba(250, 255, 189,0) none;
+   background: rgba(250, 255, 189, 0) none;
    color: #FFFFFF;
    border: 0 !important;
  }
+
  input::-webkit-search-cancel-button {
    display: none;
  }
- :focus {outline: none;}
-html{
-  height: 100%;
-}
+
+ :focus {
+   outline: none;
+ }
+
+ html {
+   height: 100%;
+ }
+
  body {
    -webkit-font-smoothing: antialiased;
    -moz-osx-font-smoothing: grayscale;
    margin: 0;
    padding: 0;
    height: 100%;
+   overflow: hidden;
    color: #222;
-   position:relative;
-   box-sizing:border-box;
+   position: relative;
+   box-sizing: border-box;
  }
 
  body:before {
@@ -67,6 +185,31 @@ html{
    width: 100%;
    z-index: -9999;
  }
- .pointer{
-  cursor:pointer
+
+::-webkit-scrollbar {
+   /*滚动条整体样式*/
+   width: 4px;
+   /*高宽分别对应横竖滚动条的尺寸*/
+   height: 4px;
+
+ }
+
+::-webkit-scrollbar-thumb {
+   /*滚动条里面小方块*/
+   border-radius: 5px;
+   -webkit-box-shadow: inset005pxrgba(0, 0, 0, 0.2);
+   background: rgba(0, 0, 0, 0.2);
+
+ }
+
+::-webkit-scrollbar-track {
+   /*滚动条里面轨道*/
+   -webkit-box-shadow: inset005pxrgba(0, 0, 0, 0.2);
+   border-radius: 0;
+   background: rgba(0, 0, 0, 0.1);
+
+ }
+
+ .pointer {
+   cursor: pointer
  }

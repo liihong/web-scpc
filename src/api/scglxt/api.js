@@ -9,6 +9,7 @@ let api = {
     getDDWorkSpeed: 'scglxt/statistics/getDDWorkSpeed',//获取订单动态工时
     getPeopleHour: 'scglxt/statistics/getPeopleHour', //工人工时统计
     exportPersonalStat: 'scglxt/statistics/exportPersonalStat', //导出工人工时统计
+    getPersonalDay: 'scglxt/statistics/getPersonalDay',
 
     //数据字典操作
     getSjzdById: 'scglxt/sjzd/getSjzdById',
@@ -30,6 +31,7 @@ let api = {
     ht_sptg: 'scglxt/bjd/ht_sptg',
     getHtSpyy: 'scglxt/bjd/getHtSpyy',
     //订单操作
+    getOrderList: 'scglxt/ddgl/getOrderList',
     getDdDetail: 'scglxt/ddgl/getDdDetail',
     getDdTz: 'scglxt/ddgl/getDdTz',
     copyDd: 'scglxt/ddgl/copyDd',

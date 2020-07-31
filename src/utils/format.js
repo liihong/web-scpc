@@ -51,7 +51,8 @@ format.menuRouterData = function (menuData) {
 
     router.addRoutes([{
         path: '/',
-        redirect: '/' + childArr[0].resKey,
+        // redirect: '/' + childArr[0].resKey,
+        redirect: '/dashboard',
         component: () =>
             import ('@/views/layout/Layout.vue'),
         children: [{

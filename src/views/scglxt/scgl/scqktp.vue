@@ -4,7 +4,9 @@
              tab-position="left">
       <el-tab-pane label="1.定制实时看板内容"
                    name="first">
-        <el-transfer v-model="myArray"
+        <el-transfer 
+        style="height:80vh"
+        v-model="myArray"
                      filterable
                      :props="{
                       key: 'id',
@@ -235,6 +237,16 @@ export default {
   }
   .el-transfer-panel {
     width: 400px;
+  }
+  .el-transfer-panel{
+    height: 100%;
+    max-height:inherit;
+  }
+  .el-transfer-panel__body{
+    height: 100%;
+  }
+  .el-transfer-panel__list.is-filterable{
+    height: 100%;
   }
 }
 </style>

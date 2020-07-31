@@ -149,7 +149,7 @@ export default {
       this.queryData.id = file.id
       this.$ajax
         .post(this.$api.DeleteForeingDataById, this.queryData)
-        .then(res => {
+        .then(() => {
           this.$message.success('删除文件成功')
         })
     },

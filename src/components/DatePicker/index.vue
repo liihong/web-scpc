@@ -47,7 +47,7 @@ export default {
       vm.selectValue = it.value
       this.$emit(
         'sureBtnClick',
-        !!this.selectValue ? this.selectValue.join(' ') : this.selectValue
+        this.selectValue ? this.selectValue.join(' ') : this.selectValue
       )
     },
     onFocus() {
@@ -58,7 +58,7 @@ export default {
     emitSelectDate() {
       this.$emit(
         'sureBtnClick',
-        !!this.selectValue ? this.selectValue.join(' ') : this.selectValue
+        this.selectValue ? this.selectValue.join(' ') : this.selectValue
       )
     },
     getDa: function(n) {
@@ -70,7 +70,7 @@ export default {
   mounted() {
     this.$emit(
       'sureBtnClick',
-      !!this.selectValue ? this.selectValue.join(' ') : this.selectValue
+      this.selectValue ? this.selectValue.join(' ') : this.selectValue
     )
   },
   watch: {

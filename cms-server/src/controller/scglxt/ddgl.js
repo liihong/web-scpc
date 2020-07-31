@@ -8,6 +8,22 @@ const ddModel = 'scglxt_t_dd';
 const fs = require('fs');
 
 module.exports = class extends Base {
+  async getOrderListAction() {
+    const {pageSize, pageNumber} = this.get();
+
+    const data = await this.model('scglxt_t_dd').join({
+      table: 'scglxt_t_ht',
+      as: 'ht',
+      join: 'left',
+      on: ['ssht', 'id']
+    }).field('t.id,xmname,ssht,fun_yjggs ( t.id ) dqjd,zgs,ht.htbh,ht.remark').alias('t').page(pageNumber, pageSize).where({
+      ckzt: null,
+      isshow: 1
+    }).countSelect();
+
+    return this.success(data);
+  }
+
   // 根据订单ID获取客户信息
   async getDDKhxxByIdAction() {
     const ssdd = this.get('ssdd');

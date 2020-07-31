@@ -6,7 +6,6 @@
 
 <script>
 import services from "@/api/user";
-import {getUUId} from '@/utils/index'
 import md5 from 'js-md5'
 
 export default {

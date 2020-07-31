@@ -58,27 +58,36 @@ module.exports = class extends Base {
   async getPeopleHourAction() {
     const time = this.post('date');
     const zddmc = this.post('zddmc');
-
-    const bomSql = `SELECT bom.id,ssdd,dd.xmname ddmc,bom.jgsl,zddmc bommc FROM scglxt_t_bom bom,scglxt_t_dd dd WHERE  bom.ssdd=dd.id and bom.id IN (
-            SELECT bomid FROM scglxt_t_gygc WHERE STATUS=2 AND jssj BETWEEN "` + time.split(' ')[0] + ` 00:00:00" AND "` + time.split(' ')[1] + `  23:59:59") And (zddmc like '%` + zddmc + `%' or xmname like '%` + zddmc + `%') order by bom.endtime,bom.ssdd desc`;
-
+    const gynr = this.post('gynr');
+    let bomSql = `SELECT bom.id,ssdd,dd.xmname ddmc,bom.jgsl,zddmc bommc FROM scglxt_t_bom bom,scglxt_t_dd dd WHERE  bom.ssdd=dd.id and bom.id IN (
+            SELECT bomid FROM scglxt_t_gygc WHERE STATUS=2 `;
+    if (gynr !== undefined && gynr !== '') {
+      bomSql += `AND (gynr = '${gynr}') AND jssj BETWEEN "${time.split(' ')[0]} 00:00:00" AND "${time.split(' ')[1]}  23:59:59") And (zddmc like '%` + zddmc + `%' or xmname like '%` + zddmc + `%') order by bom.endtime,bom.ssdd desc`;
+    } else {
+      bomSql += `AND jssj BETWEEN "` + time.split(' ')[0] + ` 00:00:00" AND "` + time.split(' ')[1] + `  23:59:59") And (zddmc like '%` + zddmc + `%' or xmname like '%` + zddmc + `%') order by bom.endtime,bom.ssdd desc`;
+    }
     const bomData = await this.model().query(bomSql);
-    const sql = `SELECT any_value(gygc.id) id,
+    let sql = `SELECT any_value(gygc.id) id,
         any_value(gygc.ssdd) ssdd, any_value(xmname) ddmc, any_value(bomid) bomid,
         any_value(zddmc) bommc, any_value(gynr) gynr,any_value(jgsl) jgsl,
         any_value(jggl.jgryid) czryid, any_value(ry.rymc) rymc,(ifnull( gygc.zbgs, 0 )/(SELECT count(*) from scglxt_t_jggl where gygcid=gygc.id))+(gygc.edgs*jggl.jgjs) edgs
     FROM scglxt_t_gygc gygc left join scglxt_t_jggl jggl on gygc.id=jggl.gygcid, scglxt_t_dd dd, scglxt_t_bom bom, scglxt_t_ry ry 
     WHERE
         gygc.ssdd = dd.id  AND gygc.bomid = bom.id 
-        And (zddmc like '%` + zddmc + `%' or xmname like '%` + zddmc + `%')
-        AND jggl.jgryid = ry.id   AND jggl.jgjssj BETWEEN "` + time.split(' ')[0] + ` 00:00:00" 
-        AND "` + time.split(' ')[1] + `  23:59:59"   order by ddmc,bomid`;
-
+        And (zddmc like '%` + zddmc + `%' or xmname like '%` + zddmc + `%')`;
+    if (gynr !== undefined && gynr !== '') {
+      sql += `and (gynr = '${gynr}')
+      AND jggl.jgryid = ry.id   AND jggl.jgjssj BETWEEN "` + time.split(' ')[0] + ` 00:00:00"
+      AND "` + time.split(' ')[1] + `  23:59:59"   order by ddmc,bomid`;
+    } else {
+      sql += `AND jggl.jgryid = ry.id   AND jggl.jgjssj BETWEEN "` + time.split(' ')[0] + ` 00:00:00" 
+      AND "` + time.split(' ')[1] + `  23:59:59"   order by ddmc,bomid`;
+    }
     const data = await this.model().query(sql);
 
     bomData.map(item => {
       data.map(el => {
-        if (item.id == el.bomid) {
+        if (item.id === el.bomid) {
           if (item[el.rymc]) {
             item[el.rymc] += el.edgs;
           } else {
@@ -146,11 +155,32 @@ module.exports = class extends Base {
   async getPersonalDayAction() {
     const token = this.header('token');
 
-    const data = await this.model('scglxt_t_jggl').where({jgryid: token}).select();
+    const sql = `SELECT t.id,(
+      SELECT xmname FROM scglxt_t_dd WHERE id=gygc.ssdd) ddmc,(
+      SELECT zddmc FROM scglxt_t_bom WHERE id=gygc.bomid) bommc,t.jgjs,(
+      SELECT rymc FROM scglxt_t_ry WHERE id=t.jyryid) jyrymc,t.jgkssj,t.jgjssj,t.sbid,(
+      SELECT sbmc FROM scglxt_t_sb WHERE id=t.sbid) sbmc,gygc.bzgs,t.sfjy FROM scglxt_t_jggl t,scglxt_t_gygc gygc WHERE t.gygcid=gygc.id AND date(jgjssj)=curdate() AND jgryid='${token}' order by gygc.ssdd`;
+
+    const data = await this.model().query(sql);
 
     return this.success(data);
   }
 
   async exportPersonalStatAction() {
+  }
+
+  // 获取班组工作台所需数据面板
+  async getTeamStatAction() {
+    const {gynr} = this.get();
+
+    const sygs = this.model('v_scglxt_sygs').where({
+      gynr: gynr
+    }).sum('gynr');
+
+    const data = {
+      syzgs: sygs || 0
+    };
+
+    return this.success(data);
   }
 };

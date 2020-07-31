@@ -1,53 +1,93 @@
 <template>
   <div class="dd-working">
-    <img width="100%" src="../../../assets/images/head.png" />
-    <div class="header-button" @click="cntzClick">产能调整</div>
+    <img width="100%"
+         src="../../../assets/images/head.png" />
+    <div class="header-button"
+         @click="cntzClick">产能调整</div>
     <div class="working">
       <div>
-        <bar-echarts :option="option" class="echarts-container"></bar-echarts>
+        <bar-echarts :option="option"
+                     class="echarts-container"></bar-echarts>
       </div>
       <div>
-        <el-button type="primary" @click="exportExecel">导出表格</el-button>
-        <el-button type="primary" @click="queryWeek">本周</el-button>
+        <el-button type="primary"
+                   @click="exportExecel">导出表格</el-button>
+        <el-button type="primary"
+                   @click="queryWeek">本周</el-button>
       </div>
-      <el-table
-        id="out-table"
-        class="working-table"
-        :cell-class-name="getCellStyle"
-        header-cell-class-name="header-style"
-        :data="tableData"
-      >
-        <el-table-column type="index" width="25" align="center"></el-table-column>
-        <el-table-column min-width="200" prop="xmname" label="项目名称" align="left">
+      <el-table id="out-table"
+                class="working-table"
+                height="65vh"
+                :cell-class-name="getCellStyle"
+                header-cell-class-name="header-style"
+                :data="tableData">
+        <el-table-column type="index"
+                         width="25"
+                         align="center"></el-table-column>
+        <el-table-column min-width="200"
+                         prop="xmname"
+                         label="项目名称"
+                         align="left">
           <template slot-scope="scope">
-            <router-link
-              style="color:#48b884;"
-              :to="{path: 'jgqkhz', query: {ddid: scope.row.id}}"
-              target="_blank"
-            >{{scope.row.xmname}}</router-link>
+            <router-link style="color:#48b884;"
+                         :to="{path: 'jgqkhz', query: {ddid: scope.row.id}}"
+                         target="_blank">{{scope.row.xmname}}</router-link>
           </template>
         </el-table-column>
-        <el-table-column min-width="250" prop="mark" label="标注" align="left"></el-table-column>
-        <el-table-column min-width="110" prop="starttime" label="开始时间" align="center"></el-table-column>
-        <el-table-column min-width="110" prop="endtime" label="结束时间" align="center">
+        <el-table-column min-width="250"
+                         prop="mark"
+                         label="标注"
+                         align="left"></el-table-column>
+        <el-table-column min-width="110"
+                         prop="starttime"
+                         label="开始时间"
+                         align="center"></el-table-column>
+        <el-table-column min-width="110"
+                         prop="endtime"
+                         label="结束时间"
+                         align="center">
           <template slot-scope="scope">
             <span :class="checkTime(scope.row['endtime'])?'': 'red'">
               {{scope.row['endtime']}}
             </span>
           </template>
         </el-table-column>
-        <el-table-column prop="che" label="车" align="center"></el-table-column>
-        <el-table-column prop="xi" label="铣" align="center"></el-table-column>
-        <el-table-column prop="cnc" label="CNC" align="center"></el-table-column>
-        <el-table-column prop="xqg" label="线切割" align="center"></el-table-column>
-        <el-table-column prop="dhh" label="电火花" align="center"></el-table-column>
-        <el-table-column prop="qian" label="钳" align="center"></el-table-column>
-        <el-table-column prop="mo" label="磨" align="center"></el-table-column>
-        <el-table-column prop="hanjie" label="焊接" align="center"></el-table-column>
-        <el-table-column prop="waixie" label="外协" align="center"></el-table-column>
-        <el-table-column prop="zhusu" label="注塑" align="center"></el-table-column>
-        <el-table-column prop="rechuli" label="热处理" align="center"></el-table-column>
-        <el-table-column prop="sygs" label="总计" align="center"></el-table-column>
+        <el-table-column prop="che"
+                         label="车"
+                         align="center"></el-table-column>
+        <el-table-column prop="xi"
+                         label="铣"
+                         align="center"></el-table-column>
+        <el-table-column prop="cnc"
+                         label="CNC"
+                         align="center"></el-table-column>
+        <el-table-column prop="xqg"
+                         label="线切割"
+                         align="center"></el-table-column>
+        <el-table-column prop="dhh"
+                         label="电火花"
+                         align="center"></el-table-column>
+        <el-table-column prop="qian"
+                         label="钳"
+                         align="center"></el-table-column>
+        <el-table-column prop="mo"
+                         label="磨"
+                         align="center"></el-table-column>
+        <el-table-column prop="hanjie"
+                         label="焊接"
+                         align="center"></el-table-column>
+        <el-table-column prop="waixie"
+                         label="外协"
+                         align="center"></el-table-column>
+        <el-table-column prop="zhusu"
+                         label="注塑"
+                         align="center"></el-table-column>
+        <el-table-column prop="rechuli"
+                         label="热处理"
+                         align="center"></el-table-column>
+        <el-table-column prop="sygs"
+                         label="总计"
+                         align="center"></el-table-column>
       </el-table>
     </div>
     <sbcn :dialogState="dialogState" />
@@ -64,7 +104,7 @@ export default {
     barEcharts,
     sbcn
   },
-  data() {
+  data () {
     return {
       dialogState: {
         show: false
@@ -130,7 +170,7 @@ export default {
       tableData: []
     };
   },
-  mounted() {
+  mounted () {
     this.initData();
     let _this = this;
     this.$socket.on("getTableData", () => {
@@ -138,14 +178,14 @@ export default {
     });
   },
   methods: {
-    getCellStyle({ rowIndex }) {
+    getCellStyle ({ rowIndex }) {
       if (Number.isInteger(rowIndex / 2) == 0) {
         return "cell-stripe-style";
       } else {
         return "cell-style";
       }
     },
-    initData(isCustom = true) {
+    initData (isCustom = true) {
       this.$ajax.get(this.$api.getGygsPc).then(res => {
         if (res.errno == 0) {
           let xAxis = [],
@@ -158,20 +198,20 @@ export default {
           this.option.series[0].data = datas;
         }
       });
-      this.$ajax.post(this.$api.getDDWorkSpeed,{
+      this.$ajax.post(this.$api.getDDWorkSpeed, {
         isCustom: isCustom
       }).then(res => {
         if (res.errno == 0) {
           this.tableData = res.data;
-          let sums = [],sums2= [],sums3= [];
+          let sums = [], sums2 = [], sums3 = [];
           Object.keys(this.tableData[0]).forEach((column, index) => {
             if (index === 1) {
               sums['xmname'] = "总计(分钟)";
-               sums2['xmname'] = "总计(小时)";
-               sums3['xmname'] = "总计(天)";
+              sums2['xmname'] = "总计(小时)";
+              sums3['xmname'] = "总计(天)";
               return;
             }
-           
+
             const values = this.tableData.map(item =>
               Number(item[column])
             );
@@ -187,12 +227,12 @@ export default {
             } else {
               sums[column] = "";
             }
-            sums2[column] = (sums[column]/60).toFixed(2)
-            sums3[column] = ((sums[column]/60)/24).toFixed(2)
+            sums2[column] = (sums[column] / 60).toFixed(2)
+            sums3[column] = ((sums[column] / 60) / 24).toFixed(2)
 
-            if( column == 'starttime' || column == 'endtime') {
-               sums2[column] = "";
-               sums3[column] = "";
+            if (column == 'starttime' || column == 'endtime') {
+              sums2[column] = "";
+              sums3[column] = "";
             }
           });
           this.tableData.push(sums)
@@ -201,22 +241,22 @@ export default {
         }
       });
     },
-    queryWeek(){
+    queryWeek () {
       this.initData(false)
     },
-    cntzClick() {
+    cntzClick () {
       this.dialogState.show = true;
     },
-    checkTime(endtime){
-        let date1 = new Date(endtime);
-        let date2 = new Date();
-        if (date1.getTime() > date2.getTime()) {
-            return true;
-        } else {
-            return false;
-        }
+    checkTime (endtime) {
+      let date1 = new Date(endtime);
+      let date2 = new Date();
+      if (date1.getTime() > date2.getTime()) {
+        return true;
+      } else {
+        return false;
+      }
     },
-    exportExecel() {
+    exportExecel () {
       /* generate workbook object from table */
       var wb = XLSX.utils.table_to_book(document.querySelector("#out-table"));
       /* get binary string as output */
@@ -235,7 +275,7 @@ export default {
       }
       return wbout;
     },
-    getSummaries(param) {
+    getSummaries (param) {
       const { columns, data } = param;
       const sums = [];
       columns.forEach((column, index) => {
@@ -270,13 +310,13 @@ export default {
   background: #00233a;
   overflow: hidden;
   // 表头不对齐bug
-    .gutter {
-      display: table-cell !important;
-    }
+  .gutter {
+    display: table-cell !important;
+  }
   .working {
     padding: 20px;
   }
-  .header-style{
+  .header-style {
     border-bottom: 0 !important;
   }
 }
@@ -304,7 +344,7 @@ export default {
     border-bottom: 0;
   }
 }
-.red{
-  color:rgb(240, 62, 62); 
+.red {
+  color: rgb(240, 62, 62);
 }
 </style>
