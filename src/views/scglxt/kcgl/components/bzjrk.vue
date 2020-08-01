@@ -102,7 +102,6 @@ export default {
         })
         .then(res => {
           if (res.errno == 0) {
-            console.log(res.data)
             if (res.data.length == 0) {
               this.$confirm(
                 `仓库中未找到该零件【${vm.formData.LJMC}】,是否新增?`,

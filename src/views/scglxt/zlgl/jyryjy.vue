@@ -156,10 +156,7 @@ export default {
               this.$message.success('操作成功！')
               this.initData()
               setTimeout(() => {
-                this.$socket.emit('getTableData', res => {
-                  console.log(res)
-                  console.log('发送通知更新数据')
-                },0)
+                this.$socket.emit('getTableData', null,0)
               })
             }
           })

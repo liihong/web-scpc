@@ -102,8 +102,8 @@ export default {
           })
       }
     },
-    handleRemove(item) {
-      console.log(item)
+    handleRemove() {
+      // console.log(item)
     },
     onUpload(file) {
       let files = { 0: file.raw }

@@ -146,7 +146,7 @@ export default {
           "车间生产工时.xlsx"
         );
       } catch (e) {
-        if (typeof console !== "undefined") console.log(e, wbout);
+        throw(e)
       }
       return wbout;
     }

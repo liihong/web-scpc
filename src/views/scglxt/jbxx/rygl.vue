@@ -35,7 +35,6 @@ export default {
       }
     },
     deleteUser(id){
-      console.log(id)
         services.deleteUser({
           id:id
         })

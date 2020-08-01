@@ -83,8 +83,8 @@ export default {
       })
     },
     // 改变该用户是否启用
-    enabledChange(val){
-      console.log(val)
+    enabledChange(){
+      // console.log(val)
     },
     editUserInfo(index, rows) {
       let rowData = rows[index]

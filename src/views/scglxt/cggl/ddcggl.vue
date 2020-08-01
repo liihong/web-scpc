@@ -31,7 +31,6 @@ export default {
   },
   methods: {
     changeRadio(row) {
-      console.log(row)
         this.$ajax
           .post(this.$api.updateBLZT, {
             id: row.ID,

@@ -130,7 +130,6 @@ export default {
   mounted () {
     var offsetHeight = window.innerHeight
     this.tableHeight = offsetHeight - 220
-    console.log(this.$attrs)
   },
   watch: {
     tableInfo () {

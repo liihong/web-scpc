@@ -281,7 +281,7 @@ export default {
                 this.dialogByk.show = true;
               }
             } else {
-              console.log("没有检索到库存");
+              throw("没有检索到库存");
             }
           });
       }
@@ -340,8 +340,6 @@ export default {
                         this.$message.success("关联成功");
                         this.dialogState.show = false;
                       }
-                    } else {
-                      console.log("没有检索到库存");
                     }
                   });
               } else {

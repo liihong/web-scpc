@@ -171,7 +171,6 @@ export default {
             this.resDatas = this.arrGroupBy(this.resDatas,(item)=>{
                 return item[this.treeBy]
             })   
-            console.log(this.resDatas) 
           }
           this.total = parseInt(res.data.count)
           this.listLoading = false

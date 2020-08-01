@@ -250,7 +250,7 @@ export default {
           '工人工时统计' + this.selectDate + '.xlsx'
         )
       } catch (e) {
-        if (typeof console !== 'undefined') console.log(e, wbout)
+        throw(e)
       }
       return wbout
     }

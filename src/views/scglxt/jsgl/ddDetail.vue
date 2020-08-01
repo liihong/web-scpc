@@ -212,6 +212,7 @@ export default {
 </style>
 <style lang="scss" scoped>
 .ddDetail {
+  margin: 20px;
   .detail-header {
     width: 100%;
     line-height: 32px;

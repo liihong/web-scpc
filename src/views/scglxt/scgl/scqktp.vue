@@ -161,7 +161,6 @@ export default {
           }
           // 更新items数组
           const item = _this.customData.splice(oldIndex, 1)
-          console.log(item)
           _this.customData.splice(newIndex, 0, item[0])
           // 下一个tick就会走patch更新
         },

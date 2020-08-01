@@ -84,7 +84,6 @@ export default {
     //   }
     // }
     'dialogState.query'() {
-      console.log(this.dialogState.query)
       this.$nextTick(() => {
         this.query = this.dialogState.query
       })

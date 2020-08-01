@@ -147,8 +147,8 @@ export default {
           }
         })
     },
-    getdata(val) {
-      console.log(val)
+    getdata() {
+      // console.log(val)
     },
     datadragEnd() {},
     drop(info) {
