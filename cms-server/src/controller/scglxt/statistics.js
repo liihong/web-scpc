@@ -113,15 +113,15 @@ module.exports = class extends Base {
   // 获取订单动态剩余工时
   async getDDWorkSpeedAction() {
     const query = this.post();
-    let whereObj = '1=1';
+    let whereObj = '1=1  group by dd.id desc ORDER BY DDLEVEL,dd.sjcjsj DESC,ddorder desc';
     if (query.xmname && query.xmname !== '') {
-      whereObj = `1=1 and dd.xmname like '%` + query.xmname + `%'`;
+      whereObj = `1=1 and dd.xmname like '%` + query.xmname + `%' group by dd.id desc ORDER BY DDLEVEL,dd.sjcjsj DESC,ddorder desc`;
     }
     if (query.ddid && query.ddid !== '') {
-      whereObj = `1=1 and dd.id='` + query.ddid + `'`;
+      whereObj = `1=1 and dd.id='` + query.ddid + `' group by dd.id desc ORDER BY DDLEVEL,dd.sjcjsj DESC,ddorder desc`;
     }
     if (!query.isCustom) {
-      whereObj = ' dd.isshow=1 ';
+      whereObj = ' dd.isshow=1  group by dd.id desc order by dd.ddorder+1 asc';
     }
 
     const sql = `  
@@ -144,7 +144,7 @@ module.exports = class extends Base {
             MAX(CASE gynr WHEN '20170524144646657'  THEN sygs ELSE 0 END ) 'waixie' ,
             sum(sygs) sygs
         FROM
-        scglxt_t_ht ht,scglxt_t_dd dd ,v_scglxt_sygs sygs where ht.id=dd.ssht and sygs<>0 and dd.id =sygs.ddid and dd.ckzt is null and ` + whereObj + ` group by dd.id desc order by dd.ddorder+1 asc`;
+        scglxt_t_ht ht,scglxt_t_dd dd ,v_scglxt_sygs sygs where ht.id=dd.ssht and sygs<>0 and dd.id =sygs.ddid and dd.ckzt is null and ` + whereObj + ``;
 
     const data = await this.model().query(sql);
 

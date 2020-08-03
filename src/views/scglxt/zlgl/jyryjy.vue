@@ -9,7 +9,7 @@
         <template slot-scope="scope">
           <el-button-group>
             <el-button type="success" @click="changeRadio(scope.row)" class="radio" :label="1">通过</el-button>
-            <el-button type="primary" @click="rbjsSection(scope.row)" class="radio" :label="4">让步接收</el-button>
+            <el-button type="primary" @click="rbjsSection(scope.row)" class="radio" :label="4">让步</el-button>
             <el-button type="warning" @click="noPass(scope.row)" class="radio" :label="3">返工</el-button>
             <el-button type="danger" @click="passSection(scope.row)" class="radio" :label="2">报废</el-button>
           </el-button-group>
@@ -76,7 +76,7 @@ export default {
     this.initData()
   },
   mounted() {
-    this.initData()
+    // this.initData()
   },
   methods: {
     openJgjl(bomid){

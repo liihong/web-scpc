@@ -81,7 +81,7 @@ export default {
     datePicker,
     jgjlDialog
   },
-  data() {
+  data () {
     return {
       tableHeight: 600,
       selectDate: '',
@@ -94,18 +94,18 @@ export default {
       }
     }
   },
-  created() {
+  created () {
     this.initData()
     this.$socket.on('getTableData', () => {
       this.initData()
     })
   },
   methods: {
-    openJgjl(bomid) {
+    openJgjl (bomid) {
       this.dialogJgjl.query = { BOMID: bomid }
       this.dialogJgjl.show = true
     },
-    async getTableData() {
+    async getTableData () {
       let resDatas = await this.$ajax.post(this.$api.getPeopleHour, {
         date: this.selectDate,
         zddmc: this.queryValue
@@ -114,7 +114,7 @@ export default {
         this.tableData = resDatas.data
       }
     },
-    async initData() {
+    async initData () {
       this.$ajax.post(this.$api.getBzList).then(res => {
         if (res.errno == 0) {
           let data = res.data
@@ -135,14 +135,23 @@ export default {
         }
       })
     },
-    sureBtnClick(time) {
+    sureBtnClick (time) {
       this.selectDate = time
       this.getTableData()
     },
     //导出
-    exportExcel() {
+    exportExcel () {
       /* generate workbook object from table */
-      var wb = XLSX.utils.table_to_book(document.querySelector('#out-table'))
+      // var wb = XLSX.utils.table_to_book(document.querySelector('#out-table'))
+      const id = '#out-table'
+      var fix = document.querySelector('.el-table__fixed');
+      var wb;
+      if (fix) {
+        wb = XLSX.utils.table_to_book(document.querySelector(id).removeChild(fix));
+        document.querySelector(id).appendChild(fix);
+      } else {
+        wb = XLSX.utils.table_to_book(document.querySelector(id));
+      }
       /* get binary string as output */
       var wbout = XLSX.write(wb, {
         bookType: 'xlsx',
@@ -155,7 +164,7 @@ export default {
           '工人工时统计' + this.selectDate + '.xlsx'
         )
       } catch (e) {
-        throw(e)
+        throw (e)
       }
       return wbout
 

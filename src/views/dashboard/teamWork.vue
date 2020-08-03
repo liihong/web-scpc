@@ -74,17 +74,17 @@
       </el-tab-pane>
       <el-tab-pane label="待加工"
                    lazy
-                   name="second">
-        <teamTable ljzt="0502" />
+                   name="third">
+        <teamTable ljzt="0501" />
       </el-tab-pane>
       <el-tab-pane label="待检验"
                    lazy
-                   name="third">
-        <teamTable ljzt="0503" />
+                   name="four">
+        <bzdjyTable />
       </el-tab-pane>
       <el-tab-pane label="报废日志"
                    lazy
-                   name="four">
+                   name="five">
         <teamTable ljzt="0503" />
       </el-tab-pane>
     </el-tabs>
@@ -100,6 +100,7 @@ import XLSX from 'xlsx'
 import jgjlDialog from '../scglxt/zlgl/components/jgjlDialog'
 import barEcharts from "@/components/Echarts/barEcharts";
 import teamTable from './components/teamTable.vue'
+import bzdjyTable from './components/bzdjyTable.vue'
 
 import { mapGetters } from 'vuex'
 export default {
@@ -108,7 +109,8 @@ export default {
     barEcharts,
     datePicker,
     jgjlDialog,
-    teamTable
+    teamTable,
+    bzdjyTable
   },
   data () {
     return {
@@ -126,6 +128,10 @@ export default {
         legend: {
             orient: 'center',
             data: ['已加工工时', '剩余工时']
+        },
+        tooltip: {
+          show: true, // 不显示鼠标hover事件的线
+          trigger: 'axis',
         },
         series: [
             {
@@ -220,6 +226,7 @@ export default {
       });
 
       this.option.series[0].data = sums
+      this.pieOption.series[0].data[1].value = sums.reduce((a,b)=>a+b)
     },
     async initData () {
       let res = await this.$ajax.post(this.$api.getPeopleByBz, {
@@ -231,6 +238,10 @@ export default {
         this.option.xAxis[0].data = res.data.map(item => item.rymc)
         this.getSummaries({ columns: this.peopleList, data: this.tableData })
       }
+
+      const sygs = await this.$ajax.get(this.$api.getSygsList)
+      this.pieOption.series[0].data[0].value = sygs.data.find(v=>v.gynr === this.fzgy)['sum']
+
     },
     sureBtnClick (time) {
       this.selectDate = time

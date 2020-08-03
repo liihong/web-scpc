@@ -113,7 +113,7 @@ event:{
         @size-change="sizeChange"
       ></el-pagination>
     </el-col>
-    <resEdit @initData="getResList" @saveAfter="saveAfter" :dialogState="dialogState" />
+    <resEdit  @initData="getResList" @saveAfter="saveAfter" :dialogState="dialogState" />
   </section>
 </template>
 

@@ -33,9 +33,9 @@
       </template>
     </ResList>
     <gygxDialog :dialogState="dialogState" ref="gygx" />
-    <editBom :dialogState="bomForm" />
-    <bjdList noBom :dialogState="bjdState" />
-    <jgjlDialog :dialogState="dialogJgjl" />
+    <editBom  :dialogState="bomForm" />
+    <bjdList  noBom :dialogState="bjdState" />
+    <jgjlDialog  :dialogState="dialogJgjl" />
   </div>
 </template>
 

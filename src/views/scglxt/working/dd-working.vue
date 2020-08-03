@@ -331,6 +331,7 @@ export default {
   height: 160px;
 }
 .working-table {
+  background: #00233a;
   .cell-style {
     font-size: 18px;
     color: #00d5ff;

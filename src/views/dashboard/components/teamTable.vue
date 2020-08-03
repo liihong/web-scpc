@@ -1,85 +1,90 @@
 <template>
-  <div>
-    <el-table class="el-table"
-              :data="tableDatas"
-              stripe
-              border
-              max-height="500px"
-              style="width: 100%;">
-      <el-table-column v-for="(row,index) in columnDatas"
-                       :key="index"
-                       :prop="row.id"
-                       align="center"
-                       :fixed="(row.frozen == 1?'left':false)"
-                       :label="row.name"
-                       :min-width="(row.length != '')?row.length:150">
-        <template slot-scope="scope">
-          <div v-if="row.id === 'DQJD'">
-            <router-link :to="{path:'/ddDetail', query:{id:scope.row.id}}">
-              <el-progress :text-inside="true"
-                           :stroke-width="14"
-                           :percentage="getBFB(scope.row.dqjd,scope.row.zgs)"></el-progress>
-            </router-link>
-          </div>
-          <span v-else>{{scope.row[row.id]}}</span>
-          
-        </template>
-      </el-table-column>
-    </el-table>
+  <div class="jgryjg">
+    <ResList tableId='010401'
+             :query="query"
+             noTool
+             noEdit
+             noAdd
+             ref="teamTable">
+      <template slot="SSDD"
+                slot-scope="scope">
+        <el-badge v-show="!!scope.row.DDLEVEL"
+                  :value="scope.row.DDLEVEL == '0402' ? '重要' : scope.row.DDLEVEL == '0403' ? '' : '紧急'"
+                  class="item"
+                  :type="scope.row.DDLEVEL == '0402' ? 'warning' : scope.row.DDLEVEL == '0403' ? 'info' : 'danger'">
+          <span style="margin:0 5px;">{{scope.row.SSDD_TEXT}}</span>
+        </el-badge>
+      </template>
+      <template slot="BOMID"
+                slot-scope="scope">
+        <span class="spanText"
+              @click="gybpClick(scope.row)">{{scope.row.BOMID_TEXT}}</span>
+      </template>
+      <template slot="GYNR"
+                slot-scope="scope">
+        <a v-if="!!scope.row.DDTZ"
+           :href="scope.row.DDTZ"
+           target="_blank">
+          <span :style="{color:scope.row.CZRYID? 'red': ''}"> {{scope.row.GYNR_TEXT}}</span>
+        </a>
+        <span v-else
+              :style="{color:scope.row.CZRYID? 'red': ''}"> {{scope.row.GYNR_TEXT}}</span>
+        <i v-if="scope.row.CZRYID"
+           class="ingIcon">
+          <svg-icon icon-class="ing" />
+        </i>
+      </template>
+      <template slot="DQJD"
+                slot-scope="scope">
+        <div style="text-align:left;"
+             v-html="scope.row.DQJD"></div>
+      </template>
+    </ResList>
   </div>
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
+
 export default {
+  name: 'jgryjg',
+  components: {
+  },
+  props: {
+    ljzt: {
+      type: String,
+      default: '0501'
+    }
+  },
   data () {
     return {
-      columnDatas: [{
-        id: 'htbh',
-        name: '所属合同'
-      }, {
-        id: 'xmname',
-        name: '订单编号'
-      }, {
-        id: 'remark',
-        name: '订单备注'
-      }, {
-        id: 'dqjd',
-        name: '进度'
-      }],
-      tableDatas: []
+      query: {
+      }
     }
+  },
+  computed: {
+    ...mapGetters(['fzgy']),
   },
   mounted () {
-    this.initData()
+    if (this.ljzt === '0501') {
+      this.query = { gynr: this.fzgy, czryid: null }
+    } else {
+      this.query = { gynr: this.fzgy, czryid: 'is not null' }
+    }
+    this.$nextTick(()=>{
+      this.$refs.teamTable.getConfig()
+      this.$refs.teamTable.getResList()
+    })
   },
   methods: {
-    initData () {
-      this.$ajax.get(this.$api.getOrderList, {
-        pageNumber: 1,
-        pageSize: 100,
-      }).then(res => {
-        if (res.data) {
-          this.tableDatas = res.data.data;
-        }
-      });
-    },
-    //获取订单百分比
-    getBFB(dqjd = 0, zgs = 0) {
-      let ddzgs = zgs || 0
-      let yjggs = dqjd || 0
-      if (yjggs*1 == 0) {
-        return 0
-      }
-      if (ddzgs*1 == 0) {
-        return 0
-      }
-      let bfb = (yjggs / ddzgs) * 100
-
-      return Math.ceil(bfb)
-    }
   }
 }
 </script>
-
 <style>
+.ingIcon {
+  position: absolute;
+  right: 0;
+  top: 0;
+  font-size: 42px;
+}
 </style>

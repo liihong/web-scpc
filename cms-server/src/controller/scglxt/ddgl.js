@@ -47,7 +47,7 @@ module.exports = class extends Base {
       as: 'kh',
       join: 'left',
       on: ['ht.khid', 'id']
-    }).alias('t').field('t.id,kh.mc khmc,ht.htbh,ht.jkje,t.xmname,t.starttime,t.endtime,ht.ywlx,ht.htje,fun_yjggs ( t.id ) dqjd,t.zgs,ht.bjdzj,ht.remark').where({
+    }).alias('t').field('t.id,t.ssht,kh.mc khmc,ht.htbh,ht.jkje,t.xmname,t.starttime,t.endtime,ht.ywlx,ht.htje,fun_yjggs ( t.id ) dqjd,t.zgs,ht.bjdzj,ht.remark').where({
       't.id': id
     }).find();
 
@@ -59,7 +59,22 @@ module.exports = class extends Base {
     }).alias('t').field('t.ssdd,t.gynr,gy.gymc,sum(bzgs) zgs').where({
       't.ssdd': id
     }).group('gynr').select();
+
+    const edgsTj = await this.model('scglxt_t_gygc').join({
+      table: 'scglxt_t_jggy',
+      as: 'gy',
+      join: 'left',
+      on: ['gynr', 'id']
+    }).alias('t').field('t.ssdd,t.gynr,gy.gymc,sum(edgs) zgs').where({
+      't.ssdd': id
+    }).group('gynr').select();
+
+    const htfj = await this.model('scglxt_t_ht_fj').where({
+      ssht: data.ssht
+    }).find();
     data.gstj = ddtj;
+    data.edgsTj = edgsTj;
+    data.htfj = htfj;
     return this.success(data);
   }
   // 获取进行中的订单
@@ -146,6 +161,7 @@ module.exports = class extends Base {
         });
         item.id = newBOMId;
         item.clzt = 0;
+        item.ddorder = null;
         item.zddmc = item.zddmc;
         item.zddzt = '0501';
         item.endtime = data.endtime;

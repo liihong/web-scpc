@@ -1,7 +1,5 @@
+
 import util from '../../utils/util';
-import {
-  fail
-} from 'assert';
 const Base = require('./base.js');
 const nodeExcel = require('excel-export'); // 首先，引入excel模块：
 
@@ -135,10 +133,16 @@ module.exports = class extends Base {
     });
     let whereObj = {};
     let query = this.get('query');
-    if (query && query != '{}' && JSON.stringify(query) != '{}') {
+    if (query && query !== '{}' && JSON.stringify(query) !== '{}') {
       query = JSON.parse(query);
       Object.keys(query).map(key => {
-        whereObj[key] = ['=', `${query[key]}`];
+        if (query[key] === null) {
+          whereObj[key] = null;
+        } else if (query[key].toString().indexOf('not null') !== -1) {
+          whereObj[key] = ['!=', null];
+        } else {
+          whereObj[key] = ['=', `${query[key]}`];
+        }
       });
     }
     if (queryKey) {

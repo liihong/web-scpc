@@ -126,7 +126,7 @@ module.exports = class extends Base {
           gxnr: gynr.join('-'),
           gs: gs
         };
-        if (form[form.length - 1].gynr == '20170424203607219') {
+        if (form[form.length - 1].gynr === '20170424203607219') {
           bomUpdate.bmcl = form[form.length - 1].zysx;
         }
         await this.model('scglxt_t_bom').where({
@@ -425,13 +425,17 @@ module.exports = class extends Base {
     const pageSize = this.post('pageSize');
     const queryKey = this.post('queryKey');
     const curPage = (pageNumber - 1) * pageSize;
+    const gynr = this.post('gynr');
     let where = '1=1';
 
     if (queryKey) {
       where = "SSDD_TEXT like '%" + queryKey + "%' or BOMID_TEXT like '%" + queryKey + "%' or CZRYID_TEXT like '%" + queryKey + "%'";
     }
+    if (gynr && gynr !== '') {
+      where += ` and  gynr = '${gynr}'`;
+    }
     const sql = `SELECT * from (SELECT jggl.ID, dd.xmname SSDD_TEXT,gygc.ZYSX,gygc.KSSJ,gygc.JSSJ,fun_dqgygc1 (gygc.BOMID) DQJD,
-        bom.zddmc BOMID_TEXT, bom.zddjb ZDDJB, bom.bmcl BMCL, jggy.gymc GYNR_TEXT,bom.jgsl KJGJS,gygc.YJGJS,
+        bom.zddmc BOMID_TEXT, bom.zddjb ZDDJB, bom.bmcl BMCL,gygc.gynr, jggy.gymc GYNR_TEXT,bom.jgsl KJGJS,gygc.YJGJS,
         ry.rymc CZRYID_TEXT,jggl.JGRYID, sb.sbmc SBID_TEXT, jggl.jgjs SJJS, gygc.BOMID,gygc.id gygcid, date_format( dd.endtime, '%Y-%m-%d' ) ddjssj,
         gygc.serial  FROM
             scglxt_t_gygc gygc,
@@ -452,7 +456,7 @@ module.exports = class extends Base {
     ORDER BY
         bom.ssdd,gygc.bomid,dd.DDLEVEL) t where (` + where + `)  limit ` + curPage + `,` + pageSize + `;`;
 
-    const countSql = `SELECT count(*) count  FROM (select gygc.id,dd.xmname SSDD_TEXT, bom.zddmc BOMID_TEXT,ry.rymc CZRYID_TEXT from 
+    const countSql = `SELECT count(*) count  FROM (select gygc.id,dd.xmname SSDD_TEXT,gygc.gynr, bom.zddmc BOMID_TEXT,ry.rymc CZRYID_TEXT from 
                         scglxt_t_gygc gygc,
                         scglxt_t_bom bom,
                         scglxt_t_jggy jggy,
@@ -1045,5 +1049,12 @@ module.exports = class extends Base {
     const sData = await this.model('operate_log').add(errorLog);
 
     return this.success(sData);
+  }
+
+  // 车间工艺剩余工时列表
+  async getSygsListAction() {
+    const data = await this.model('v_scglxt_sygs').group('gynr').field('gynr,sum(sygs) AS sum').select();
+
+    return this.success(data);
   }
 };

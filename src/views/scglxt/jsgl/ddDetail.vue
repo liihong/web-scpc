@@ -8,7 +8,8 @@
         <td colspan="2">
           <div class="big-font">客户名称：{{ ddData.khmc }}</div>
         </td>
-        <td>
+        <td colspan="2"
+            style="text-align:right;padding-right:100px;">
           <div class="big-font">合同编号：{{ ddData.htbh }}</div>
         </td>
       </tr>
@@ -32,19 +33,20 @@
         <td>
           <div>
             <span class="small-font-name">备注</span>
-            <span class="small-font-value">12312</span>
+            <span class="small-font-value">{{ddData.remark}}</span>
           </div>
         </td>
-        <td rowspan="2" style="width:600px;">
+        <td rowspan="2">
           <div class="flex">
-            <div>
+            <div style="text-align:left;">
               <span style="display:block;">总工时</span>
               <span style="font-size: 24px;">{{ ddData.zgs }}</span>
             </div>
-            <div style="width:200px;">
+            <div style="width:150px;text-align:left;">
               <span style="display:block;">加工进度</span>
               <span style="font-size: 24px;">
-                <el-progress :stroke-width="20" :percentage="getBFB(ddData.dqjd,ddData.zgs)"></el-progress>
+                <el-progress :stroke-width="20"
+                             :percentage="getBFB(ddData.dqjd,ddData.zgs)"></el-progress>
               </span>
             </div>
           </div>
@@ -83,73 +85,129 @@
       </tr>
       <tr>
         <td colspan="4">
-          工时统计(小时)：
-          <span
-            v-for="(item,index) in ddData.gstj"
-            :key="index"
-          >{{item.gymc}}({{item.zgs}})-</span>
+          <div class="flex" style="justify-content: space-between;">
+            <div>
+              <div style="border-bottom: 0.5px solid #e6e6e6;">
+                工艺排产工时：<span v-for="(item,index) in ddData.edgsTj"
+                      :key="index"
+                      class="inline-block">{{item.gymc}}</span>
+              </div>
+              <div style="border-bottom: 0.5px solid #e6e6e6;">
+                额定(分钟)：
+                <span v-for="(item,index) in ddData.edgsTj"
+                      :key="index"
+                      class="inline-block">{{item.zgs}}</span>
+              </div>
+              <div style="border-bottom: 0.5px solid #e6e6e6;">
+                排产(分钟)：
+                <span v-for="(item,index) in ddData.gstj"
+                      :key="index"
+                      class="inline-block">{{item.zgs}}</span>
+              </div>
+              <div style="border-bottom: 0.5px solid #e6e6e6;">
+                额定(小时)：
+                <span v-for="(item,index) in ddData.edgsTj"
+                      :key="index"
+                      class="inline-block">{{(item.zgs/60).toFixed(2)}}</span>
+              </div>
+              <div>
+                排产(小时)：
+                <span v-for="(item,index) in ddData.gstj"
+                      :key="index"
+                      class="inline-block">{{(item.zgs/60).toFixed(2)}}</span>
+              </div>
+            </div>
+            <div>
+            <bar-echarts style="width:500px;height:150px;"
+                         :option="option" />
+          </div>
+          </div>
         </td>
       </tr>
     </table>
-    <span class="content-name">零件加工进度</span>
+    <span class="content-name">零件加工进度({{sumCount}})</span>
     <div class="detail-content">
-      <el-card class="box-card" v-for="(item,key) in statusList" :key="key">
-        <div slot="header" class="clearfix">
+      <el-card class="box-card"
+               v-for="(item,key) in statusList"
+               :key="key">
+        <div slot="header"
+             class="clearfix">
           <el-tag type="success">{{item.MC}}</el-tag>
           <span style="float:right;">{{bomList[item.ID].length}}</span>
         </div>
         <div class="text item">
           <ul class="board-list">
-            <li
-              style="border-left: 4px solid rgb(254, 115, 0);"
-              class="board-list-card"
-              v-for="(el,i) in bomList[item.ID]"
-              :key="i"
-            >
+            <li style="border-left: 4px solid rgb(254, 115, 0);"
+                class="board-list-card"
+                v-for="(el,i) in bomList[item.ID]"
+                :key="i">
               <div class="list-title">{{el.ZDDMC}}</div>
               <div class="list-cz">{{el.ZDDCZ_TEXT}}</div>
-              <div class="list-ddjd" v-html="el.DQJQ">
+              <div class="list-ddjd"
+                   v-html="el.DQJQ">
                 <!-- {{el.DQJQ}} -->
               </div>
             </li>
           </ul>
         </div>
       </el-card>
-      <!-- <el-card class="box-card" v-for="(item,key) in bomList" :key="key">
-        <div slot="header" class="clearfix">
-          <span>{{item.ZDDMC}}</span>
-          <el-tag type="success">{{item.ZDDZT_TEXT}}</el-tag>
-        </div>
-        <div class="text item">
-          <span v-html="item.DQJQ"></span>
-        </div>
-      </el-card>-->
     </div>
   </div>
 </template>
 
 <script>
+import barEcharts from "@/components/Echarts/barEcharts";
+
 export default {
-  data() {
+  components: {
+    barEcharts,
+  },
+  data () {
     return {
       ddData: {},
       bomList: {},
-      statusList: []
+      statusList: [],
+      sumCount: 0,
+      option: {
+        legend: {},
+        tooltip: {
+          trigger: 'axis',
+          axisPointer: {
+            type: 'shadow'
+          }
+        },
+        xAxis: {
+          type: 'category',
+          axisTick: { show: false },
+          data: []
+        },
+        yAxis: {
+          type: 'log'
+        },
+        series: [
+          { type: 'bar', name: '排产工时', data: [] },
+          { type: 'bar', name: '额定工时', barGap: '-100%', data: [] },
+        ]
+      }
     };
   },
   computed: {
-    id() {
+    id () {
       return this.$route.query.id;
     }
   },
-  created() {
+  created () {
     this.initData();
   },
   methods: {
-    async initData() {
+    async initData () {
       let dd = await this.$ajax.get(this.$api.getDdDetail, { id: this.id });
       if (dd.errno == 0) {
         this.ddData = dd.data;
+
+        this.option.xAxis.data = dd.data.edgsTj.map(v => v.gymc)
+        this.option.series[1].data = dd.data.edgsTj.map(v => v.zgs)
+        this.option.series[0].data = dd.data.gstj.map(v => v.zgs)
       }
 
       let query = {
@@ -170,6 +228,7 @@ export default {
       let bom = await this.$ajax.get(this.$api.queryTableData, query);
       if (bom.errno == 0) {
         let data = bom.data.data;
+        this.sumCount = data.length
         data.map(item => {
           this.statusList.map(el => {
             if (item.ZDDZT == el.ID) {
@@ -181,7 +240,7 @@ export default {
       }
     },
     //获取订单百分比
-    getBFB(dqjd = 0, zgs = 0) {
+    getBFB (dqjd = 0, zgs = 0) {
       let ddzgs = zgs || 0;
       let yjggs = dqjd || 0;
       if (yjggs * 1 == 0) {
@@ -209,6 +268,11 @@ export default {
     padding: 0 !important;
   }
 }
+.inline-block {
+  display: inline-block;
+  min-width: 70px;
+  text-align: center;
+}
 </style>
 <style lang="scss" scoped>
 .ddDetail {
@@ -228,10 +292,13 @@ export default {
     display: flex;
     background: #eff2f5;
     justify-content: flex-start;
-    height: 100%;
+    max-height: calc(100vh - 320px);
+    max-width: calc(100vw - 200px);
+    overflow: scroll;
   }
 }
 .box-card {
+  height: max-content;
   margin: 5px;
   min-width: 250px;
   background: #f7f7f7;
@@ -242,23 +309,23 @@ export default {
     flex-direction: column;
     width: 290px;
     margin: 20px 0;
-    padding:0 5px;
+    padding: 0 5px;
     background: #ffffff;
     border: none;
     border-radius: 2px;
     transition: box-shadow 0.1s ease, transform 0.1s ease,
       -webkit-transform 0.1s ease;
-      .list-title{
-        color: #40485B;
-        font-size: 16px;
-      }
-      .list-cz{
-        color:rgba(0,0,0,0.4);
-        margin-left:5px;
-      }
-      .list-ddjd{
-        margin:5px;
-      }
+    .list-title {
+      color: #40485b;
+      font-size: 16px;
+    }
+    .list-cz {
+      color: rgba(0, 0, 0, 0.4);
+      margin-left: 5px;
+    }
+    .list-ddjd {
+      margin: 5px;
+    }
   }
 }
 
@@ -281,14 +348,16 @@ export default {
   letter-spacing: 0.29px;
 }
 .small-font-name {
-  font-family: PingFangSC-Regular;
+  display: inline-block;
+  width:70px;
+  text-align: right;
   font-size: 12px;
   color: #666666;
   letter-spacing: 0.19px;
 }
 .small-font-value {
   font-family: PingFangSC-Medium;
-  font-size: 12px;
+  font-size: 14px;
   color: #333333;
   letter-spacing: 0.19px;
   margin-left: 10px;

@@ -122,7 +122,7 @@ export default {
           }
         },
         barWidth: '18',
-        color: ['#ff862f', '#851dd1','#ff4e6d','#4f89ef','#ffc642', '#0040a3','#00bed1','#00d543'],
+        color: ['#FFC354', '#5D98E2','#EE8181','#4f89ef','#ffc642', '#0040a3','#00bed1','#00d543'],
         xAxis: [
           {
             type: 'category',

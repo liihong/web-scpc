@@ -4,7 +4,7 @@
 <template>
   <section>
     <!--工具条-->
-    <el-col :span="24" class="toolbar">
+    <el-col :span="24" class="toolbar" v-if="!noTool">
       <el-form :inline="true">
         <el-col :span="7">
           <el-form-item>
@@ -45,7 +45,7 @@
           </el-button-group>
         </template>
       </el-table-column>
-      <el-table-column align="center" v-for="(row,index) in resRows" :key="index" :prop="row.COLUMN_NAME" :fixed="(row.IS_FROZEN == 1?'left':false)" :label="row.COLUMN_CNAME" :min-width="(row.COLUMNLENGTH != '')?row.COLUMNLENGTH:150">
+      <el-table-column align="center" v-for="(row,index) in resRows.filter(item=>item.PROPERTY_TYPE != 10)" :key="index" :prop="row.COLUMN_NAME" :fixed="(row.IS_FROZEN == 1?'left':false)" :label="row.COLUMN_CNAME" :min-width="(row.COLUMNLENGTH != '')?row.COLUMNLENGTH:150">
         <template slot-scope="scope">
           <span v-if="row.PROPERTY_TYPE == '2' || row.PROPERTY_TYPE == '4'">
             <slot :name="row.COLUMN_NAME" v-bind:row="scope.row">
@@ -92,6 +92,10 @@ export default {
     noAdd: {
       type: Boolean,
       default: false
+    },
+    noTool:{
+      type: Boolean,
+      default: false,
     },
     query: {
       type: Object,
