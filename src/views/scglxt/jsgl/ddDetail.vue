@@ -293,7 +293,8 @@ export default {
     background: #eff2f5;
     justify-content: flex-start;
     max-height: calc(100vh - 320px);
-    max-width: calc(100vw - 200px);
+    // max-width: calc(100vw - 200px);
+    width: 100%;
     overflow: scroll;
   }
 }

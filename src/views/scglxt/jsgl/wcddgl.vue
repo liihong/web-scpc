@@ -1,7 +1,7 @@
 <template>
   <div class="ddgl">
     <ResList ref="wcddList" tableId='0114' noEdit>
-       <el-table-column slot="operate" fixed="left" label="操作" min-width="180" align="center">
+       <el-table-column slot="operate" fixed="left" label="操作" min-width="200" align="center">
         <template slot-scope="scope">
           <el-button-group size="mini">
             <el-button @click="exportBL(scope.row.ID)" size="mini" type="primary">备料</el-button>
