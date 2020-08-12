@@ -1,6 +1,9 @@
 <template>
   <div class="jgryjg">
-    <ResList tableId='010410' noEdit noAdd ref="jgList">
+    <ResList tableId='010410' noEdit noAdd ref="jgList" @selectChange="getChecks">
+    <el-form-item slot="toolBar">
+      <el-button type="primary" icon="el-icon-s-unfold" @click="passMany" class="radio" :label="1">批量外协</el-button>
+    </el-form-item>
       <el-table-column slot="operate" fixed="left" label="操作" min-width="80" align="center">
         <template slot-scope="scope">
           <el-button v-if="!scope.row.CZRYID" size="mini" type="primary" @click="beginWork(scope.row)">开始</el-button>
@@ -47,6 +50,10 @@ export default {
   },
   data() {
     return {
+      selectRows: [],
+      passManyState: {
+        show: false,
+      },
       dialogState: {
         row: {},
         type: 'read',
@@ -66,6 +73,9 @@ export default {
     ...mapGetters(['fzgy']),
   },
   methods: {
+     getChecks(sel) {
+      this.selectRows = sel
+    },
     //显示工艺编排信息
     gybpClick(row) {
       this.dialogState.show = true
@@ -83,6 +93,14 @@ export default {
       this.overState.kjgjs = row.DJGJS * 1
       this.overState.ddjs = row.JGSL
       this.overState.show = true
+    },
+    passMany(){
+      if(this.selectRows.length>0) {
+        this.passManyState.show=true
+        this.passManyState.selectRows = this.selectRows
+      }else{
+        this.$message.warning('请选中零件后再操作。')
+      }
     }
   }
 }

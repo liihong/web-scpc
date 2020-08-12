@@ -16,10 +16,10 @@ module.exports = class extends Base {
       as: 'ht',
       join: 'left',
       on: ['ssht', 'id']
-    }).field('t.id,xmname,ssht,fun_yjggs ( t.id ) dqjd,zgs,ht.htbh,ht.remark').alias('t').page(pageNumber, pageSize).where({
+    }).field('t.id,xmname,ssht,fun_yjggs ( t.id ) dqjd,zgs,ht.htbh,ht.jssj,ht.remark').alias('t').page(pageNumber, pageSize).where({
       ckzt: null,
       isshow: 1
-    }).countSelect();
+    }).order('ddorder+1 DESC').countSelect();
 
     return this.success(data);
   }

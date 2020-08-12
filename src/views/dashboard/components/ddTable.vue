@@ -14,15 +14,21 @@
                        :label="row.name"
                        :min-width="(row.length != '')?row.length:150">
         <template slot-scope="scope">
-          <div v-if="row.id === 'DQJD'">
+         
+          <div v-if="row.id === 'dqjd'">
             <router-link :to="{path:'/ddDetail', query:{id:scope.row.id}}">
               <el-progress :text-inside="true"
                            :stroke-width="14"
                            :percentage="getBFB(scope.row.dqjd,scope.row.zgs)"></el-progress>
             </router-link>
           </div>
+           <div v-else-if="row.id === 'xmname'">
+            <router-link :to="{path:'/ddDetail', query:{id:scope.row.id}}">
+              {{scope.row[row.id]}}
+            </router-link>
+          </div>
           <span v-else>{{scope.row[row.id]}}</span>
-          
+
         </template>
       </el-table-column>
     </el-table>
@@ -42,6 +48,9 @@ export default {
       }, {
         id: 'remark',
         name: '订单备注'
+      }, {
+        id: 'jssj',
+        name: '交货时间'
       }, {
         id: 'dqjd',
         name: '进度'
@@ -64,13 +73,13 @@ export default {
       });
     },
     //获取订单百分比
-    getBFB(dqjd = 0, zgs = 0) {
+    getBFB (dqjd = 0, zgs = 0) {
       let ddzgs = zgs || 0
       let yjggs = dqjd || 0
-      if (yjggs*1 == 0) {
+      if (yjggs * 1 == 0) {
         return 0
       }
-      if (ddzgs*1 == 0) {
+      if (ddzgs * 1 == 0) {
         return 0
       }
       let bfb = (yjggs / ddzgs) * 100

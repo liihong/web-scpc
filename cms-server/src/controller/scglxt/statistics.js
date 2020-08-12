@@ -183,4 +183,62 @@ module.exports = class extends Base {
 
     return this.success(data);
   }
+
+  // 获取总工作台所需数据  默认查询近七天的工艺完成情况
+
+  async getAdminStatAction() {
+    const sql = `SELECT jggy.id,jggy.gymc,sum(edgs) edgs,DATE_FORMAT(jssj,'%Y-%m-%d') jssj FROM scglxt_t_gygc gygc,scglxt_t_jggy jggy WHERE gygc.gynr=jggy.id AND DATE_SUB(CURDATE(),INTERVAL 7 DAY)<=date(jssj) GROUP BY DATE_FORMAT(jssj,'%Y-%m-%d'),gynr ORDER BY gymc,jssj`;
+
+    const datas = await this.model().query(sql);
+    const xData = await this.model('scglxt_t_gygc').where('DATE_SUB( CURDATE(), INTERVAL 7 DAY )<= date( jssj )').group(`DATE_FORMAT( jssj, '%Y-%m-%d' )`).getField(`DATE_FORMAT( jssj, '%Y-%m-%d' ) jssj`);
+
+    const legend = await this.model('scglxt_t_jggy').where({sftj: '1'}).field('id,gymc name').select();
+    // const pArr = [];
+    legend.forEach(item => {
+      // pArr.push(this.getGyDatas(item, xData));
+      item.data = [];
+      item.type = 'line';
+      xData.map(el => {
+        const tmp = datas.filter(v => {
+          return v.jssj === el && v.id === item.id;
+        });
+        if (tmp.length > 0) {
+          item.data.push(tmp[0]['edgs']);
+        } else {
+          item.data.push(0);
+        }
+      });
+    });
+
+    // await Promise.all(pArr);
+    const data = {
+      legend: legend.map(el => el.name),
+      xAxis: xData,
+      series: legend
+    };
+    return this.success(data);
+  }
+
+  // 判断当前工艺是新增还是修改
+  async getGyDatas(item, dates) {
+    return new Promise(async resolve => {
+      const wjData = await this.model('scglxt_t_gygc').where(`DATE_SUB(CURDATE(),INTERVAL 7 DAY)<=date(jssj) and gynr='${item.id}'`).field(`sum(edgs) edgs,DATE_FORMAT(jssj,'%Y-%m-%d') jssj`).group(`DATE_FORMAT(jssj,'%Y-%m-%d')`).select();
+      item.data = [];
+      item.type = 'line';
+      // for (let i = 0; i < dates.length; i++) {
+      //   const tmp = wjData.find(v => v.jssj === dates[i]);
+      // }
+      dates.map(el => {
+        const tmp = wjData.filter(v => {
+          return v.jssj === el;
+        });
+        if (tmp.length > 0) {
+          item.data.push(tmp[0]['edgs']);
+        } else {
+          item.data.push(0);
+        }
+      });
+      resolve();
+    });
+  }
 };

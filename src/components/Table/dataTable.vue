@@ -17,8 +17,6 @@
   <section>
     <!--列表-->
     <el-table class="el-table"
-              v-bind="$attr"
-              v-on="$listeners"
               :data="tableData"
               v-loading="listLoading"
               stripe
@@ -130,6 +128,14 @@ export default {
   mounted () {
     var offsetHeight = window.innerHeight
     this.tableHeight = offsetHeight - 220
+    if (this.tableDatas && this.tableDatas.length > 0) {
+      this.tableData = this.tableDatas
+    } else {
+      this.tableData = this.tableInfo.list
+      this.pageNumber = this.tableInfo.curPagerNo
+      this.pageSize = this.tableInfo.pageSize
+      this.total = this.tableInfo.rowsCount
+    }
   },
   watch: {
     tableInfo () {
@@ -142,8 +148,10 @@ export default {
         this.total = this.tableInfo.rowsCount
       }
     },
-    tableDatas () {
-      if (this.tableDatas && this.tableDatas.length > 0) {
+    tableDatas:{
+      deep:true,
+      handler:()=>{
+        if (this.tableDatas && this.tableDatas.length > 0) {
         this.tableData = this.tableDatas
       } else {
         this.tableData = this.tableInfo.list
@@ -151,7 +159,8 @@ export default {
         this.pageSize = this.tableInfo.pageSize
         this.total = this.tableInfo.rowsCount
       }
-    },
+      }
+    }
   }
 }
 </script>

@@ -1,3 +1,4 @@
+import util from '../../utils/util';
 module.exports = class extends think.Controller {
   __before() {
     // if(this.ctx.originalUrl != '/user/login') {
@@ -7,8 +8,8 @@ module.exports = class extends think.Controller {
     // }
   }
   _call() {
-    let method = this.http.method.toLowerCase();
-    if (method === "options") {
+    const method = this.http.method.toLowerCase();
+    if (method === 'options') {
       this.setCorsHeader();
       this.end();
       return;
@@ -17,14 +18,19 @@ module.exports = class extends think.Controller {
     return super.__call();
   }
   setCorsHeader() {
-    this.header("Access-Control-Allow-Origin", "*");
-    this.header("Access-Control-Allow-Headers", "x-requested-with,token");
-    this.header("Access-Control-Request-Method", "OPTION,GET,POST,PUT,DELETE");
-    this.header("Access-Control-Allow-Credentials", "true");
+    this.header('Access-Control-Allow-Origin', '*');
+    this.header('Access-Control-Allow-Headers', 'x-requested-with,token');
+    this.header('Access-Control-Request-Method', 'OPTION,GET,POST,PUT,DELETE');
+    this.header('Access-Control-Allow-Credentials', 'true');
+  }
+
+  async addOperateLog(data) {
+    console.log(data);
+    data.id = util.getUUId();
+    await this.model('operate_log').add(data);
   }
   constructor(ctx) {
     super(ctx); // 调用父级的 constructor 方法，并把 ctx 传递进去
     // 其他额外的操作
   }
-
 };

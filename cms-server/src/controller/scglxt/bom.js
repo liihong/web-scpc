@@ -21,10 +21,10 @@ module.exports = class extends Base {
     };
     complex['gygcid'] = ['in', `select id from scglxt_t_gygc where bomid='` + id + `'`];
     whereObj._complex = complex;
-    const deleteGx = await this.model('scglxt_t_jggl').where(
+    await this.model('scglxt_t_jggl').where(
       `gygcid in (select id from scglxt_t_gygc where bomid='` + id + `')`
     ).delete();
-    const deleteGy = await this.model(gyModel).where({
+    await this.model(gyModel).where({
       bomid: id
     }).delete();
 
