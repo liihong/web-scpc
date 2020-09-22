@@ -76,6 +76,7 @@ export default {
   methods: {
     //修改加工记录
     updateJGJL(row) {
+      console.log(row)
       this.activeRow = row
       this.formData.jgjs = row.JGJS
       this.radioValue = row.JGRYID

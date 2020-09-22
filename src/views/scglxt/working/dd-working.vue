@@ -7,7 +7,7 @@
     <div class="working">
       <div>
         <bar-echarts :option="option"
-                     class="echarts-container"></bar-echarts>
+                     class="echarts-infos"></bar-echarts>
       </div>
       <div>
         <el-button type="primary"
@@ -17,12 +17,12 @@
       </div>
       <el-table id="out-table"
                 class="working-table"
-                height="65vh"
+                height="60vh"
                 :cell-class-name="getCellStyle"
                 header-cell-class-name="header-style"
                 :data="tableData">
         <el-table-column type="index"
-                         width="25"
+                         width="50"
                          align="center"></el-table-column>
         <el-table-column min-width="200"
                          prop="xmname"
@@ -304,8 +304,24 @@ export default {
   }
 };
 </script>
-
-<style lang="scss">
+<style  lang="scss">
+.working-table {
+  background: #00233a;
+  .cell-style {
+    font-size: 18px;
+    color: #00d5ff;
+    background: #162736;
+    border-bottom: 0;
+  }
+  .cell-stripe-style {
+    font-size: 18px;
+    color: #00d5ff;
+    background: #2b4b67;
+    border-bottom: 0;
+  }
+}
+</style>
+<style lang="scss" scoped>
 .dd-working {
   background: #00233a;
   overflow: hidden;
@@ -327,24 +343,10 @@ export default {
   right: 10px;
   top: 15px;
 }
-.echarts-container {
+.echarts-infos {
   height: 160px;
 }
-.working-table {
-  background: #00233a;
-  .cell-style {
-    font-size: 18px;
-    color: #00d5ff;
-    background: #162736;
-    border-bottom: 0;
-  }
-  .cell-stripe-style {
-    font-size: 18px;
-    color: #00d5ff;
-    background: #2b4b67;
-    border-bottom: 0;
-  }
-}
+
 .red {
   color: rgb(240, 62, 62);
 }

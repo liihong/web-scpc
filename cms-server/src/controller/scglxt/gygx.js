@@ -608,6 +608,7 @@ module.exports = class extends Base {
 
     const jgglUpdate = {
       sfjy: '1',
+      jgjs: jgjs - dhjs,
       jysj: util.getNowTime(),
       jyryid: jyryid
     };
@@ -637,13 +638,17 @@ module.exports = class extends Base {
       id: bomid
     }).find();
     let data = {};
+
+    // 不管是返工还是报废 都应该将原加工记录删掉
+
     // 返工
-    if (sjzt == '2201') {
+    if (sjzt === '2201') {
+      gygcUpdate.fgcs = "(select count(*) from scglxt_t_jggl_tmp where jgglid='" + id + " and sjzt='2201')+1";
+
       await this.model('scglxt_t_gygc').where({
         id: gygcid
       }).update(gygcUpdate);
 
-      gygcUpdate.fgcs = "(select count(*) from scglxt_t_jggl_tmp where jgglid='" + id + " and sjzt='2201')+1";
       data = await this.model('scglxt_t_jggl').where({
         id: id
       }).update(jgglUpdate);
@@ -946,7 +951,7 @@ module.exports = class extends Base {
     }).getField('id');
 
     // 如果报废件数=订单件数则该零件直接出库，删除该工序以后所有的加工工序
-    if (bomData.jgjs == dhjs) {
+    if (bomData.jgjs === dhjs) {
       if (ids.length > 0) {
         // 修改
         await this.model('scglxt_t_gygc').where({
@@ -994,6 +999,11 @@ module.exports = class extends Base {
       await this.model('scglxt_t_jggl').where({
         gygcid: ['in', ids]
       }).decrement('jgjs', dhjs);
+
+      await this.model('scglxt_t_jggl').where({
+        gygcid: ['in', ids],
+        jgjs: 0
+      }).delete();
     }
 
     // 如果需要生成新的加工单，则自动录入数据

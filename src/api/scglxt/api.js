@@ -18,6 +18,7 @@ let api = {
     getPeopleByBz: 'scglxt/sjzd/getPeopleByBz',
     getSBLXList:'scglxt/sjzd/getSBLXList',
     updateSblxInfo: 'scglxt/sjzd/updateSblxInfo',
+    getAllWxCj: 'scglxt/sjzd/getAllWxCj',
 
     //工艺工序操作
     getJggyList: 'scglxt/gygx/getJggyList',

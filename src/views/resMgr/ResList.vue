@@ -220,7 +220,7 @@ export default {
       }
       this.timer = setTimeout(() => {
         this.queryResList();
-      }, 1500);
+      }, 1000);
     },
     queryResList() {
       if (this.query != undefined) {
