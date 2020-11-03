@@ -51,7 +51,8 @@ export default {
         { id: 'sbmc', name: '使用设备' },
         { id: 'jgkssj', name: '开始时间' },
         { id: 'jgjssj', name: '结束时间' },
-        { id: 'bzgs', name: '额定工时' },
+        { id: 'bzgs', name: '总工时' },
+        { id: 'edgs', name: '额定工时' },
       ],
       tableData: []
     }

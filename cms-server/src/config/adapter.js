@@ -40,7 +40,7 @@ exports.model = {
     // prefix: 'cms_',
     encoding: 'utf8',
     // host: '127.0.0.1',
-    host: '223.72.9.162',
+    host: '223.72.9.161',
     port: '12304',
     // port: '3306',
     user: 'root',

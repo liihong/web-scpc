@@ -79,7 +79,9 @@ let api = {
     uploadBOMEndTime: 'scglxt/bom/uploadBOMEndTime',
     getBOMBykc:'scglxt/bom/getBOMBykc', //获取BOM备用库存
     setBOMBykc:'scglxt/bom/setBOMBykc',//关联备用库存
-
+    stopBOMProcess: 'scglxt/bom/stopBOMProcess',
+    getBykcList: 'scglxt/bom/getBykcList',
+    
     //组件操作
     addZj: 'scglxt/zj/addZj',
     editZj: 'scglxt/zj/editZj',

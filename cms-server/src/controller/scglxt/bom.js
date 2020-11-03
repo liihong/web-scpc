@@ -521,4 +521,22 @@ module.exports = class extends Base {
 
     return this.success(data);
   }
+
+  // 停止加工
+  async stopBOMProcessAction() {
+    const bomid = this.post('bomid');
+
+    const data = await this.model('scglxt_t_bom').where({id: bomid}).update({
+      zddzt: '0508'
+    });
+
+    return this.success(data);
+  }
+
+  // 获取所有备用库信息
+  async getBykcListAction() {
+    const data = await this.model('scglxt_t_bom_byk').field('id,zddmc,jgsl').where('jgsl > 0').select();
+
+    return this.success(data);
+  }
 };

@@ -30,13 +30,20 @@
     </ResList>
     <gybp :dialogState="dialogState" ref="gygx" />
     <selectPerson :dialogState="personState" />
+    <selectBakStore v-if="bykState.show" :dialogState="bykState" /> 
     <overWork :dialogState="overState" />
+    <el-dialog width="200px" :visible.sync="isBykShow" title="是否关联备用库">
+      <el-radio v-model="isRelevance" label="1">关联备用库</el-radio>
+      <el-radio v-model="isRelevance" label="2">不关联</el-radio><br/><br/>
+      <el-button type="primary" @click="onSureRele">确定</el-button>
+    </el-dialog>
   </div>
 </template>
 
 <script>
 import gybp from '../jsgl/components/gygx'
 import selectPerson from './components/selectPerson'
+import selectBakStore from './components/selectBakStore' //选择备用库
 import overWork from './components/overWork'
 
 import { mapGetters } from 'vuex'
@@ -46,6 +53,7 @@ export default {
   components: {
     gybp,
     selectPerson,
+    selectBakStore,
     overWork
   },
   data() {
@@ -62,7 +70,13 @@ export default {
       overState: {
         show: false,
         gyid: ''
-      }
+      },
+      bykState:{
+        show: false,
+        row:{}
+      },
+      isBykShow: false,
+      isRelevance:'1',
     }
   },
   computed: {
@@ -81,8 +95,25 @@ export default {
     },
     // 开始加工
     beginWork(row) {
+      this.bykState.row = row
       this.personState.gyid = row.ID
-      this.personState.show = true
+      console.log(row)
+      if(row.GYNR === '201909111019399817')// 如果工艺内容是库存的话，则弹出关联备用库存窗口，其他则正常
+      {
+        this.isBykShow = true
+        // this.bykState.show = true
+      }else{
+        this.personState.show = true
+      }
+    },
+    onSureRele(){
+      this.isBykShow = false
+      if(this.isRelevance === '1')// 如果工艺内容是库存的话，则弹出关联备用库存窗口，其他则正常
+      {
+        this.bykState.show = true
+      }else{
+        this.personState.show = true
+      }
     },
     // 结束加工
     endWork(row) {

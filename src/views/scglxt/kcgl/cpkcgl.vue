@@ -1,7 +1,7 @@
 <template>
   <div>
     <ResList tableId='010411' ref="cpbykc"
-             noEdit>
+             >
       <el-table-column slot="operate"
                        fixed="left"
                        label="操作"
@@ -18,7 +18,7 @@
         </template>
       </el-table-column>
     </ResList>
-    <el-dialog title="手动备用库存出库" width="30%" :visible="isShow">
+    <el-dialog title="手动备用库存出库" width="30%" :visible.sync="isShow" close-on-click-modal close-on-press-escape	>
       <el-form :model="query">
         <el-form-item label="选择订单">
           <el-select v-model="query.ssdd"

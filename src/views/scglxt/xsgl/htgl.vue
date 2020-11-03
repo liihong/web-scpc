@@ -47,6 +47,9 @@
         >{{scope.row.SPZT_TEXT}}<a  v-if="scope.row.SPZT == 1" @click="lookSpyy(scope.row)">查看原因</a></span>
         <span v-else>{{scope.row.SPZT_TEXT}}</span>
       </template>
+       <template slot="DQJD" slot-scope="scope">
+          <el-progress :text-inside="true" :stroke-width="14" :percentage="getBFB(scope.row.DQJD,scope.row.ZGS)"></el-progress>
+      </template>
     </ResList>
     <bjd :dialogState="dialogState"></bjd>
     <bjdList :dialogState="bjdState" />
@@ -179,6 +182,20 @@ export default {
           this.$message.addError(res.errmsg);
         }
       });
+    },
+     //获取订单百分比
+    getBFB(dqjd = 0, zgs = 0) {
+      let ddzgs = zgs || 0
+      let yjggs = dqjd || 0
+      if (yjggs*1 == 0) {
+        return 0
+      }
+      if (ddzgs*1 == 0) {
+        return 0
+      }
+      let bfb = (yjggs / ddzgs) * 100
+
+      return Math.ceil(bfb)
     }
   },
   watch:{

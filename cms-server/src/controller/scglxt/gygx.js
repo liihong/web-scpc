@@ -403,6 +403,22 @@ module.exports = class extends Base {
           await this.model('scglxt_t_bom').where({id: gygcData.bomid}).update({
             zddzt: gyInfo.gxsx
           });
+          await this.model('scglxt_t_gygc').where({id: gyid}).update({
+            sjjs: 0,
+            yjgjs: jgjs,
+            status: 2,
+            jssj: util.getNowTime(),
+            sfjy: 1
+          });
+          await this.model('scglxt_t_jggl').where({
+            gygcid: gyid,
+            jgryid: worker,
+            jgjssj: null
+          }).update({
+            jyryid: '201609101108000000',
+            jysj: util.getNowTime(),
+            jgjssj: util.getNowTime()
+          });
         }
       }
 

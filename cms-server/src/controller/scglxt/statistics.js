@@ -60,7 +60,7 @@ module.exports = class extends Base {
     const zddmc = this.post('zddmc');
     const gynr = this.post('gynr');
     let bomSql = `SELECT bom.id,ssdd,dd.xmname ddmc,bom.jgsl,zddmc bommc FROM scglxt_t_bom bom,scglxt_t_dd dd WHERE  bom.ssdd=dd.id and bom.id IN (
-            SELECT bomid FROM scglxt_t_gygc WHERE 1=1`;
+            SELECT bomid FROM scglxt_t_gygc WHERE 1=1 `;
     if (gynr !== undefined && gynr !== '') {
       bomSql += `AND (gynr = '${gynr}') AND kssj BETWEEN "${time.split(' ')[0]} 00:00:00" AND "${time.split(' ')[1]}  23:59:59") And (zddmc like '%` + zddmc + `%' or xmname like '%` + zddmc + `%') order by bom.endtime,bom.ssdd desc`;
     } else {
@@ -159,7 +159,7 @@ module.exports = class extends Base {
       SELECT xmname FROM scglxt_t_dd WHERE id=gygc.ssdd) ddmc,(
       SELECT zddmc FROM scglxt_t_bom WHERE id=gygc.bomid) bommc,t.jgjs,(
       SELECT rymc FROM scglxt_t_ry WHERE id=t.jyryid) jyrymc,t.jgkssj,t.jgjssj,t.sbid,(
-      SELECT sbmc FROM scglxt_t_sb WHERE id=t.sbid) sbmc,gygc.bzgs,t.sfjy FROM scglxt_t_jggl t,scglxt_t_gygc gygc WHERE t.gygcid=gygc.id AND date(jgjssj)=curdate() AND jgryid='${token}' order by gygc.ssdd`;
+      SELECT sbmc FROM scglxt_t_sb WHERE id=t.sbid) sbmc,(gygc.bzgs+gygc.zbgs) bzgs,gygc.edgs,t.sfjy FROM scglxt_t_jggl t,scglxt_t_gygc gygc WHERE t.gygcid=gygc.id AND date(jgjssj)=curdate() AND jgryid='${token}' order by gygc.ssdd`;
 
     const data = await this.model().query(sql);
 

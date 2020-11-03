@@ -192,6 +192,7 @@
         <el-button type="primary"
                    @click="onSave">保存</el-button>
         <el-button @click="onCancel">取消</el-button>
+        <el-button  v-if="optionType === 'edit'" @click="stopProcess" type="danger">停止加工</el-button>
       </el-col>
     </el-dialog>
     <selectByk :dialogState="dialogByk"
@@ -432,6 +433,17 @@ export default {
         })
         .then(res => {
           this.$set(this.dropDownListData, attr, res.data);
+        });
+    },
+    stopProcess(){
+      this.$ajax
+        .post(this.$api.stopBOMProcess, {
+          bomid: this.resId
+        })
+        .then(res => {
+          if(res.errno === 0)
+            this.$message.success('停止加工')
+            this.dialogState.show = false
         });
     }
   },
