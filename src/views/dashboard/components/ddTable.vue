@@ -4,6 +4,7 @@
               :data="tableDatas"
               stripe
               border
+              header-cell-class-name="table_th"
               max-height="500px"
               style="width: 100%;">
       <el-table-column v-for="(row,index) in columnDatas"

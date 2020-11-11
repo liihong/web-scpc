@@ -10,6 +10,7 @@ let api = {
     getPeopleHour: 'scglxt/statistics/getPeopleHour', //工人工时统计
     exportPersonalStat: 'scglxt/statistics/exportPersonalStat', //导出工人工时统计
     getPersonalDay: 'scglxt/statistics/getPersonalDay',
+    getPersonalMonth: 'scglxt/statistics/getPersonalMonth',
     getSygsList: 'scglxt/gygx/getSygsList', //某一工艺剩余工时
     getAdminStat: 'scglxt/statistics/getAdminStat',
     //数据字典操作

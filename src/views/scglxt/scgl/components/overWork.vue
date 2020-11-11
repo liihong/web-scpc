@@ -77,7 +77,7 @@ export default {
         })
         return
       }
-      if (!!this.jgjs && this.jgjs == 0) {
+      if (this.jgjs == 0) {
         this.$message({
           message: '完成件数不能为0！',
           type: 'warning'

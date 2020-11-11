@@ -60,17 +60,17 @@ module.exports = class extends Base {
     const zddmc = this.post('zddmc');
     const gynr = this.post('gynr');
     let bomSql = `SELECT bom.id,ssdd,dd.xmname ddmc,bom.jgsl,zddmc bommc FROM scglxt_t_bom bom,scglxt_t_dd dd WHERE  bom.ssdd=dd.id and bom.id IN (
-            SELECT bomid FROM scglxt_t_gygc WHERE 1=1 `;
+            SELECT bomid FROM scglxt_t_gygc gygc,scglxt_t_jggl jggl  WHERE 1=1 `;
     if (gynr !== undefined && gynr !== '') {
-      bomSql += `AND (gynr = '${gynr}') AND kssj BETWEEN "${time.split(' ')[0]} 00:00:00" AND "${time.split(' ')[1]}  23:59:59") And (zddmc like '%` + zddmc + `%' or xmname like '%` + zddmc + `%') order by bom.endtime,bom.ssdd desc`;
+      bomSql += `AND (gynr = '${gynr}') and gygc.id=jggl.gygcid AND jggl.jgjssj BETWEEN "${time.split(' ')[0]} 00:00:00" AND "${time.split(' ')[1]}  23:59:59") And (zddmc like '%` + zddmc + `%' or xmname like '%` + zddmc + `%') order by bom.endtime,bom.ssdd desc`;
     } else {
-      bomSql += `AND kssj BETWEEN "` + time.split(' ')[0] + ` 00:00:00" AND "` + time.split(' ')[1] + `  23:59:59") And (zddmc like '%` + zddmc + `%' or xmname like '%` + zddmc + `%') order by bom.endtime,bom.ssdd desc`;
+      bomSql += ` and gygc.id=jggl.gygcid AND jggl.jgjssj BETWEEN "` + time.split(' ')[0] + ` 00:00:00" AND "` + time.split(' ')[1] + `  23:59:59") And (zddmc like '%` + zddmc + `%' or xmname like '%` + zddmc + `%') order by bom.endtime,bom.ssdd desc`;
     }
     const bomData = await this.model().query(bomSql);
     let sql = `SELECT any_value(gygc.id) id,
         any_value(gygc.ssdd) ssdd, any_value(xmname) ddmc, any_value(bomid) bomid,
         any_value(zddmc) bommc, any_value(gynr) gynr,any_value(jgsl) jgsl,
-        any_value(jggl.jgryid) czryid, any_value(ry.rymc) rymc,(ifnull( gygc.zbgs, 0 )/(SELECT count(*) from scglxt_t_jggl where gygcid=gygc.id))+(gygc.edgs*(jggl.jgjs -ifnull(jggl.bfjs,0))) edgs
+        any_value(jggl.jgryid) czryid, any_value(ry.rymc) rymc,(ifnull( gygc.zbgs, 0 )/(SELECT count(*) from scglxt_t_jggl where gygcid=gygc.id))+(gygc.edgs*(jggl.jgjs)) edgs
     FROM scglxt_t_gygc gygc left join scglxt_t_jggl jggl on gygc.id=jggl.gygcid, scglxt_t_dd dd, scglxt_t_bom bom, scglxt_t_ry ry 
     WHERE
         gygc.ssdd = dd.id  AND gygc.bomid = bom.id 
@@ -160,6 +160,21 @@ module.exports = class extends Base {
       SELECT zddmc FROM scglxt_t_bom WHERE id=gygc.bomid) bommc,t.jgjs,(
       SELECT rymc FROM scglxt_t_ry WHERE id=t.jyryid) jyrymc,t.jgkssj,t.jgjssj,t.sbid,(
       SELECT sbmc FROM scglxt_t_sb WHERE id=t.sbid) sbmc,(gygc.bzgs+gygc.zbgs) bzgs,gygc.edgs,t.sfjy FROM scglxt_t_jggl t,scglxt_t_gygc gygc WHERE t.gygcid=gygc.id AND date(jgjssj)=curdate() AND jgryid='${token}' order by gygc.ssdd`;
+
+    const data = await this.model().query(sql);
+
+    return this.success(data);
+  }
+
+  // 用户当月的工作记录
+  async getPersonalMonthAction() {
+    const token = this.header('token');
+
+    const sql = `SELECT t.id,(
+      SELECT xmname FROM scglxt_t_dd WHERE id=gygc.ssdd) ddmc,(
+      SELECT zddmc FROM scglxt_t_bom WHERE id=gygc.bomid) bommc,t.jgjs,(
+      SELECT rymc FROM scglxt_t_ry WHERE id=t.jyryid) jyrymc,t.jgkssj,t.jgjssj,t.sbid,(
+      SELECT sbmc FROM scglxt_t_sb WHERE id=t.sbid) sbmc,(gygc.bzgs+gygc.zbgs) bzgs,gygc.edgs,t.sfjy FROM scglxt_t_jggl t,scglxt_t_gygc gygc WHERE t.gygcid=gygc.id AND jgjssj BETWEEN DATE_FORMAT(NOW(),'%Y-%m-01') AND NOW() AND jgryid='${token}' order by gygc.ssdd`;
 
     const data = await this.model().query(sql);
 
