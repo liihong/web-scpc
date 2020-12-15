@@ -82,6 +82,7 @@ let api = {
     setBOMBykc:'scglxt/bom/setBOMBykc',//关联备用库存
     stopBOMProcess: 'scglxt/bom/stopBOMProcess',
     getBykcList: 'scglxt/bom/getBykcList',
+    getGyByBzBomMC: 'scglxt/bom/getGyByBzBomMC',
     
     //组件操作
     addZj: 'scglxt/zj/addZj',

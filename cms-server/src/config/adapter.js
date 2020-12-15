@@ -36,13 +36,13 @@ exports.model = {
   },
   mysql: {
     handle: mysql,
-    database: 'scpc',
+    database: 'scpc2',
     // prefix: 'cms_',
     encoding: 'utf8',
-    // host: '127.0.0.1',
-    host: '223.72.9.228',
-    port: '12304',
-    // port: '3306',
+    host: '127.0.0.1',
+    // host: '223.72.9.67',
+    // port: '12304',
+    port: '3306',
     user: 'root',
     password: 'root@123',
     dateStrings: true

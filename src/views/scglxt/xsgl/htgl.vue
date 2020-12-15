@@ -160,7 +160,7 @@ export default {
 
       let ddData = {
         ssht: htInfo.data.id,
-        xmname: "2020-" + htInfo.data.htjc + "-" + ddbh.data,
+        xmname: (new Date()).getFullYear() + "-" + htInfo.data.htjc + "-" + ddbh.data,
         ddlevel: "0403",
         starttime: htInfo.data.kssj,
         endtime: htInfo.data.jssj,

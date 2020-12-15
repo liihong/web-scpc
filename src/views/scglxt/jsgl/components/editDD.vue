@@ -94,7 +94,6 @@ export default {
     }
   },
   mounted() {
-    this.$set(this.formData,'DDLEVEL', '0403')
     this.getSjzdData(
       'ssht',
       'SELECT id,htbh NAME,htjc FROM scglxt_t_ht'
@@ -106,7 +105,8 @@ export default {
         return item.id == val
       })
       let ddbh = await this.$ajax.post(this.$api.getNewDDbh)
-      this.formData.XMNAME = '2020-' + (arr[0].htjc).toUpperCase() + '-' + ddbh.data
+      // this.formData.XMNAME = (new Date()).getFullYear()+'-' + (arr[0].htjc).toUpperCase() + '-' + ddbh.data
+      this.$set(this.formData,'XMNAME',(new Date()).getFullYear()+'-' + (arr[0].htjc).toUpperCase() + '-' + ddbh.data)
     },
     onSave() {
       let params = {}
@@ -221,6 +221,7 @@ export default {
             this.$nextTick(() => {
               this.$refs.rulesForm.resetFields()
               this.formData = {}
+              this.$set(this.formData,'DDLEVEL', '0403')
             })
           }
         }

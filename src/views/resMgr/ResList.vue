@@ -18,6 +18,7 @@ event:{
         <el-form-item>
           <el-button size="mini" @click="handleExport" type="primary" icon="el-icon-download">导出</el-button>
         </el-form-item>
+        <slot name="query"></slot>
         <el-form-item>
           <el-input
             size="small"

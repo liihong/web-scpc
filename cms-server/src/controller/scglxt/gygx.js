@@ -1001,6 +1001,14 @@ module.exports = class extends Base {
           serial: ['>', parseInt(jgglData.serial)],
           status: '2'
         }).decrement('yjgjs', dhjs);
+
+        await this.model('scglxt_t_jggl').where({
+          gygcid: ['in', ids],
+          jgjs: 0
+        }).delete();
+        await this.model('scglxt_t_jggl').where({
+          gygcid: ['in', ids]
+        }).decrement('jgjs', dhjs);
       }
 
       // 修改加工记录数据
@@ -1012,14 +1020,6 @@ module.exports = class extends Base {
       }).update({
         bfjs: dhjs
       });
-      await this.model('scglxt_t_jggl').where({
-        gygcid: ['in', ids]
-      }).decrement('jgjs', dhjs);
-
-      await this.model('scglxt_t_jggl').where({
-        gygcid: ['in', ids],
-        jgjs: 0
-      }).delete();
     }
 
     // 如果需要生成新的加工单，则自动录入数据

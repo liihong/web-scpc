@@ -77,9 +77,9 @@ export default {
         })
         return
       }
-      if (this.jgjs == 0) {
+      if (this.jgjs <= 0) {
         this.$message({
-          message: '完成件数不能为0！',
+          message: '完成件数不能为0或小于0！',
           type: 'warning'
         })
         return

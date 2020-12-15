@@ -15,10 +15,10 @@ module.exports = class extends Base {
       const table = await this.model('resource_table').getTableInfo(tableId);
       let fileds = await this.model('resource_table_column').getColumnList(tableId, 'UPDATE');
       fileds = fileds.map(item => {
-        if (item.ATTRIBUTE_TYPE != '2') { return item.COLUMN_NAME }
+        if (item.ATTRIBUTE_TYPE !== '2') { return item.COLUMN_NAME }
       });
       fileds = fileds.filter(item => {
-        return item != undefined;
+        return item !== undefined;
       });
       const data = await this.model(table.table_name).field(fileds).where({
         id: this.get('id')

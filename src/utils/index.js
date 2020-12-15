@@ -2,7 +2,7 @@
  * Created by lihong
  */
 
-export function parseTime(time, cFormat) {
+export function parseTime (time, cFormat) {
   if (arguments.length === 0) {
     return null
   }
@@ -46,7 +46,7 @@ export function parseTime(time, cFormat) {
  * Function
  * @param {*} obj
  */
-export function typeOfObj(obj) {
+export function typeOfObj (obj) {
   let objType = Object.prototype.toString.call(obj)
   return objType.replace('[object ', '').replace(']', '')
 }
@@ -54,7 +54,7 @@ export function typeOfObj(obj) {
  * 判断字符串是否为空
  * @param {*} str 
  */
-export function isNotEmpty(str) {
+export function isNotEmpty (str) {
   let flag = false
   if (str != null && str != undefined && str != '' && str != 'null') {
     flag = true
@@ -62,7 +62,7 @@ export function isNotEmpty(str) {
   return flag
 }
 
-export function formatTime(time, option) {
+export function formatTime (time, option) {
   time = +time * 1000
   const d = new Date(time)
   const now = Date.now()
@@ -101,7 +101,7 @@ export function formatTime(time, option) {
  * @param {识别属性} id
  * @param {分割属性} attr 
  */
-export function formatTreeData(arr, id, attr) {
+export function formatTreeData (arr, id, attr) {
   let treeData = []
   // 提取出父目录
   let parentArr = arr.filter((doc) => {
@@ -124,7 +124,7 @@ export function formatTreeData(arr, id, attr) {
   })
   return treeData
 }
-export function objToFormData(obj) {
+export function objToFormData (obj) {
   var params = new FormData()
   Object.keys(obj).map(function (item) {
     params.append(item, obj[item])
@@ -134,7 +134,7 @@ export function objToFormData(obj) {
 /**
  * 根据时间生成随机唯一ID
  */
-export function getUUId() {
+export function getUUId () {
   const now = new Date()
   let month = now.getMonth() + 1
   let day = now.getDate()
@@ -192,7 +192,7 @@ export function getNowFormatDate () {
  * @param {*} date 
  * @param {*} days 
  */
-export  function addDate(date, days) {
+export function addDate (date, days) {
   var d = new Date(date)
   d.setDate(d.getDate() + days)
   var month = d.getMonth() + 1
@@ -212,15 +212,15 @@ export  function addDate(date, days) {
  * @param {*} fn 
  * @param {*} time 
  */
-export function debounce(fn,time = 1000){
+export function debounce (fn, time = 1000) {
   var timer;
-  return function(){
-    if(timer !== null){
+  return function () {
+    if (timer !== null) {
       clearTimeout(timer);
     }
-    timer = setTimeout(()=>{
+    timer = setTimeout(() => {
       fn.apply(this, arguments);
-    },time);
+    }, time);
   }
 }
 
@@ -229,13 +229,19 @@ export function debounce(fn,time = 1000){
  * @param {*} fn 
  * @param {*} time 
  */
-export function throttle(fn,time = 1000){
+export function throttle (fn, time = 1000) {
   let timestamp = 0;
-  return function(){
+  return function () {
     let now = Date.now()
-    if(now-timestamp > time){
-      fn.apply(this,arguments)
+    if (now - timestamp > time) {
+      fn.apply(this, arguments)
       timestamp = now
     }
   }
+}
+
+export function flatten (ary) {
+  return ary.reduce((pre, cur) => {
+    return pre.concat(Array.isArray(cur.children) ? flatten(cur.children) : cur);
+  })
 }

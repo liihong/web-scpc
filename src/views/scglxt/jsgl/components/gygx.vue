@@ -7,17 +7,15 @@
         当前订单：
         <span style="color:#42b983">{{row.SSDD_TEXT}} </span>
         零件名称：
-        <a :href="row.DDTZ"
-           target="_blank">
-          <span style="color:#42b983"> {{row.ZDDMC}}</span>
-        </a>
+          <span class="pointer" @click="onLoadGy" style="color:#42b983"> {{row.ZDDMC}}</span>
+          (点击零件名称加载库中已有工艺)
       </span>
       <span v-else>
         零件名称：
-        <a :href="row.DDTZ"
-           target="_blank">
+         <a :href="row.DDTZ"
+           target="_blank"> 
           <span style="color:#42b983">{{row.BOMID_TEXT}}</span>
-        </a>
+         </a> 
       </span>
     </div>
     <el-row>
@@ -341,6 +339,26 @@ export default {
         zbgs: 0,
         sblxList: sblx || []
       })
+    },
+    onLoadGy(){
+      this.$ajax
+        .get(this.$api.getGyByBzBomMC, {
+          bommc: this.row.ZDDMC
+        })
+        .then(res => {
+          if (res.errno == 0) {
+            this.gygxList = res.data
+            this.gygxList.map(item => {
+              let sblx = this.sjzdList.filter(el => {
+                return el.ssgy == item.gynr
+              })
+              item.id = this.$util.getUUId()
+              item.bomid = this.bomid
+              item.sblxList = sblx
+              return item
+            })
+          }
+        })
     },
     //切换标准流程
     changeBzlc(val) {

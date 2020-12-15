@@ -92,7 +92,9 @@ module.exports = class extends Base {
   }
   // 根据订单表数据，生成新的订单编号
   async getNewDDbhAction() {
-    let count = await this.model('scglxt_t_dd').query(`SELECT SUBSTRING_INDEX(xmname,'-',-1) AS count FROM scglxt_t_dd   where xmname like '2020%' order by sjcjsj desc limit 1`);
+    const nowDate = new Date();
+    const nowYear = nowDate.getFullYear();
+    let count = await this.model('scglxt_t_dd').query(`SELECT SUBSTRING_INDEX(xmname,'-',-1) AS count FROM scglxt_t_dd   where xmname like '${nowYear}%' order by sjcjsj desc limit 1`);
 
     if (count.length > 0) {
       count = '00000' + (parseInt(count[0].count) + 1);
