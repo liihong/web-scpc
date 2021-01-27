@@ -21,7 +21,7 @@
             </el-date-picker>
           </el-form-item>
         </el-col>
-        <el-col :span="12" v-if="optionType == 'add'">
+        <el-col :span="12">
           <el-form-item prop="ENDTIME" label="结束时间">
             <el-date-picker value-format="yyyy-MM-dd" v-model="formData.ENDTIME" type="date" placeholder="结束时间">
             </el-date-picker>
@@ -72,7 +72,8 @@ export default {
       columnData: [],
       formData: this.dialogState.formData,
       dropDownListData: {},
-      primaryKey: {}
+      primaryKey: {},
+      oldEndTime: '',
     }
   },
   computed: {
@@ -125,6 +126,14 @@ export default {
             this.$message.editSuccess()
             this.$emit('saveAfter', params.form)
             this.dialogState.show = false
+            if(this.oldEndTime !== this.formData.ENDTIME){
+              this.$ajax.post(this.$api.updateEndTime, {
+                ddid: this.formData.ID,
+                endTime: this.formData.ENDTIME
+              }).then(()=>{
+                this.$message.addSuccess("您修改了结束时间，将同步修改BOM的结束时间");
+              })
+            }
           } else {
             this.$message.editError(res.errmsg)
           }
@@ -186,6 +195,7 @@ export default {
         })
         .then(res => {
           this.formData = res.data
+          this.oldEndTime = res.data.ENDTIME
         })
     },
     // 获取数据字典数据

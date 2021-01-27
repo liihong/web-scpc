@@ -48,14 +48,14 @@ export default {
       cksl: 0,
     }
   },
-  mounted(){
+  async mounted(){
     
-    this.initData()
+    await this.initData()
   },
   methods: {
-    initData () {
+    async initData () {
       this.cksl = this.dialogState.row.JGSL
-      this.$ajax
+      await this.$ajax
         .post(this.$api.getBykcList, {
           pageSize: 1000,
           pageNumber: 1
@@ -63,11 +63,11 @@ export default {
         .then(res => {
           if (res.errno == 0) {
             this.bykList = res.data;
+            console.log(this.dialogState.row.BOMID_TEXT)
             const bom = res.data.find(item=>{
               return item.zddmc === this.dialogState.row.BOMID_TEXT
             })
-            if(bom !== undefined)
-              this.activeItem = bom
+            this.activeItem = bom
           }
         });
     },

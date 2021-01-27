@@ -4,25 +4,11 @@
       <el-row>
         <el-col :span="24" class="toolbar">
           <el-form :inline="true" @submit.native.prevent>
-            <el-form-item label="选择订单">
-              <el-select v-model="query.SSDD" @change="ssddChange" filterable placeholder="请选择">
-                <el-option
-                  v-for="item in selectInfo.ssdd"
-                  :key="item.ID"
-                  :label="item.XMNAME"
-                  :value="item.ID"
-                ></el-option>
-              </el-select>
+            <el-form-item label="订单">
+              {{dialogState.row.SSDD_TEXT}}
             </el-form-item>
-            <el-form-item label="选择零件">
-              <el-select v-model="query.BOMID" @change="ssljChage" filterable placeholder="请选择">
-                <el-option
-                  v-for="item in selectInfo.ssbom"
-                  :key="item.id"
-                  :label="item.zddmc"
-                  :value="item.id"
-                ></el-option>
-              </el-select>
+            <el-form-item label="零件">
+               {{dialogState.row.BOMID_TEXT}}
             </el-form-item>
           </el-form>
         </el-col>
@@ -106,38 +92,14 @@ export default {
       }
     };
   },
-  mounted() {
-    this.initData();
-  },
   methods: {
-    initData() {
-      this.$ajax
-        .post(this.$api.getDdListByWhere, {
-          pageSize: 1000,
-          pageNumber: 1,
-          where: "ckzt is null"
-        })
-        .then(res => {
-          if (res.errno == 0) {
-            this.selectInfo.ssdd = res.data.data;
-          }
-        });
-    },
-    ssddChange() {
-      this.$ajax
-        .get(this.$api.getDdBOMData, {
-          id: this.query.SSDD
-        })
-        .then(res => {
-          if (res.errno == 0) {
-            this.selectInfo.ssbom = res.data.bomInfo;
-            this.query.BOMID = "";
-          }
-        });
-    },
     ssljChage() {
-      this.$refs.jgglList.getConfig();
-      this.$refs.jgglList.getResList();
+      this.query.SSDD = this.dialogState.row.SSDD
+      this.query.BOMID = this.dialogState.row.BOMID
+      this.$nextTick(()=>{
+        this.$refs.jgglList.getConfig();
+        this.$refs.jgglList.getResList();
+      })
     },
     selectChange(rows) {
       this.selectRows = rows;
@@ -192,10 +154,7 @@ export default {
   watch: {
     "dialogState.show"() {
       if (this.dialogState.show) {
-        this.initData();
-      } else {
-        this.query.SSDD = "";
-        this.query.BOMID = "";
+        this.ssljChage();
       }
     }
   }

@@ -114,7 +114,7 @@ event:{
         @size-change="sizeChange"
       ></el-pagination>
     </el-col>
-    <resEdit  @initData="getResList" @saveAfter="saveAfter" :dialogState="dialogState" />
+    <resEdit  @initData="getResList" @saveAfter="saveAfter" @editAfter="editAfter" :dialogState="dialogState" />
   </section>
 </template>
 
@@ -308,6 +308,9 @@ export default {
     // 点击保存后，如果还想执行什么操作可以在这个方法里进行
     saveAfter(info) {
       this.$emit("saveAfter", info);
+    },
+    editAfter(params) {
+      this.$emit('editAfter', params)
     },
     // 编辑按钮事件处理
     handleEdit(row) {

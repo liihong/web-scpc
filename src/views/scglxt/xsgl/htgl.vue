@@ -1,6 +1,6 @@
 <template>
   <div>
-    <ResList :num="num" tableId="0101" ref="htgl" @saveAfter="addDd" :query="query" noEdit>
+    <ResList :num="num" tableId="0101" ref="htgl" @saveAfter="addDd" @editAfter="editAfter" :query="query" noEdit>
       <el-form-item slot="toolBar">
         审批状态：
         <el-radio-group @change="changeSpzt" v-model="spzt">
@@ -18,7 +18,7 @@
           <el-button-group size="mini" v-else>
             <el-button size="mini" @click="bjdClickLook(scope.row)" type="primary">报价单</el-button>
             <el-button size="mini" @click="bjdClick(scope.row)" type="primary">上传</el-button>
-            <el-button size="mini" @click="$refs.htgl.handleEdit(scope.row)" type="primary">编辑</el-button>
+            <el-button size="mini" @click="handleEdit(scope.row)" type="primary">编辑</el-button>
             <el-button size="mini" @click="handleDelete(scope.row)" type="danger">删除</el-button>
           </el-button-group>
         </template>
@@ -72,6 +72,7 @@ export default {
     return {
       num:0,
       spzt:null,
+      oldData:{},
       dialogState: {
         show: false,
         row: {}
@@ -122,6 +123,10 @@ export default {
     changeSpzt(){
       this.query = {SPZT: this.spzt}
       this.num++
+    },
+    handleEdit(row){
+      this.oldData = row
+      this.$refs.htgl.handleEdit(row)
     },
     bjdClick(row) {
       this.dialogState.row = row;
@@ -182,6 +187,17 @@ export default {
           this.$message.addError(res.errmsg);
         }
       });
+    },
+    // 编辑后判断结束时间是否有变动，如果有 同时改变该合同下所有订单和BOM的结束时间
+    editAfter(params){
+      if(params.jssj !== this.oldData.JSSJ){
+          this.$ajax.post(this.$api.updateEndTime, {
+                ddid: this.formData.ID,
+                endTime: this.formData.ENDTIME
+              }).then(()=>{
+                this.$message.addSuccess("您修改了合同结束时间，将同步修改订单和BOM的结束时间");
+              })
+      }
     },
      //获取订单百分比
     getBFB(dqjd = 0, zgs = 0) {

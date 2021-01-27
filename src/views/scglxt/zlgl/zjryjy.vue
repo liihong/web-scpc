@@ -21,16 +21,16 @@
       </el-badge>
     </template>
   </ResList>
-   <passPart isBF :dialogState="dialogState" />
+   <endCheckCrap isBF :dialogState="dialogState" />
    </div>
 </template>
 
 <script>
-import passPart from './components/passPart'
+import endCheckCrap from './components/endCheckCrap'
 
 export default {
   components:{
-    passPart
+    endCheckCrap
   },
   data() {
     return {
@@ -81,9 +81,11 @@ export default {
     //终检不通过
     passSection(row){
       this.dialogState.row = row
+      this.dialogState.row.BOMID = row.ID
+
       this.dialogState.row.SJJS = row.JGSL
       this.dialogState.row.BOMID_TEXT = row.ZDDMC
-      
+      this.dialogState.row.ISZJ = 1
       this.dialogState.show = true
     }
   }

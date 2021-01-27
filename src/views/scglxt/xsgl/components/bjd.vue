@@ -61,14 +61,6 @@ export default {
           id: 'dj'
         },
         {
-          name: '未税单价',
-          id: 'wsdj'
-        },
-        {
-          name: '含税单价',
-          id: 'hsdj'
-        },
-        {
           name: '总金额',
           id: 'zje'
         },
@@ -78,11 +70,20 @@ export default {
           length: 50
         },
         {
+          name: '未税单价',
+          id: 'wsdj'
+        },
+        {
+          name: '含税单价',
+          id: 'hsdj'
+        },
+        {
           name: '税金',
           id: 'sj',
           length: 50
         }
       ],
+      outputHeader:['xh','ljmc','th','cz','dw','sl','dj','zje','wsdj','hsdj','sj'],
       step: 1
     }
   },
@@ -110,6 +111,7 @@ export default {
       this.readExcel(files)
     },
     readExcel(files) {
+      const that = this
       //表格导入
       if (files.length <= 0) {
         //如果没有文件名
@@ -127,20 +129,22 @@ export default {
             type: 'binary'
           })
           const wsname = workbook.SheetNames[0] //取第一张表
-          const ws = XLSX.utils.sheet_to_json(workbook.Sheets[wsname]) //生成json表格内容
-
+          console.log(wsname)
+          const ws = XLSX.utils.sheet_to_json(workbook.Sheets[wsname], {header:that.outputHeader,defval:''}) //生成json表格内容
+          console.log(ws)
           if (ws.length > 0) {
             let temp = []
-            ws.map(item => {
-              let obj = {}
-              this.columns.map(el => {
-                obj[el.id] = item[el.name] == undefined ? '' : item[el.name]
-              })
-              obj.ssht = this.dialogState.row.ID
-              obj.id = this.$util.getUUId()
-              temp.push(obj)
+            ws.splice(11,ws.length-23).map(item => {
+              // this.columns.map(el => {
+              //   obj[el.id] = item[el.name] == undefined ? '' : item[el.name]
+              // })
+              item.ssht = this.dialogState.row.ID
+              item.id = this.$util.getUUId()
+              temp.push(item)
             })
             this.dataList = temp
+            // this.dataList = ws.splice(11,ws.length-23)
+            console.log(this.dataList)
           }
         } catch (e) {
           return false

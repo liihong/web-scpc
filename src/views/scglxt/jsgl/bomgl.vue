@@ -129,9 +129,7 @@ export default {
     }
   },
   mounted () {
-    if (this.$route.query.SSDD) {
-      this.$set(this.query,'SSDD',this.$route.query.SSDD);
-    }
+     this.$set(this.query,'SSDD',this.$route.query.SSDD);
   },
   methods: {
     openJgjl (bomid) {
@@ -207,6 +205,11 @@ export default {
       this.bomForm.id = row.ID;
       this.bomForm.formData = row;
       this.bomForm.show = true;
+    }
+  },
+  watch:{
+    '$route.query'(to){
+      this.$set(this.query,'SSDD',to.SSDD);
     }
   }
 };

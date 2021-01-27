@@ -157,6 +157,7 @@ module.exports = class extends Base {
             el.ssdd = newId;
             el.czryid = null;
             el.jyryid = null;
+            el.sfwx = null;
             el.bomid = newBOMId;
             return el;
           }
@@ -469,7 +470,7 @@ SELECT (@rownum:=@rownum+1) AS rownum,gy.gymc sbmc,gc.ZYSX gynr,null as t,edgs,g
       id: util.getUUId(),
       type: '修改订单结束时间',
       error: '',
-      infos: this.post(),
+      infos: {id, endTime},
       operater: this.header('token')
     };
 

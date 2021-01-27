@@ -78,6 +78,7 @@ export default {
           this.params.jgjs = this.row.SJJS
           this.params.yjgjs = this.row.YJGJS
           this.params.serial = this.row.serial
+          this.params.iszj = this.row.ISZJ //是否是终检操作
           if (this.dialogState.type == 'part') {
             this.$ajax
               .post(this.$api.gygxCheckPassPart, this.params)

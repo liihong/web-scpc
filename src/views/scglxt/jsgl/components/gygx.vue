@@ -343,7 +343,8 @@ export default {
     onLoadGy(){
       this.$ajax
         .get(this.$api.getGyByBzBomMC, {
-          bommc: this.row.ZDDMC
+          bommc: this.row.ZDDMC,
+          id: this.row.ID
         })
         .then(res => {
           if (res.errno == 0) {

@@ -158,6 +158,7 @@ module.exports = class extends Base {
         item.jssj = null;
         item.czryid = null;
         item.jyryid = null;
+        item.sfwx = null;
         item.ssdd = form.ssdd;
         return item;
       });
@@ -543,11 +544,21 @@ module.exports = class extends Base {
   // 通过BOM名称查询最新的bom对应的工艺编排
   async getGyByBzBomMCAction() {
     const bommc = this.get('bommc');
-    const bom = await this.model('scglxt_t_bom').field('id').where({zddmc: ['like', `%${bommc}%`]}).order('sjcjsj asc').select();
+    const id = this.get('id');
+    const bom = await this.model('scglxt_t_bom').field('id').where({zddmc: ['like', `%${bommc}%`], id: ['!=', id]}).order('sjcjsj desc').select();
     let data = [];
     if (bom.length > 0) {
       data = await this.model('scglxt_t_gygc').where({bomid: bom[0].id}).join({ table: 'scglxt_t_sblx', as: 'sblx', join: 'left', on: ['sbid', 'id'] }).join({ table: 'scglxt_t_jggy', as: 'jggy', join: 'left', on: ['gynr', 'id'] }).order('serial asc').field('scglxt_t_gygc.id,bomid,gynr,bzgs,edgs,zbgs,serial,sbid,zysx,ssdd,jggy.gymc,sblx.mc sbmc').select();
     }
     return this.success(data);
+  }
+
+  // 通过BOM名称查询对应最新的BOM材料信息
+  async getInfoByBomMcAction() {
+    const bommc = this.get('bommc');
+    const id = this.get('id');
+    const bom = await this.model('scglxt_t_bom').where({zddmc: ['like', `%${bommc}%`], id: ['!=', id]}).order('sjcjsj desc').select();
+
+    return this.success(bom);
   }
 };

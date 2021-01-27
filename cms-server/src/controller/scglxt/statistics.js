@@ -131,18 +131,18 @@ module.exports = class extends Base {
             dd.starttime,
             dd.endtime,
             ht.remark mark,
-             MAX(CASE gynr WHEN '201609010949574021' THEN sygs ELSE 0 END ) 'xqg',
-             MAX(CASE gynr WHEN '201609010949574022' THEN sygs ELSE 0 END ) 'xi',
-            MAX(CASE gynr WHEN '201609010949574025' THEN sygs ELSE 0 END ) 'qian',
-            MAX(CASE gynr WHEN '201609010949574023' THEN sygs ELSE 0 END ) 'zhusu',
-            MAX(CASE gynr WHEN '201609010949574024' THEN sygs ELSE 0 END ) 'che',
-            MAX(CASE gynr WHEN '201609010949574026' THEN sygs ELSE 0 END ) 'cnc',
-            MAX(CASE gynr WHEN '201609010949574027' THEN sygs ELSE 0 END ) 'dhh',
-            MAX(CASE gynr WHEN '201609010949574028' THEN sygs ELSE 0 END ) 'mo',
-            MAX(CASE gynr WHEN '20170424203552800'  THEN sygs ELSE 0 END ) 'rechuli',
-            MAX(CASE gynr WHEN '20170724160856037'  THEN sygs ELSE 0 END ) 'hanjie',
-            MAX(CASE gynr WHEN '20170524144646657'  THEN sygs ELSE 0 END ) 'waixie' ,
-            sum(sygs) sygs
+            SUM(CASE gynr WHEN '201609010949574021' THEN sygs ELSE 0 END ) 'xqg',
+             SUM(CASE gynr WHEN '201609010949574022' THEN sygs ELSE 0 END ) 'xi',
+             SUM(CASE gynr WHEN '201609010949574025' THEN sygs ELSE 0 END ) 'qian',
+            SUM(CASE gynr WHEN '201609010949574023' THEN sygs ELSE 0 END ) 'zhusu',
+            SUM(CASE gynr WHEN '201609010949574024' THEN sygs ELSE 0 END ) 'che',
+            SUM(CASE gynr WHEN '201609010949574026' THEN sygs ELSE 0 END ) 'cnc',
+            SUM(CASE gynr WHEN '201609010949574027' THEN sygs ELSE 0 END ) 'dhh',
+            SUM(CASE gynr WHEN '201609010949574028' THEN sygs ELSE 0 END ) 'mo',
+            SUM(CASE gynr WHEN '20170424203552800'  THEN sygs ELSE 0 END ) 'rechuli',
+            SUM(CASE gynr WHEN '20170724160856037'  THEN sygs ELSE 0 END ) 'hanjie',
+            SUM(CASE gynr WHEN '20170524144646657'  THEN sygs ELSE 0 END ) 'waixie' ,
+            SUM(sygs) sygs
         FROM
         scglxt_t_ht ht,scglxt_t_dd dd ,v_scglxt_sygs_bom sygs where ht.id=dd.ssht and sygs<>0 and dd.id =sygs.ddid and dd.ckzt is null and ` + whereObj + ``;
 

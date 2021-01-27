@@ -83,6 +83,7 @@ let api = {
     stopBOMProcess: 'scglxt/bom/stopBOMProcess',
     getBykcList: 'scglxt/bom/getBykcList',
     getGyByBzBomMC: 'scglxt/bom/getGyByBzBomMC',
+    getInfoByBomMc: 'scglxt/bom/getInfoByBomMc',
     
     //组件操作
     addZj: 'scglxt/zj/addZj',
@@ -112,7 +113,7 @@ let api = {
     gygxCheckNoPass: 'scglxt/gygx/gygxCheckNoPass',
     gygxCheckRBJS: 'scglxt/gygx/gygxCheckRBJS',//质检让步接收
     sureManualScrap: 'scglxt/gygx/sureManualScrap',//手工增加报废流程
-    
+    sureManualScrapCL: 'scglxt/gygx/sureManualScrapCL',
     //人工修改加工记录
     updateJGJL: 'scglxt/gygx/updateJGJL',
     deleteJGJL: 'scglxt/gygx/deleteJGJL'

@@ -404,6 +404,7 @@ export default {
         .then(res => {
           if (res.errno == 0) {
             this.formData = res.data;
+
             this.formData.CLXZ = parseInt(res.data.CLXZ);
             // 如果是长方体
             if (this.formData.CLXZ == 1) {
@@ -419,11 +420,42 @@ export default {
             this.changeCZ(this.formData.ZDDCZ);
             resolve()
           }
+        }).then(()=>{
+           if(this.formData.CLDX === null || this.formData.CLDX === ''){
+            this.getCLInfoByMC()
+           }
         }).catch(()=>{
           reject()
         });
       })
       
+    },
+    // 查询数据库中是否有当前名称回填材料信息
+    getCLInfoByMC(){
+        this.$ajax.get(this.$api.getInfoByBomMc, {
+              bommc: this.formData.ZDDMC,
+              id: this.resId
+            }).then(res=>{
+              if(res.errno === 0) {
+                if(res.data.length>0){
+                  const infos = res.data[0]
+                  console.log(infos)
+                  // 如果是长方体
+                  if (infos.clxz == 1) {
+                    let dx = infos.cldx.split("*");
+                    console.log(dx)
+                    this.volume.l = dx[0];
+                    this.volume.w = dx[1];
+                    this.volume.h = dx[2];
+                  } else {
+                    let dx = infos.cldx.split("*");
+                    this.volume.d = dx[0].slice(1, dx[0].length);
+                    this.volume.h = dx[1];
+                  }
+                  this.changeCZ(infos.zddcz);
+                }
+              }
+            })
     },
     // 获取数据字典数据
     getSjzdData(attr, sql) {
