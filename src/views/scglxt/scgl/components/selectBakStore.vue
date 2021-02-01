@@ -18,6 +18,9 @@
       </el-option>
         </el-select>
       </el-form-item>
+      <el-form-item label="备用库件数">
+        {{activeItem.jgsl}}
+      </el-form-item>
       <el-form-item label="出库数量">
         <el-input v-model="cksl"  />
       </el-form-item>

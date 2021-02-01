@@ -134,10 +134,10 @@ module.exports = class extends Base {
 
     const bomList = await this.model('scglxt_t_bom').where({
       ssdd: id
-    }).order('id').select();
+    }).order('sjcjsj').select();
     const gygcList = await this.model('scglxt_t_gygc').where({
       ssdd: id
-    }).order('id').select();
+    }).order('sjcjsj').select();
 
     if (bomList.length > 0) {
       bomList.map(item => {
