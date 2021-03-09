@@ -61,11 +61,16 @@ module.exports = class extends Base {
     }).group('gynr').select();
 
     const edgsTj = await this.model('scglxt_t_gygc').join({
+      table: 'scglxt_t_bom',
+      as: 'bom',
+      join: 'left',
+      on: ['bomid', 'id']
+    }).join({
       table: 'scglxt_t_jggy',
       as: 'gy',
       join: 'left',
       on: ['gynr', 'id']
-    }).alias('t').field('t.ssdd,t.gynr,gy.gymc,sum(edgs) zgs').where({
+    }).alias('t').field('t.ssdd,t.gynr,gy.gymc,(sum(edgs*bom.jgsl)) zgs').where({
       't.ssdd': id
     }).group('gynr').select();
 

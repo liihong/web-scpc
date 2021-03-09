@@ -489,6 +489,9 @@ export default {
       this.getConfig();
       this.getResList();
     },
+    '$route'(){
+      this.queryParams.queryKey = ''
+    }
   }
 };
 </script>

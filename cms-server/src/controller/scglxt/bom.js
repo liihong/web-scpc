@@ -278,18 +278,21 @@ module.exports = class extends Base {
     const vm = this;
 
     return new Promise(async resolve => {
-      const jgsl = await this.model(bomModel).where({
-        id: bomid
-      }).getField('jgsl');
-      console.log(jgsl[0]);
+      // const jgsl = await this.model(bomModel).where({
+      //   id: bomid
+      // }).getField('jgsl');
+
       jgjsList.push(new Promise(async resolve => {
-        await this.model('scglxt_t_gygc').where({
-          bomid: bomid,
-          serial: '0'
-        }).alias('gygc').update({
-          status: 0,
-          kjgjs: jgsl[0]
-        });
+        // await this.model('scglxt_t_gygc').where({
+        //   bomid: bomid,
+        //   serial: '0'
+        // }).alias('gygc').update({
+        //   status: 0,
+        //   kjgjs: jgsl[0]
+        // });
+        const updateSql = `UPDATE scglxt_t_gygc gygc SET status=0,kjgjs= (SELECT bom.jgsl FROM  scglxt_t_bom bom  WHERE  bom.id = gygc.bomid)
+        WHERE gygc.bomid = '` + bomid + `' AND gygc.serial = '0'`;
+        await this.model().execute(updateSql);
         resolve();
       }));
       resolve();
@@ -468,7 +471,8 @@ module.exports = class extends Base {
     const errorLog = {
       id: util.getUUId(),
       type: '转入备用库',
-      infos: JSON.stringify(this.post())
+      infos: JSON.stringify(this.post()),
+      operater: this.header('token')
     };
     await this.model('operate_log').add(errorLog);
 
@@ -530,6 +534,14 @@ module.exports = class extends Base {
     const data = await this.model('scglxt_t_bom').where({id: bomid}).update({
       zddzt: '0508'
     });
+
+    const errorLog = {
+      id: util.getUUId(),
+      type: '停止加工',
+      infos: JSON.stringify(this.post()),
+      operater: this.header('token')
+    };
+    await this.model('operate_log').add(errorLog);
 
     return this.success(data);
   }

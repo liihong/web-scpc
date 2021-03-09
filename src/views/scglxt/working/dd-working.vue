@@ -54,40 +54,74 @@
         </el-table-column>
         <el-table-column prop="che"
                          label="车"
-                         align="center"></el-table-column>
+                         align="center">
+          <template slot-scope="scope">
+            {{formatNumber(scope.row['che']/60)}}
+          </template>
+        </el-table-column>
         <el-table-column prop="xi"
                          label="铣"
-                         align="center"></el-table-column>
+                         align="center">
+          <template slot-scope="scope">
+            {{formatNumber(scope.row['xi']/60)}}
+          </template>
+        </el-table-column>
         <el-table-column prop="cnc"
                          label="CNC"
-                         align="center"></el-table-column>
+                         align="center">
+          <template slot-scope="scope">
+            {{formatNumber(scope.row['cnc']/60)}}
+          </template>
+        </el-table-column>
         <el-table-column prop="xqg"
                          label="线切割"
-                         align="center"></el-table-column>
+                         align="center">
+          <template slot-scope="scope">
+            {{formatNumber(scope.row['xqg']/60)}}
+          </template>
+        </el-table-column>
         <el-table-column prop="dhh"
                          label="电火花"
-                         align="center"></el-table-column>
+                         align="center"> <template slot-scope="scope">
+            {{formatNumber(scope.row['dhh']/60)}}
+          </template></el-table-column>
         <el-table-column prop="qian"
                          label="钳"
-                         align="center"></el-table-column>
+                         align="center"><template slot-scope="scope">
+            {{formatNumber(scope.row['qian']/60)}}
+          </template></el-table-column>
         <el-table-column prop="mo"
                          label="磨"
-                         align="center"></el-table-column>
+                         align="center"><template slot-scope="scope">
+            {{formatNumber(scope.row['mo']/60)}}
+          </template></el-table-column>
         <el-table-column prop="hanjie"
                          label="焊接"
-                         align="center"></el-table-column>
+                         align="center"><template slot-scope="scope">
+            {{formatNumber(scope.row['hanjie']/60)}}
+          </template></el-table-column>
         <el-table-column prop="waixie"
                          label="外协"
-                         align="center"></el-table-column>
+                         align="center"><template slot-scope="scope">
+            {{formatNumber(scope.row['waixie']/60)}}
+          </template></el-table-column>
         <el-table-column prop="zhusu"
                          label="注塑"
-                         align="center"></el-table-column>
+                         align="center"><template slot-scope="scope">
+            {{formatNumber(scope.row['zhusu']/60)}}
+          </template></el-table-column>
         <el-table-column prop="rechuli"
                          label="热处理"
-                         align="center"></el-table-column>
+                         align="center"><template slot-scope="scope">
+            {{formatNumber(scope.row['rechuli']/60)}}
+          </template></el-table-column>
         <el-table-column prop="sygs"
                          label="总计"
-                         align="center"></el-table-column>
+                         align="center">
+                        <template slot-scope="scope">
+            {{formatNumber(scope.row['sygs']/60)}}
+          </template>
+                         </el-table-column>
       </el-table>
     </div>
     <sbcn :dialogState="dialogState" />
@@ -202,9 +236,10 @@ export default {
         isCustom: isCustom
       }).then(res => {
         if (res.errno == 0) {
+          const tmpArr = [].concat(res.data)
           this.tableData = res.data;
           let sums = [], sums2 = [], sums3 = [];
-          Object.keys(this.tableData[0]).forEach((column, index) => {
+          Object.keys(tmpArr[0]).forEach((column, index) => {
             if (index === 1) {
               sums['xmname'] = "总计(分钟)";
               sums2['xmname'] = "总计(小时)";
@@ -212,7 +247,7 @@ export default {
               return;
             }
 
-            const values = this.tableData.map(item =>
+            const values = tmpArr.map(item =>
               Number(item[column])
             );
             if (!values.every(value => isNaN(value))) {
@@ -227,15 +262,16 @@ export default {
             } else {
               sums[column] = "";
             }
-            sums2[column] = (sums[column] / 60).toFixed(2)
-            sums3[column] = ((sums[column] / 60) / 24).toFixed(2)
+            sums2[column] = (sums[column])
+            sums3[column] = ((sums[column]) / 24).toFixed(2)
+            sums[column] = sums[column]*60
 
             if (column == 'starttime' || column == 'endtime') {
               sums2[column] = "";
               sums3[column] = "";
             }
           });
-          this.tableData.push(sums)
+          // this.tableData.push(sums)
           this.tableData.push(sums2)
           this.tableData.push(sums3)
         }
@@ -271,7 +307,7 @@ export default {
           "车间生产工时.xlsx"
         );
       } catch (e) {
-        throw(e)
+        throw (e)
       }
       return wbout;
     },
@@ -300,6 +336,11 @@ export default {
       });
 
       return sums;
+    },
+    formatNumber(val){
+      if (val == undefined || val == null || typeof (val) !== 'number') { return null; }
+        let v2 = 100;
+        return Math.round(val * v2) / v2;
     }
   }
 };

@@ -186,7 +186,7 @@ export default {
         },
         series: [
           { type: 'bar', name: '排产工时', data: [] },
-          { type: 'bar', name: '额定工时', barGap: '-100%', data: [] },
+          { type: 'bar', name: '额定工时', barGap: '10%', data: [] },
         ]
       }
     };
@@ -208,6 +208,7 @@ export default {
         this.option.xAxis.data = dd.data.edgsTj.map(v => v.gymc)
         this.option.series[1].data = dd.data.edgsTj.map(v => v.zgs)
         this.option.series[0].data = dd.data.gstj.map(v => v.zgs)
+        this.$forceUpdate()
       }
 
       let query = {
@@ -257,6 +258,11 @@ export default {
   watch: {
     bomList: {
       deep: true
+    },
+    '$route.query.id'(){
+      if(this.$route.query.id){
+        this.initData()
+      }
     }
   }
 };
