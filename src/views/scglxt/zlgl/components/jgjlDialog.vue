@@ -23,6 +23,17 @@
          <el-form-item prop="gymc" label="工艺名称">
           {{activeRow.GYNR}}
         </el-form-item>
+        <el-form-item label="切换班组人员">
+           <el-select @change="changeBz" style="width:200px"
+                 v-model="activeBz"
+                 placeholder="请选择">
+        <el-option v-for="item in bzList"
+                   :key="item.id"
+                   :label="item.bzmc"
+                   :value="item.id">
+        </el-option>
+      </el-select>
+        </el-form-item>
         <el-form-item prop="jgryid" label="加工人员">
           <el-radio-group v-model="radioValue">
           <el-radio
@@ -65,6 +76,8 @@ export default {
       activeRow: {},
       query: {},
       peopleList: [],
+      activeBz: '',
+      bzList: [],
       formData:{},
       isUpdate: false,
       radioValue:''
@@ -73,7 +86,30 @@ export default {
    computed: {
     ...mapGetters(['roles'])
   },
+   mounted() {
+    this.initData()
+  },
   methods: {
+    initData() {
+      this.$ajax.post(this.$api.getBzList).then(res => {
+        if (res.errno == 0) {
+          this.bzList = res.data
+          this.activeBz = this.roles[0]
+          this.changeBz(this.activeBz)
+        }
+      })
+    },
+    changeBz(val) {
+      this.$ajax
+        .post(this.$api.getPeopleByBz, {
+          bzid: val
+        })
+        .then(res => {
+          if (res.errno == 0) {
+            this.peopleList = res.data
+          }
+        })
+    },
     //修改加工记录
     updateJGJL(row) {
       console.log(row)

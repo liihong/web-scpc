@@ -30,6 +30,7 @@
           <span style="margin-right:20px;">勾选以下已加工记录进行报废</span>
           <el-button @click="onManualScrap" size="mini" type="warning" icon="el-icon-s-release">报废</el-button>
           <el-button @click="onManualScrapCL" size="mini" type="danger" icon="el-icon-s-release">材料报废</el-button>
+          <el-button @click="onManualScrapJS"  size="mini" type="danger" icon="el-icon-s-release">技术报废</el-button>
 
         </el-col>
         <el-col :span="24">
@@ -186,7 +187,25 @@ export default {
           this.dialogState.show = false
         }
       });
+     });
+    },
+    onManualScrapJS(){
+      if (this.selectInfo.ssbom == '') {
+        this.$message.warning(`请选择报废BOM!`);
+        return
+      }
+      this.$message.confirm('技术报废默认保留现有工时并生成新的加工单？', () => {
+        this.$ajax.post(this.$api.sureManualScrapJS, {
+          ssdd: this.query.SSDD,
+          bomid: this.query.BOMID
+        }).then(res => {
+          if (res.errno == 0) {
+            this.$message.success(`成功报废零件并生成新的加工单!`);
+            this.isSureScrap = false;
+            this.dialogState.show = false
+          }
         });
+      });
     }
   },
   watch: {

@@ -396,10 +396,11 @@ module.exports = class extends Base {
       }
 
       // 操作完成后判断该工序是否是最后一道工序，并且免检
-      const nextData = await this.model('scglxt_t_gygc').where({bomid: gygcData.bomid, serial: gygcData.serial + 1}).select();
-      if (nextData.length === 0) {
-        const gyInfo = await this.model('scglxt_t_jggy').where({id: gynr}).find();
-        if (gyInfo.gxsx !== '' && gyInfo.gxsx != null) {
+      const gyInfo = await this.model('scglxt_t_jggy').where({id: gynr}).find();
+      if (gyInfo.gxsx !== '' && gyInfo.gxsx != null) {
+        const nextData = await this.model('scglxt_t_gygc').where({bomid: gygcData.bomid, serial: gygcData.serial + 1}).select();
+        // 如果没有下工序则直接入库，如果有下工序则直接到下工序不需要质检
+        if (nextData.length === 0) {
           await this.model('scglxt_t_bom').where({id: gygcData.bomid}).update({
             zddzt: gyInfo.gxsx
           });
@@ -418,6 +419,27 @@ module.exports = class extends Base {
             jyryid: '201609101108000000',
             jysj: util.getNowTime(),
             jgjssj: util.getNowTime()
+          });
+        } else {
+          await this.model('scglxt_t_gygc').where({id: gyid}).update({
+            sjjs: 0,
+            yjgjs: jgjs,
+            status: 2,
+            jssj: util.getNowTime(),
+            sfjy: 1
+          });
+          await this.model('scglxt_t_jggl').where({
+            gygcid: gyid,
+            jgryid: worker,
+            jgjssj: null
+          }).update({
+            jyryid: '201609101108000000',
+            jysj: util.getNowTime(),
+            jgjssj: util.getNowTime()
+          });
+          await this.model('scglxt_t_gygc').where({id: nextData[0].id}).update({
+            kjgjs: jgjs,
+            status: 1
           });
         }
       }
@@ -1178,6 +1200,93 @@ module.exports = class extends Base {
     const errorLog = {
       id: util.getUUId(),
       type: '材料报废成功',
+      infos: JSON.stringify(this.post()),
+      operater: this.header('token')
+    };
+    const sData = await this.model('operate_log').add(errorLog);
+
+    return this.success(sData);
+  }
+
+  // 手工技术报废，保留所有加工记录，并生成新的订单
+  async sureManualScrapJSAction() {
+    // 第一步：更新bom的报废数量，第二步：增加报废操作记录，第三步：删除已操作的加工记录，第四步
+    const bomid = this.post('bomid');
+
+    const bomData = await this.model('scglxt_t_bom').where({
+      id: bomid
+    }).find();
+
+    // 第一步：更新bom的报废数量，第二步：增加报废操作记录，第三步：删除已操作的加工记录，第四步
+    await this.model('scglxt_t_bom').where({id: bomid}).update({
+      bfjs: bomData.jgsl,
+      zddzt: '0508'
+    });
+    const gygcData = await this.model('scglxt_t_gygc').where({
+      bomid: bomid,
+      serial: 0
+    }).find();
+
+    const jgglData = await this.model('scglxt_t_jggl').where({
+      gygcid: gygcData.id
+    }).field('jgryid,jgjs,jyryid,jgkssj,jgjssj,jysj,sbid,gygcid,id jgglid').find();
+
+    const oldJgglID = bomid;
+
+    const tmpLogData = jgglData;
+    tmpLogData.id = util.getUUId();
+    tmpLogData.jgglid = oldJgglID;
+    tmpLogData.sjzt = '2202';
+    tmpLogData.dhjs = bomData.jgsl;
+    tmpLogData.dhyy = '系统-技术报废';
+
+    await this.model('scglxt_t_jggl_tmp').add(tmpLogData);
+
+    // 生成新的加工单
+    const newbomid = util.getUUId();
+
+    bomData.id = newbomid;
+    bomData.zddmc = bomData.zddmc + '_报废重做';
+    bomData.zddzt = '0501';
+    bomData.jgsl = bomData.jgsl;
+    bomData.clzt = '3';
+    bomData.rksj = null;
+    bomData.cksj = null;
+    bomData.blkssj = null;
+    bomData.bljssj = null;
+    bomData.sjcjsj = util.getNowTime();
+
+    await this.model('scglxt_t_bom').add(bomData);
+
+    const gygxDatas = await this.model('scglxt_t_gygc').where({
+      bomid: bomid
+    }).select();
+
+    if (gygxDatas.length > 0) {
+      gygxDatas.map(item => {
+        item.id = util.getUUId();
+        item.bomid = newbomid;
+        item.kjgjs = 0;
+        item.yjgjs = 0;
+        item.sjjs = 0;
+        item.bfjs = 0;
+        item.sfjy = null;
+        item.czryid = null;
+        item.kssj = null;
+        item.jssj = null;
+        item.status = null;
+        item.jyryid = null;
+        item.fgcs = null;
+        item.sjcjsj = util.getNowTime();
+        return item;
+      });
+      await this.model('scglxt_t_gygc').addMany(gygxDatas);
+    }
+
+    // 生成操作日志
+    const errorLog = {
+      id: util.getUUId(),
+      type: '技术报废成功',
       infos: JSON.stringify(this.post()),
       operater: this.header('token')
     };

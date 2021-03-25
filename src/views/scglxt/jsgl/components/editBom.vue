@@ -256,7 +256,7 @@ export default {
   mounted() {
     this.getSjzdData(
       "ssdd",
-      "SELECT id,xmname NAME FROM scglxt_t_dd where ckzt is null"
+      "SELECT id,xmname NAME FROM scglxt_t_dd where ckzt is null order by sjcjsj desc"
     );
     this.getSjzdData("clmc", "SELECT id,clmc name,cldj,mi FROM scglxt_t_cl");
     this.getSjzdData("zj", "SELECT id zjid,zjmc,zjdj FROM scglxt_t_zj");

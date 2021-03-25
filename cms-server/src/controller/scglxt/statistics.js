@@ -121,7 +121,7 @@ module.exports = class extends Base {
       whereObj = `1=1 and dd.id='` + query.ddid + `' group by dd.id desc ORDER BY DDLEVEL,dd.sjcjsj DESC,ddorder desc`;
     }
     if (!query.isCustom) {
-      whereObj = ' dd.isshow=1  group by dd.id desc order by dd.ddorder+1 asc';
+      whereObj = ' 1=1  group by dd.id desc order by dd.ddorder+1 asc';
     }
 
     const sql = `  
