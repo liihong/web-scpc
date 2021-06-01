@@ -172,7 +172,8 @@ module.exports = class extends Base {
         item.ddorder = null;
         item.zddmc = item.zddmc;
         item.zddzt = '0501';
-        item.endtime = data.endtime;
+        // item.endtime = data.endtime;
+        item.endTime = null;
         item.sjcjsj = util.getNowTime();
         item.blkssj = null;
         item.bljssj = null;
@@ -392,7 +393,7 @@ SELECT (@rownum:=@rownum+1) AS rownum,gy.gymc sbmc,gc.ZYSX gynr,null as t,edgs,g
     const ddsql = `select ht.htbh,dd.xmname,zd.mc ddlevel, starttime,endtime from scglxt_t_dd dd,scglxt_t_ht ht,scglxt_tyzd zd where dd.ssht=ht.id and zd.xh = dd.ddlevel and dd.id = '` + ddid + `'`;
     const infos = await this.model().query(ddsql);
 
-    const sql = `SELECT  (@rownum := @rownum + 1) AS rownum, bom.id, zddmc,  t2.clmc, cldx, bljs,jgsl,ROUND(IFNULL(clzl*(1+sh),0),2) clzl,IFNULL(cldj,0) cldj, ROUND(IFNULL(clje, 0),2) clje 
+    const sql = `SELECT  (@rownum := @rownum + 1) AS rownum, bom.id, zddmc,  t2.clmc, cldx, bljs,jgsl,ROUND( IFNULL( clzl *( 1+sh ), 0 ), 2 ) clzl,IFNULL( cldj, 0 ) cldj,ROUND( IFNULL( clzl *( 1+sh ), 0 ), 2 )*bljs*cldj clje 
         FROM (select @rownum := 0) t,scglxt_t_bom bom  LEFT JOIN scglxt_t_cl t2   ON bom.zddcz = t2.id  WHERE ssdd = '` + ddid + `' order by sjcjsj`;
 
     const tjInfo = {

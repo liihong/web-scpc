@@ -429,6 +429,12 @@ module.exports = class extends Base {
       };
       await this.model('scglxt_t_dd_ck').add(ckLog);
 
+      const sql = `SELECT '${ckLog.id}' as 'ckid', bom.id,kh.mc khmc,ht.htbh,dd.xmname ddmc,zddmc ljmc,bom.jgsl ljsl,bjd.dj ljdj,format(bjd.zje,3) ljzj,NOW() cksj FROM scglxt_t_kh kh,scglxt_t_ht ht,scglxt_t_dd dd,scglxt_t_bom bom LEFT JOIN scglxt_t_ht_bjd bjd ON bom.bjdid=bjd.id WHERE kh.id=ht.khid AND ht.id=dd.ssht AND dd.id=bom.ssdd AND bom.id IN (${id})`;
+
+      // 出库详细记录
+      const logInfos = await this.model().query(sql);
+      await this.model('scglxt_t_dd_ck_log').addMany(logInfos);
+
       return this.success(data);
     } catch (ex) {
       const errorLog = {

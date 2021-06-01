@@ -83,7 +83,6 @@ module.exports = class extends Base {
             gxnr: gynr.join('-'),
             gs: gs
           };
-          console.log(form[form.length - 1]);
           if (form[form.length - 1].gynr == '20170424203607219') {
             bomUpdate.bmcl = form[form.length - 1].zysx;
           }
@@ -539,7 +538,7 @@ module.exports = class extends Base {
     }).update(updateJggl);
 
     const updateSql = `
-            update scglxt_t_gygc a set jyryid='` + jyryid + `',sfjy=1,yjgjs =  yjgjs+(select c.jgjs from scglxt_t_jggl c where c.id = '` + id + `' ) ,bfjs=0,sjjs=0 where id = '` + gygcid + `'`;
+            update scglxt_t_gygc a set jyryid='` + jyryid + `',sfjy=1,yjgjs =yjgjs+(select c.jgjs from scglxt_t_jggl c where c.id = '` + id + `' ) ,bfjs=0,sjjs=0 where id = '` + gygcid + `'`;
 
     // 更新工艺的已加工件数
     const data = await this.model().execute(updateSql);
@@ -573,11 +572,25 @@ module.exports = class extends Base {
     // 如果有下一到工序则更新开始下一道工序的可加工数量
     if (nextJGgy.length == 1) {
       await this.model('scglxt_t_gygc').where({
-        bomid: bomid,
-        serial: parseInt(serial) + 1
+        id: nextJGgy[0].id
       }).update({
         kjgjs: yjgjs
       });
+
+      const nextKjgjs = await this.model('scglxt_t_gygc').where({
+        id: nextJGgy[0].id
+      }).getField('kjgjs', true);
+      console.log(nextKjgjs);
+      console.log(kjgjs);
+
+      // 容错处理，如果已加工件数+送检件数大于可加工件数，则默认将已加工件数更新为可加工件数
+      if (nextKjgjs > kjgjs) {
+        await this.model('scglxt_t_gygc').where({
+          id: nextJGgy[0].id
+        }).update({
+          kjgjs: yjgjs
+        });
+      }
     } else {
       // 如果已加工件数+报废件数=第一条工艺的可加工件数，说明整个流程加工完成，则修改订单状态
       const bfjs = await this.model('scglxt_t_gygc').where({
@@ -1133,27 +1146,27 @@ module.exports = class extends Base {
 
     await this.model('scglxt_t_jggl_tmp').add(tmpLogData);
 
-    const ids = await this.model('scglxt_t_gygc').where({
-      bomid
-    }).getField('id');
+    // const ids = await this.model('scglxt_t_gygc').where({
+    //   bomid
+    // }).getField('id');
 
     // 把所有的已加工件数设置为0
-    await this.model('scglxt_t_gygc').where({
-      id: ['in', ids]
-    }).update({
-      yjgjs: 0,
-      kjgjs: 0
-    });
+    // await this.model('scglxt_t_gygc').where({
+    //   id: ['in', ids]
+    // }).update({
+    //   yjgjs: 0,
+    //   kjgjs: 0
+    // });
 
     // 删除所有加工记录
-    await this.model('scglxt_t_jggl').where({
-      gygcid: ['in', ids]
-    }).delete();
+    // await this.model('scglxt_t_jggl').where({
+    //   gygcid: ['in', ids]
+    // }).delete();
 
     // 修改bom下所有已加工件数为0
-    await this.model('scglxt_t_gygc').where({
-      bomid: bomid
-    }).decrement('yjgjs', 0);
+    // await this.model('scglxt_t_gygc').where({
+    //   bomid: bomid
+    // }).decrement('yjgjs', 0);
 
     // 生成新的加工单
     const newbomid = util.getUUId();

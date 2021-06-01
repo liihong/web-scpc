@@ -7,8 +7,7 @@
     <!-- <el-table-column slot="operate" fixed="left" label="操作" min-width="200" align="center">
       <template slot-scope="scope">
         <el-button-group>
-          <el-button type="primary" @click="pass(scope.row)" class="radio" :label="1">出库</el-button>
-          <el-button type="danger" @click="passSection(scope.row)" class="radio" :label="2">不通过</el-button>
+          <el-button type="primary" @click="pass(scope.row)" class="radio" :label="1">导出出库记录</el-button>
         </el-button-group>
       </template>
     </el-table-column> -->

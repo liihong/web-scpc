@@ -142,6 +142,7 @@ module.exports = class extends Base {
             SUM(CASE gynr WHEN '20170424203552800'  THEN sygs ELSE 0 END ) 'rechuli',
             SUM(CASE gynr WHEN '20170724160856037'  THEN sygs ELSE 0 END ) 'hanjie',
             SUM(CASE gynr WHEN '20170524144646657'  THEN sygs ELSE 0 END ) 'waixie' ,
+            SUM(CASE gynr WHEN '20200721168199771199'  THEN sygs ELSE 0 END ) 'zhuangpei' ,
             SUM(sygs) sygs
         FROM
         scglxt_t_ht ht,scglxt_t_dd dd ,v_scglxt_sygs_bom sygs where ht.id=dd.ssht and sygs<>0 and dd.id =sygs.ddid and dd.ckzt is null and ` + whereObj + ``;

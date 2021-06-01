@@ -115,6 +115,11 @@
                          align="center"><template slot-scope="scope">
             {{formatNumber(scope.row['rechuli']/60)}}
           </template></el-table-column>
+         <el-table-column prop="zhuangpei"
+                         label="装配"
+                         align="center"><template slot-scope="scope">
+            {{formatNumber(scope.row['zhuangpei']/60)}}
+          </template></el-table-column>
         <el-table-column prop="sygs"
                          label="总计"
                          align="center">

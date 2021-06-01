@@ -64,9 +64,11 @@
                         @change="changeRaido"
                         label="材料形状">
             <el-radio-group v-model="formData.CLXZ">
-              <el-radio :label="1">长方体</el-radio>
+              <!-- <el-radio :label="1">长方体</el-radio>
               <el-radio :label="2">圆柱体</el-radio>
               <el-radio :label="3">塑料</el-radio>
+               <el-radio :label="3">塑料</el-radio> -->
+               <el-radio :label="item.id" v-for="item in dropDownListData['clxz']" :key="item.id">{{item.mc}}</el-radio>
             </el-radio-group>
           </el-form-item>
         </el-col>
@@ -266,6 +268,10 @@ export default {
         this.formData.SSDD +
         "'"
     );
+    this.getSjzdData(
+      "clxz",
+      "SELECT id,mc from scglxt_tyzd where xh like '03__'"
+    );
     this.dialogByk.isAdd = false
     this.dialogByk.JGSL = 0
     this.dialogByk.show = false
@@ -405,7 +411,7 @@ export default {
           if (res.errno == 0) {
             this.formData = res.data;
 
-            this.formData.CLXZ = parseInt(res.data.CLXZ);
+            // this.formData.CLXZ = parseInt(res.data.CLXZ);
             // 如果是长方体
             if (this.formData.CLXZ == 1) {
               let dx = this.formData.CLDX.split("*");
@@ -439,11 +445,9 @@ export default {
               if(res.errno === 0) {
                 if(res.data.length>0){
                   const infos = res.data[0]
-                  console.log(infos)
                   // 如果是长方体
                   if (infos.clxz == 1) {
                     let dx = infos.cldx.split("*");
-                    console.log(dx)
                     this.volume.l = dx[0];
                     this.volume.w = dx[1];
                     this.volume.h = dx[2];

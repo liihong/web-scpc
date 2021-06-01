@@ -263,17 +263,15 @@ export default {
     },
     //导出
     handleExport() {
-      let params = {
-        tableId: this.tableId
-      };
       // if (this.filters.name != '') {
       //   params.queryColumn = this.resRows.join(',')
       //   params.queryKey = this.filters.name
       // }
+
       if (this.query != undefined) {
-        params.query = this.query;
+        this.queryParams.query  = this.query;
       }
-      this.$ajax.getBolb(this.$api.exportExcel, params).then(res => {
+      this.$ajax.getBolb(this.$api.exportExcel, this.queryParams).then(res => {
         if (res.data) {
           let url = URL.createObjectURL(res.data);
           let fileName = res.headers["content-disposition"].split("=")[1];
@@ -490,7 +488,7 @@ export default {
       this.getResList();
     },
     '$route'(){
-      this.queryParams.queryKey = ''
+      // this.queryParams.queryKey = ''
     }
   }
 };
