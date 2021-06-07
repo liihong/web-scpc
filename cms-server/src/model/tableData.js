@@ -48,11 +48,22 @@ module.exports = class extends think.Model {
     let pArr = [],
       temp = {};
     if (query && query !== '{}' && JSON.stringify(query) !== '{}') {
-      // query = JSON.parse(query)
-      console.log(query);
-
-      const key = Object.keys(query)[0];
-      whereObj[key] = ['=', `${query[key]}`];
+      query = JSON.parse(query);
+      Object.keys(query).map(key => {
+        //如果是数组 
+        if(query[key].length>0) {
+          if (Array.isArray(query[key])) {
+            whereObj[key] = ['between', `${query[key][0]}`, `${query[key][1]}`];
+          }
+          else if (query[key] === null) {
+            whereObj[key] = null;
+          } else if (query[key].toString().indexOf('not null') !== -1) {
+            whereObj[key] = ['!=', null];
+          } else {
+            whereObj[key] = ['=', `${query[key]}`];
+          }
+        }
+      });
     }
     await displayColumn.map(async(item) => {
       if (item.ISQUERY == '1') {

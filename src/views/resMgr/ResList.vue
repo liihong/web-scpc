@@ -10,84 +10,109 @@ event:{
 <template>
   <section>
     <!--工具条-->
-    <el-col :span="24" class="toolbar">
-      <el-form :inline="true" v-show="!noTool" @submit.native.prevent>
-        <el-form-item v-show="!noAdd">
-          <el-button size="mini" @click="handleAdd" type="primary" icon="el-icon-circle-plus">新增</el-button>
-        </el-form-item>
-        <el-form-item>
-          <el-button size="mini" @click="handleExport" type="primary" icon="el-icon-download">导出</el-button>
-        </el-form-item>
-        <slot name="query"></slot>
-        <el-form-item>
-          <el-input
-            size="small"
-            v-model="queryParams.queryKey"
-            placeholder="模糊查询"
-            @input="debounceQuery"
-            @change="queryResList"
-          ></el-input>
-        </el-form-item>
-        <el-form-item>
-          <el-button size="mini" @click="queryResList" type="primary" icon="el-icon-search">查询</el-button>
-          <el-button size="mini" @click="reset" type="primary" icon="el-icon-refresh">重置</el-button>
-        </el-form-item>
-        <slot name="toolBar"></slot>
-      </el-form>
-    </el-col>
-
+    <el-row>
+      <el-col :span="24"
+              class="toolbar">
+        <el-form :inline="true"
+                 v-show="!noTool"
+                 @submit.native.prevent>
+         
+          <slot name="query"></slot>
+          <el-form-item>
+            <el-input size="small"
+                      v-model="queryParams.queryKey"
+                      placeholder="模糊查询"
+                      @input="debounceQuery"
+                      @change="queryResList"></el-input>
+          </el-form-item>
+          <el-form-item>
+            <el-button size="mini"
+                       @click="queryResList"
+                       type="primary"
+                       icon="el-icon-search">查询</el-button>
+            <el-button size="mini"
+                       @click="reset"
+                       type="primary"
+                       icon="el-icon-refresh">重置</el-button>
+          </el-form-item>
+           <el-form-item v-show="!noAdd">
+            <el-button size="mini"
+                       @click="handleAdd"
+                       type="primary"
+                       icon="el-icon-circle-plus">新增</el-button>
+          </el-form-item>
+          <el-form-item>
+            <el-button size="mini"
+                       @click="handleExport"
+                       type="primary"
+                       icon="el-icon-download">导出</el-button>
+          </el-form-item>
+          <slot name="toolBar"></slot>
+        </el-form>
+      </el-col>
+    </el-row>
     <!--列表-->
-    <el-table
-      ref="elTable"
-      :span-method="objectSpanMethod"
-      highlight-current-row
-      @sort-change="tableSort"
-      @selection-change="selsChange"
-      @row-click="rowClick"
-      :data="resDatas"
-      :row-class-name="tableRowClassName"
-      v-loading="listLoading"
-      header-cell-class-name="table_th"
-      border
-      height="70vh"
-      style="width: 100%;"
-    >
-      <el-table-column type="selection" width="25" align="center"></el-table-column>
-      <el-table-column fixed="left" type="index" width="30" align="center">
+    <el-table ref="elTable"
+              :span-method="objectSpanMethod"
+              highlight-current-row
+              @sort-change="tableSort"
+              @selection-change="selsChange"
+              @row-click="rowClick"
+              :data="resDatas"
+              :row-class-name="tableRowClassName"
+              v-loading="listLoading"
+              header-cell-class-name="table_th"
+              border
+              height="70vh"
+              style="width: 100%;">
+      <el-table-column type="selection"
+                       width="25"
+                       align="center"></el-table-column>
+      <el-table-column fixed="left"
+                       type="index"
+                       width="30"
+                       align="center">
         <template slot-scope="scope">
           <span>{{scope.$index+(queryParams.pageNumber - 1) * queryParams.pageSize + 1}}</span>
         </template>
       </el-table-column>
       <slot name="operate" />
-      <el-table-column label="操作" width="150" align="center" v-if="!noEdit">
+      <el-table-column label="操作"
+                       width="150"
+                       align="center"
+                       v-if="!noEdit">
         <template slot-scope="scope">
           <el-button-group size="mini">
-            <el-button size="mini" type="primary" @click="handleEdit(scope.row)">编辑</el-button>
-            <el-button size="mini" type="danger" @click="handleDelete(scope.row)">删除</el-button>
+            <el-button size="mini"
+                       type="primary"
+                       @click="handleEdit(scope.row)">编辑</el-button>
+            <el-button size="mini"
+                       type="danger"
+                       @click="handleDelete(scope.row)">删除</el-button>
           </el-button-group>
         </template>
       </el-table-column>
-      <el-table-column
-        :sortable="row.IS_SORT == '1' ? 'custom' : false"
-        align="center"
-        v-if="row.PROPERTY_TYPE != '10'"
-        v-for="(row,index) in resRows"
-        :key="index"
-        :prop="row.COLUMN_NAME"
-        :fixed="(row.IS_FROZEN == 1?'left':false)"
-        :label="row.COLUMN_CNAME"
-        :min-width="(row.COLUMNLENGTH != '')?row.COLUMNLENGTH:150"
-      >
+      <el-table-column :sortable="row.IS_SORT == '1' ? 'custom' : false"
+                       align="center"
+                       v-if="row.PROPERTY_TYPE != '10'"
+                       v-for="(row,index) in resRows"
+                       :key="index"
+                       :prop="row.COLUMN_NAME"
+                       :fixed="(row.IS_FROZEN == 1?'left':false)"
+                       :label="row.COLUMN_CNAME"
+                       :min-width="(row.COLUMNLENGTH != '')?row.COLUMNLENGTH:150">
         <!-- :filters="row.PROPERTY_TYPE =='2'?[]:selectObj[row.COLUMN_NAME] " -->
         <template slot-scope="scope">
           <span v-if="row.PROPERTY_TYPE == '2'">
-            <slot :name="row.COLUMN_NAME" v-bind:row="scope.row">
+            <slot :name="row.COLUMN_NAME"
+                  v-bind:row="scope.row">
               <!-- 后备内容 -->
               {{scope.row[`${row.COLUMN_NAME}_TEXT`]}}
             </slot>
           </span>
           <span v-else>
-            <slot :name="row.COLUMN_NAME" v-bind:row="scope.row">
+            <slot :name="row.COLUMN_NAME"
+                  v-bind:row="scope.row">
               <!-- 后备内容 -->
               {{scope.row[row.COLUMN_NAME]}}
             </slot>
@@ -96,25 +121,25 @@ event:{
       </el-table-column>
     </el-table>
     <!--工具条-->
-    <el-col :span="24" class="pagination">
-      <el-button
-        v-if="!noEdit"
-        type="danger"
-        @click="batchRemove"
-        :disabled="this.sels.length===0"
-      >批量删除</el-button>
-      <el-pagination
-        background
-        @current-change="handleCurrentChange"
-        :current-page="queryParams.pageNumber"
-        :page-sizes="[30, 60, 100, 150]"
-        :page-size="queryParams.pageSize"
-        layout="total, sizes, prev, pager, next, jumper"
-        :total="total"
-        @size-change="sizeChange"
-      ></el-pagination>
+    <el-col :span="24"
+            class="pagination">
+      <el-button v-if="!noEdit"
+                 type="danger"
+                 @click="batchRemove"
+                 :disabled="this.sels.length===0">批量删除</el-button>
+      <el-pagination background
+                     @current-change="handleCurrentChange"
+                     :current-page="queryParams.pageNumber"
+                     :page-sizes="[30, 60, 100, 150]"
+                     :page-size="queryParams.pageSize"
+                     layout="total, sizes, prev, pager, next, jumper"
+                     :total="total"
+                     @size-change="sizeChange"></el-pagination>
     </el-col>
-    <resEdit  @initData="getResList" @saveAfter="saveAfter" @editAfter="editAfter" :dialogState="dialogState" />
+    <resEdit @initData="getResList"
+             @saveAfter="saveAfter"
+             @editAfter="editAfter"
+             :dialogState="dialogState" />
   </section>
 </template>
 
@@ -141,7 +166,6 @@ export default {
     },
     query: {
       type: Object,
-      String
     },
     num: {
       type: Number
@@ -150,7 +174,7 @@ export default {
   components: {
     resEdit
   },
-  data() {
+  data () {
     return {
       filters: {
         columns: "",
@@ -183,7 +207,7 @@ export default {
     };
   },
   computed: {
-    primaryKey() {
+    primaryKey () {
       let key = "";
       this.resRows.map(item => {
         if (item.PROPERTY_TYPE == "10") {
@@ -195,7 +219,7 @@ export default {
   },
   methods: {
     //获取过滤数据
-    getSelectQuery() {
+    getSelectQuery () {
       this.resRows.map(item => {
         if (item.PROPERTY_TYPE == "2") {
           this.getSjzdData(item.COLUMN_NAME, item.TYPESQL);
@@ -203,7 +227,7 @@ export default {
       });
     },
     //获取表格配置信息
-    getConfig() {
+    getConfig () {
       this.$ajax
         .get(this.$api.getTableColumns, {
           flag: "list",
@@ -215,7 +239,7 @@ export default {
           this.listLoading = false;
         });
     },
-    debounceQuery() {
+    debounceQuery () {
       if (this.timer !== null) {
         clearTimeout(this.timer);
       }
@@ -223,7 +247,7 @@ export default {
         this.queryResList();
       }, 1000);
     },
-    queryResList() {
+    queryResList () {
       if (this.query != undefined) {
         this.queryParams.query = this.query;
       }
@@ -240,12 +264,12 @@ export default {
       });
       this.$emit("getResList");
     },
-    reset() {
+    reset () {
       this.queryParams.queryKey = "";
       this.queryResList();
     },
     //获取表格数据
-    getResList: function() {
+    getResList: function () {
       if (this.query != undefined) {
         this.queryParams.query = this.query;
       }
@@ -262,14 +286,14 @@ export default {
       this.$emit("getResList");
     },
     //导出
-    handleExport() {
+    handleExport () {
       // if (this.filters.name != '') {
       //   params.queryColumn = this.resRows.join(',')
       //   params.queryKey = this.filters.name
       // }
 
       if (this.query != undefined) {
-        this.queryParams.query  = this.query;
+        this.queryParams.query = this.query;
       }
       this.$ajax.getBolb(this.$api.exportExcel, this.queryParams).then(res => {
         if (res.data) {
@@ -290,7 +314,7 @@ export default {
       });
     },
     //新增按钮
-    handleAdd() {
+    handleAdd () {
       if (
         this.noEdit &&
         this.$parent.handleAdd &&
@@ -304,20 +328,20 @@ export default {
       }
     },
     // 点击保存后，如果还想执行什么操作可以在这个方法里进行
-    saveAfter(info) {
+    saveAfter (info) {
       this.$emit("saveAfter", info);
     },
-    editAfter(params) {
+    editAfter (params) {
       this.$emit('editAfter', params)
     },
     // 编辑按钮事件处理
-    handleEdit(row) {
+    handleEdit (row) {
       this.dialogState.formData = row;
       this.dialogState.id = row[this.primaryKey];
       this.dialogState.show = true;
       this.dialogState.type = "edit";
     },
-    handleDelete(row, type = true) {
+    handleDelete (row, type = true) {
       if (type) {
         this.$message.confirmDelete(() => {
           let params = new FormData();
@@ -348,23 +372,23 @@ export default {
         });
       }
     },
-    handleCurrentChange(val) {
+    handleCurrentChange (val) {
       this.queryParams.pageNumber = val;
       this.getResList();
     },
-    sizeChange(val) {
+    sizeChange (val) {
       this.queryParams.pageSize = val;
       this.getResList();
     },
-    selsChange: function(sels) {
+    selsChange: function (sels) {
       this.sels = sels;
       this.$emit("selectChange", sels);
     },
-    rowClick(row) {
+    rowClick (row) {
       this.$refs.elTable.toggleRowSelection(row);
     },
     //批量删除
-    batchRemove: function() {
+    batchRemove: function () {
       var ids = this.sels.map(item => {
         return item[this.primaryKey];
       });
@@ -382,10 +406,10 @@ export default {
             }
           });
         })
-        .catch(() => {});
+        .catch(() => { });
     },
     // 获取数据字典数据
-    getSjzdData(attr, sql) {
+    getSjzdData (attr, sql) {
       this.$ajax
         .get(this.$api.getDropDownListData, {
           typesql: sql
@@ -398,7 +422,7 @@ export default {
         });
     },
     // eslint-disable-next-line
-    tableSort({ column, prop, order }) {
+    tableSort ({ column, prop, order }) {
       if (order && order != null) {
         this.queryParams.order = prop + " " + order.replace("ending", "");
       } else {
@@ -406,13 +430,13 @@ export default {
       }
       this.getResList();
     },
-    objectSpanMethod({ row, column }) {
+    objectSpanMethod ({ row, column }) {
       const span = column["property"] + "-span";
       if (row[span]) {
         return row[span];
       }
     },
-    mergeTableRow(data, merge) {
+    mergeTableRow (data, merge) {
       if (!merge || merge.length === 0) {
         return data;
       }
@@ -439,26 +463,26 @@ export default {
       });
       return data;
     },
-    tableRowClassName({ row }) {
+    tableRowClassName ({ row }) {
       if (row.SPZT && row.SPZT == 0) {
         return "warning-row";
       }
       return "";
     }
   },
-  create() {
+  create () {
     this.getConfig();
     this.getResList();
   },
-  activated() {
+  activated () {
     this.getConfig();
     this.getResList();
   },
-  beforeRouteLeave() {
+  beforeRouteLeave () {
     this.$destory();
   },
   watch: {
-    num() {
+    num () {
       if (this.query != undefined) {
         this.queryParams.query = this.query;
       }
@@ -467,28 +491,36 @@ export default {
     },
     dialogState: {
       deep: true,
-      handler() {
+      handler () {
         if (!this.dialogState.show) {
           this.getResList();
         }
       }
     },
-    "query.SSHT"() {
+    "query.SSHT" () {
       if (this.query != undefined) {
         this.queryParams.query = this.query;
       }
       this.getConfig();
       this.getResList();
     },
-    "query.ID"() {
+    "query.ID" () {
       if (this.query != undefined) {
         this.queryParams.query = this.query;
       }
       this.getConfig();
       this.getResList();
     },
-    '$route'(){
+    '$route' () {
       // this.queryParams.queryKey = ''
+    },
+    query: {
+      deep: true,
+      handler () {
+        if (this.query != undefined) {
+          this.queryParams.query = this.query;
+        }
+      }
     }
   }
 };
@@ -508,11 +540,11 @@ export default {
   display: flex;
   justify-content: space-between;
 }
-.el-table{
-   // 表头不对齐bug
-    .gutter {
-      display: table-cell !important;
-    }
+.el-table {
+  // 表头不对齐bug
+  .gutter {
+    display: table-cell !important;
+  }
 }
 .el-table--striped .el-table__body tr.el-table__row--striped td {
   background: #f5f4f4;

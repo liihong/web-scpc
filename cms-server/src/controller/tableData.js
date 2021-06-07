@@ -4,11 +4,11 @@ const Base = require('./base.js');
 const nodeExcel = require('excel-export'); // 首先，引入excel模块：
 
 module.exports = class extends Base {
-  async indexAction() {
+  async indexAction () {
     return 'hahah';
   }
 
-  async queryTableDataByIdAction() {
+  async queryTableDataByIdAction () {
     try {
       const tableId = this.get('tableId');
 
@@ -29,7 +29,7 @@ module.exports = class extends Base {
     }
   }
   // 导出Excel
-  async exportExcelAction() {
+  async exportExcelAction () {
     const res = this.ctx.res;
     const req = this.ctx.req;
     const tableId = this.get('tableId');
@@ -37,18 +37,7 @@ module.exports = class extends Base {
     const queryKey = this.get('queryKey');
     let query = this.get('query');
     let whereObj = {};
-    if (queryColumn) {
-      if (queryKey.includes(',')) {
-        whereObj[`${queryColumn}`] = ['IN', `${queryKey}`];
-      } else {
-        whereObj[`${queryColumn}`] = ['like', `%${queryKey}%`];
-      }
-    }
-    if (query && query != '{}' && JSON.stringify(query) != '{}') {
-      query = JSON.parse(query);
-      const key = Object.keys(query)[0];
-      whereObj[key] = ['=', `${query[key]}`];
-    }
+    
     if (queryKey) {
       whereObj = await this.model('tableData').getWhereObj(query, queryColumn, queryKey, tableId);
     }
@@ -92,7 +81,7 @@ module.exports = class extends Base {
     res.end(result, 'binary');
   }
   // 根据配置查询某表的数据
-  async queryTableDataAction() {
+  async queryTableDataAction () {
     // try {
     const tableId = this.get('tableId');
     const pageSize = this.get('pageSize');
@@ -133,18 +122,8 @@ module.exports = class extends Base {
     });
     let whereObj = {};
     let query = this.get('query');
-    if (query && query !== '{}' && JSON.stringify(query) !== '{}') {
-      query = JSON.parse(query);
-      Object.keys(query).map(key => {
-        if (query[key] === null) {
-          whereObj[key] = null;
-        } else if (query[key].toString().indexOf('not null') !== -1) {
-          whereObj[key] = ['!=', null];
-        } else {
-          whereObj[key] = ['=', `${query[key]}`];
-        }
-      });
-    }
+
+    
     if (queryKey) {
       whereObj = await this.model('tableData').getWhereObj(query, queryColumn, queryKey, tableId);
     }
@@ -160,7 +139,7 @@ module.exports = class extends Base {
     //     return this.fail(err)
     // }
   }
-  getData(queryColumns, item, queryKey) {
+  getData (queryColumns, item, queryKey) {
     const vm = this;
     return new Promise(async resolve => {
       const wjData = await this.model().query(`(SELECT id FROM (${item.TYPESQL}) tras WHERE tras.name like '%${queryKey}%')`);
@@ -175,7 +154,7 @@ module.exports = class extends Base {
     });
   }
   // 添加资源
-  async addAction() {
+  async addAction () {
     try {
       const tableId = this.post('tableId');
       const form = this.post('form');
@@ -220,7 +199,7 @@ module.exports = class extends Base {
   }
 
   // 修改资源
-  async editAction() {
+  async editAction () {
     try {
       const tableId = this.post('tableId');
       const updateInfo = this.post('form');
@@ -255,7 +234,7 @@ module.exports = class extends Base {
   /**
      * 删除表资源
      */
-  async deleteAction() {
+  async deleteAction () {
     try {
       const tableId = this.post('tableId');
       const updateInfo = this.post();
