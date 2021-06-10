@@ -497,6 +497,14 @@ export default {
         }
       }
     },
+    query: {
+      deep: true,
+      handler () {
+        if (this.query != undefined) {
+          this.queryParams.query = this.query;
+        }
+      }
+    },
     "query.SSHT" () {
       if (this.query != undefined) {
         this.queryParams.query = this.query;
@@ -511,17 +519,17 @@ export default {
       this.getConfig();
       this.getResList();
     },
-    '$route' () {
-      // this.queryParams.queryKey = ''
-    },
-    query: {
-      deep: true,
-      handler () {
-        if (this.query != undefined) {
-          this.queryParams.query = this.query;
-        }
+    "query.SSDD" () {
+      console.log(this.queryParams)
+      if(this.queryParams.tableId == '0102') return
+      if (this.query != undefined) {
+        this.queryParams.query = this.query;
       }
-    }
+      console.log(this.query)
+      this.getConfig();
+      this.getResList();
+    },
+    
   }
 };
 </script>

@@ -6,7 +6,7 @@
             <span>自定义</span>
             <el-date-picker value-format="yyyy-MM-dd" align="right" v-model="selectValue" @focus="onFocus" :clearable='false' type="daterange" range-separator="至" start-placeholder="开始日期" end-placeholder="结束日期">
             </el-date-picker>
-            <el-button type="primary" size='small' class='goods-btn' @click='emitSelectDate'>确定</el-button>
+            <el-button type="primary" size='mini' class='goods-btn' @click='emitSelectDate'>确定</el-button>
         </div>
     </div>
 </template>
@@ -79,6 +79,14 @@ export default {
   }
 }
 </script>
+<style >
+.el-date-editor--daterange.el-input, .el-date-editor--daterange.el-input__inner, .el-date-editor--timerange.el-input, .el-date-editor--timerange.el-input__inner{
+  width: 240px;
+}
+.el-date-editor .el-range-input{
+  /* width: 25% !important; */
+}
+</style>
 <style lang="scss" scoped>
 .datePicker {
   display: flex;
@@ -88,11 +96,11 @@ export default {
     padding: 2px 10px;
     border-radius: 4px;
     span {
-      margin: 0 20px;
+      margin: 0 10px;
     }
   }
   span {
-    margin-left: 20px;
+    margin-left: 10px;
     color: #666666;
   }
   span:last-child {

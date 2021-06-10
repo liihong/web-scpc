@@ -66,7 +66,7 @@
              v-html="scope.row.DQJQ"></div>
       </template>
     </ResList>
-    <gygxDialog :dialogState="dialogState"
+    <gygxDialog  v-if="dialogState.show" :dialogState="dialogState"
                 ref="gygx" />
     <editBom :dialogState="bomForm" />
     <bjdList noBom

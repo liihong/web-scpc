@@ -6,16 +6,9 @@
              noAdd
              ref="zjryjy">
       <template slot="query">
-        <el-form-item label="出库时间">
-          <el-date-picker v-model="dateValue"
-                          @change="handlerDateChange"
-                          format="yyyy-MM-DD"
-                          value-format="yyyy-MM-DD"
-                          type="daterange"
-                          range-separator="至"
-                          start-placeholder="开始日期"
-                          end-placeholder="结束日期">
-          </el-date-picker>
+        <el-form-item>
+          <datePicker @sureBtnClick="handlerDateChange"
+                    v-model="dateValue" />
         </el-form-item>
       </template>
 
@@ -24,7 +17,11 @@
 </template>
 
 <script>
+import datePicker from '@/components/DatePicker'
 export default {
+  components:{
+    datePicker
+  },
   data () {
     return {
       selectRows: [],
@@ -37,9 +34,9 @@ export default {
   methods: {
     handlerDateChange (e) {
       console.log(e)
-      this.dateValue = e
+      // this.dateValue = e
       this.query = {
-        cksj: e
+        cksj: [e.split(' ')[0],e.split(' ')[1]]
       }
     }
   }

@@ -124,9 +124,9 @@ module.exports = class extends Base {
     let query = this.get('query');
 
     
-    if (queryKey) {
+    // if (queryKey) {
       whereObj = await this.model('tableData').getWhereObj(query, queryColumn, queryKey, tableId);
-    }
+    // }
     if (order && order.length > 0) {
       data = await this.model(table.table_name)
         .field(displayColumnArr.join(',')).page(pageNumber, pageSize).where(table.where_sql).where(whereObj).order(order).alias('t').countSelect();
