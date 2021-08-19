@@ -984,7 +984,7 @@ module.exports = class extends Base {
     tmpLogData.dhyy = dhyy;
 
     await this.model('scglxt_t_jggl_tmp').add(tmpLogData);
-
+    console.log(jgglData);
     // 修改
     await this.model('scglxt_t_gygc').where({
       id: jgglData.gygcid

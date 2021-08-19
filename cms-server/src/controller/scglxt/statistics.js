@@ -160,7 +160,7 @@ module.exports = class extends Base {
       SELECT xmname FROM scglxt_t_dd WHERE id=gygc.ssdd) ddmc,(
       SELECT zddmc FROM scglxt_t_bom WHERE id=gygc.bomid) bommc,t.jgjs,(
       SELECT rymc FROM scglxt_t_ry WHERE id=t.jyryid) jyrymc,t.jgkssj,t.jgjssj,t.sbid,(
-      SELECT sbmc FROM scglxt_t_sb WHERE id=t.sbid) sbmc,(gygc.bzgs+gygc.zbgs) bzgs,gygc.edgs,t.sfjy FROM scglxt_t_jggl t,scglxt_t_gygc gygc WHERE t.gygcid=gygc.id AND date(jgjssj)=curdate() AND jgryid='${token}' order by gygc.ssdd`;
+      SELECT sbmc FROM scglxt_t_sb WHERE id=t.sbid) sbmc,(gygc.bzgs+gygc.zbgs) bzgs,gygc.edgs,(gygc.edgs*t.jgjs+gygc.zbgs) edzgs,t.sfjy FROM scglxt_t_jggl t,scglxt_t_gygc gygc WHERE t.gygcid=gygc.id AND date(jgjssj)=curdate() AND jgryid='${token}' order by gygc.ssdd`;
 
     const data = await this.model().query(sql);
 
@@ -175,7 +175,24 @@ module.exports = class extends Base {
       SELECT xmname FROM scglxt_t_dd WHERE id=gygc.ssdd) ddmc,(
       SELECT zddmc FROM scglxt_t_bom WHERE id=gygc.bomid) bommc,t.jgjs,(
       SELECT rymc FROM scglxt_t_ry WHERE id=t.jyryid) jyrymc,t.jgkssj,t.jgjssj,t.sbid,(
-      SELECT sbmc FROM scglxt_t_sb WHERE id=t.sbid) sbmc,(gygc.bzgs+gygc.zbgs) bzgs,gygc.edgs,t.sfjy FROM scglxt_t_jggl t,scglxt_t_gygc gygc WHERE t.gygcid=gygc.id AND jgjssj BETWEEN DATE_FORMAT(NOW(),'%Y-%m-01') AND NOW() AND jgryid='${token}' order by gygc.ssdd`;
+      SELECT sbmc FROM scglxt_t_sb WHERE id=t.sbid) sbmc,(gygc.bzgs+gygc.zbgs) bzgs,gygc.edgs,(gygc.edgs*t.jgjs+gygc.zbgs) edzgs,t.sfjy FROM scglxt_t_jggl t,scglxt_t_gygc gygc WHERE t.gygcid=gygc.id AND jgjssj BETWEEN DATE_FORMAT(NOW(),'%Y-%m-01') AND NOW() AND jgryid='${token}' order by gygc.ssdd`;
+
+    const data = await this.model().query(sql);
+
+    return this.success(data);
+  }
+
+  // 用户当月的工作记录
+  async getPersonalStatByTimeAction() {
+    const token = this.header('token');
+    const date = this.post('date');
+
+    const sql = `SELECT t.id,(
+        SELECT xmname FROM scglxt_t_dd WHERE id=gygc.ssdd) ddmc,(
+        SELECT zddmc FROM scglxt_t_bom WHERE id=gygc.bomid) bommc,t.jgjs,(
+        SELECT rymc FROM scglxt_t_ry WHERE id=t.jyryid) jyrymc,t.jgkssj,t.jgjssj,t.sbid,(
+        SELECT sbmc FROM scglxt_t_sb WHERE id=t.sbid) sbmc,(gygc.bzgs+gygc.zbgs) bzgs,gygc.edgs,(gygc.edgs*t.jgjs+gygc.zbgs) edzgs,t.sfjy FROM scglxt_t_jggl t,scglxt_t_gygc gygc 
+        WHERE t.gygcid=gygc.id AND jgjssj BETWEEN "` + date.split(' ')[0] + ` 00:00:00" AND "` + date.split(' ')[1] + `  23:59:59" AND jgryid='${token}' order by gygc.ssdd`;
 
     const data = await this.model().query(sql);
 

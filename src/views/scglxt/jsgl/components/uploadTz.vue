@@ -15,7 +15,7 @@
       <div slot="file" slot-scope="{file}">
         <img class="el-upload-list__item-thumbnail" :src="file.url" alt="">
         <span class="el-upload-list__item-actions">
-          <div>{{file.tzmc}}</div>
+          <div style="height:60px;">{{file.tzmc}}</div>
           <span class="el-upload-list__item-preview" @click="handlePictureCardPreview(file)">
             <i class="el-icon-zoom-in"></i>
           </span>

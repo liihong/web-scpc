@@ -19,7 +19,7 @@
           </el-select>
         </el-form-item>
         <el-form-item prop="dhjs" label="打回件数">
-          <el-input-number  v-model="params.dhjs" :min="1" label="打回件数"></el-input-number><br/>
+          <el-input-number  v-model="params.dhjs" label="打回件数"></el-input-number><br/>
         </el-form-item>
         <el-form-item prop="dhyy" label="打回原因">
           <el-input v-model="params.dhyy" />

@@ -37,7 +37,7 @@ module.exports = class extends Base {
     const queryKey = this.get('queryKey');
     let query = this.get('query');
     let whereObj = {};
-    
+
     if (queryKey) {
       whereObj = await this.model('tableData').getWhereObj(query, queryColumn, queryKey, tableId);
     }
@@ -94,6 +94,7 @@ module.exports = class extends Base {
     const table = await this.model('resource_table').getTableInfo(tableId);
     const displayColumn = await this.model('resource_table_column').getColumnList(tableId);
     const displayColumnArr = [];
+    let join = [];
     let data = {};
 
     displayColumn.map(item => {
@@ -101,14 +102,37 @@ module.exports = class extends Base {
         case '1': // 文本框形式不需要翻译
         case '3': // 日期
         case '5': // 日期时间
-          displayColumnArr.push(item.COLUMN_NAME);
+          displayColumnArr.push(`t.${item.COLUMN_NAME}`);
           break;
         case '2': // 有外键关系,需要翻译
-          displayColumnArr.push(item.COLUMN_NAME);
-          displayColumnArr.push(`(SELECT NAME FROM (${item.TYPESQL}) tras WHERE tras.id=${item.COLUMN_NAME}) ${item.COLUMN_NAME}_TEXT`);
+          //如果有外键表配置，就用join
+          if (item.ISFOREIGNKEY == '1') {
+            displayColumnArr.push(`t.${item.COLUMN_NAME}`);
+            displayColumnArr.push(`${item.FOREIGNKEY_TABLE_COLUMN} ${item.COLUMN_NAME}_TEXT `);
+            join.push({
+              table: item.FOREIGNKEY_TABLENAME,
+              join: 'left', //join 方式，有 left, right, inner 3 种方式
+              as: item.FOREIGNKEY_TABLENAME, // 表别名
+              on: [item.COLUMN_NAME, 'id'] //ON 条件
+            })
+          } else {
+            displayColumnArr.push(`t.${item.COLUMN_NAME}`);
+            displayColumnArr.push(`(SELECT NAME FROM (${item.TYPESQL}) tras WHERE tras.id=t.${item.COLUMN_NAME}) ${item.COLUMN_NAME}_TEXT`);
+          }
           break;
         case '4': // 字段数据
-          displayColumnArr.push(`(${item.TYPESQL}) ${item.COLUMN_NAME}`);
+          //如果有外键表配置，就用join
+          if (item.ISFOREIGNKEY == '1') {
+            displayColumnArr.push(`${item.FOREIGNKEY_TABLENAME}.${item.FOREIGNKEY_TABLE_COLUMN} ${item.COLUMN_NAME} `);
+            join.push({
+              table: item.FOREIGNKEY_TABLENAME,
+              join: 'left', //join 方式，有 left, right, inner 3 种方式
+              as: item.FOREIGNKEY_TABLENAME, // 表别名
+              on: [item.COLUMN_NAME, 'id'] //ON 条件
+            })
+          } else {
+            displayColumnArr.push(`(${item.TYPESQL}) ${item.COLUMN_NAME}`);
+          }
           break;
         case '7': // 自动填充
           displayColumnArr.push(`${item.TYPESQL} ${item.COLUMN_NAME}`);
@@ -116,23 +140,34 @@ module.exports = class extends Base {
         case '13': // 附件字段的话，不在列表中查询
           break;
         default:
-          displayColumnArr.push(item.COLUMN_NAME);
+          displayColumnArr.push(`t.${item.COLUMN_NAME}`);
           break;
       }
     });
     let whereObj = {};
     let query = this.get('query');
 
-    
+
     // if (queryKey) {
-      whereObj = await this.model('tableData').getWhereObj(query, queryColumn, queryKey, tableId);
+    whereObj = await this.model('tableData').getWhereObj(query, queryColumn, queryKey, tableId);
     // }
+
+    if(join.length>0) {
+      let newJoin=[]
+      join.map(item=>{
+        if(newJoin.filter(el=>el.table == item.table).length>0){
+        }else{
+          newJoin.push(item)
+        }
+      })
+      join = newJoin
+    }
     if (order && order.length > 0) {
       data = await this.model(table.table_name)
-        .field(displayColumnArr.join(',')).page(pageNumber, pageSize).where(table.where_sql).where(whereObj).order(order).alias('t').countSelect();
+        .field(displayColumnArr.join(',')).page(pageNumber, pageSize).where(table.where_sql).where(whereObj).order(order).alias('t').join(join).countSelect();
     } else {
       data = await this.model(table.table_name)
-        .field(displayColumnArr.join(',')).page(pageNumber, pageSize).where(table.where_sql).where(whereObj).order(table.orderby_sql).alias('t').countSelect();
+        .field(displayColumnArr.join(',')).page(pageNumber, pageSize).where(table.where_sql).where(whereObj).order(table.orderby_sql).alias('t').join(join).countSelect();
     }
     return this.success(data);
     // } catch (err) {
