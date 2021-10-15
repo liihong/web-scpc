@@ -104,7 +104,10 @@ service.getBolb = function(url, param) {
       url: url,
       method: 'GET',
       params: param,
-      responseType: 'blob'
+      responseType: 'blob',
+      headers:{
+        token: getToken()
+      }
     }).then(res => {
       resolve(res)
     }).catch(err => {

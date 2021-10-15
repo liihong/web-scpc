@@ -15,6 +15,9 @@ let api = {
 
     getSygsList: 'scglxt/gygx/getSygsList', //某一工艺剩余工时
     getAdminStat: 'scglxt/statistics/getAdminStat',
+    exportPersonalGRGSTJ: '/api/scglxt/statistics/exportPersonalGRGSTJ',
+
+
     //数据字典操作
     getSjzdById: 'scglxt/sjzd/getSjzdById',
     getBzList: 'scglxt/sjzd/getBzList',
@@ -46,6 +49,8 @@ let api = {
     exportDdBOM: '/api/scglxt/ddgl/exportDdBOM',
     exportDdBL: '/api/scglxt/ddgl/exportDdBL',
     exportGRGSTJ: '/api/scglxt/ddgl/exportGRGSTJ',
+
+
 
     getNewDDbh: 'scglxt/ddgl/getNewDDbh',
     getDdListByWhere: 'scglxt/ddgl/getDdListByWhere',

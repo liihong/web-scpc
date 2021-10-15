@@ -1,6 +1,7 @@
 /**
  * 首页统计需要的接口
  */
+import exportXls from '../../../utils/exportXls';
 const Base = require('../base.js');
 const ddModel = 'scglxt_t_dd';
 
@@ -200,6 +201,50 @@ module.exports = class extends Base {
   }
 
   async exportPersonalStatAction() {
+  }
+
+  // 个人中心导出工人日报表
+  async exportPersonalGRGSTJAction() {
+    const token = this.header('token');
+    const hours = this.get('hours');
+    const date = this.get('date');
+
+    const res = this.ctx.res;
+
+    const basesql = `SELECT ry.id,rymc,bz.bzmc,'` + date + `' as  today,'8h' hours from scglxt_t_ry ry,scglxt_t_bz bz where ssbz=bz.id and ry.id = '` + token + `'`;
+    const infos = await this.model().query(basesql);
+    infos[0].hours = hours || '8h';
+    const sql = `SELECT (@rownum := @rownum + 1) AS rownum,(
+      SELECT xmname FROM scglxt_t_dd WHERE id=gygc.ssdd) ddmc,(
+      SELECT zddmc FROM scglxt_t_bom WHERE id=gygc.bomid) bommc,t.jgjs,'YES' complete,(
+      SELECT rymc FROM scglxt_t_ry WHERE id=t.jyryid) jyrymc,t.jgkssj,t.jgjssj,t.sbid,(
+      SELECT sbmc FROM scglxt_t_sb WHERE id=t.sbid) sbmc,(gygc.bzgs+gygc.zbgs) bzgs,gygc.edgs,(gygc.edgs*t.jgjs+gygc.zbgs) edzgs,t.sfjy FROM (select @rownum := 0) s, scglxt_t_jggl t,scglxt_t_gygc gygc WHERE t.gygcid=gygc.id 
+      AND date(jgjssj) BETWEEN "` + date.split(' ')[0] + ` 00:00:00" AND "` + date.split(' ')[1] + `  23:59:59"  AND jgryid='${token}' order by gygc.ssdd`;
+
+    const datas = await this.model().query(sql);
+
+    const tjInfo = [{
+      info: '合计(分钟)：',
+      edzgs: 0,
+      jhzgs: 0
+    }, {
+      info: '合计(小时)：',
+      edzgs: 0,
+      jhzgs: 0
+    }];
+
+    if (datas.length > 0) {
+      datas.forEach(item => {
+        tjInfo[0].edzgs += parseFloat(item.edzgs);
+        tjInfo[0].jhzgs += parseFloat(item.bzgs);
+      });
+
+      tjInfo[1].edzgs = parseFloat(tjInfo[0].edzgs / 60).toFixed(2);
+      tjInfo[1].jhzgs = parseFloat(tjInfo[0].jhzgs / 60).toFixed(2);
+      exportXls.exportPersonalDay(infos[0], datas, tjInfo, res);
+    } else {
+      return this.fail(1, '没有数据', null);
+    }
   }
 
   // 获取班组工作台所需数据面板

@@ -6,10 +6,22 @@
                      name="first">
           <div>姓名：{{name}}</div>
           <div>所属班组：{{roleNames[0]}}</div>
+
         </el-tab-pane>
       </el-tabs>
     </div>
-    <el-tabs @tab-click="changeTab" v-model="activeName">
+    <div class="flex-right">
+      <div class="flex" style="align-items: center;">
+        <el-button @click="handlerExport"
+                   type="primary" style="margin-right:30px;">导出</el-button>
+        日出勤时间：  <el-radio v-model="radio" label="8h">8h</el-radio>
+         <el-radio v-model="radio" label="9h">9h</el-radio>
+         <el-radio v-model="radio" label="10h">10h</el-radio>
+  <el-radio v-model="radio" label="11h">11h</el-radio>
+      </div>
+    </div>
+    <el-tabs @tab-click="changeTab"
+             v-model="activeName">
       <el-tab-pane label="今日工时统计"
                    name="first">
         <el-table class="el-table"
@@ -48,7 +60,7 @@
       </el-tab-pane>
       <el-tab-pane label="自定义时间"
                    name="three">
-       <datePicker @sureBtnClick="sureBtnClick"
+        <datePicker @sureBtnClick="sureBtnClick"
                     v-model="selectDate" />
         <el-table class="el-table"
                   :data="threeData"
@@ -66,7 +78,6 @@
           </el-table-column>
         </el-table>
       </el-tab-pane>
-      
 
     </el-tabs>
   </div>
@@ -87,6 +98,8 @@ export default {
     return {
       active: 'first',
       activeName: 'first',
+      cities: ['8h', '11h'],
+      radio: '8h',
       selectDate: '',
       columnDatas: [
         { id: 'ddmc', name: '订单名称' },
@@ -140,9 +153,9 @@ export default {
               sums[column] = "";
             }
             sums2[column] = (sums[column])
-            sums[column] = (sums[column]/60).toFixed(2)
+            sums[column] = (sums[column] / 60).toFixed(2)
 
-            if (column == 'bommc' || column == 'edgs'|| column == 'jgjs' || column == 'sbmc' || column == 'jyrymc'|| column == 'jgkssj'|| column == 'jgjssj') {
+            if (column == 'bommc' || column == 'edgs' || column == 'jgjs' || column == 'sbmc' || column == 'jyrymc' || column == 'jgkssj' || column == 'jgjssj') {
               sums2[column] = "";
               sums[column] = ''
             }
@@ -152,7 +165,7 @@ export default {
         }
       })
     },
-    initMonth(){
+    initMonth () {
       this.$ajax.get(this.$api.getPersonalMonth).then(res => {
         if (res) {
           this.monthData = res.data
@@ -180,9 +193,9 @@ export default {
               sums[column] = "";
             }
             sums2[column] = (sums[column])
-            sums[column] = (sums[column]/60).toFixed(2)
+            sums[column] = (sums[column] / 60).toFixed(2)
 
-            if (column == 'bommc' || column == 'edgs'|| column == 'jgjs' || column == 'sbmc' || column == 'jyrymc'|| column == 'jgkssj'|| column == 'jgjssj') {
+            if (column == 'bommc' || column == 'edgs' || column == 'jgjs' || column == 'sbmc' || column == 'jyrymc' || column == 'jgkssj' || column == 'jgjssj') {
               sums2[column] = "";
               sums[column] = ''
             }
@@ -193,8 +206,8 @@ export default {
       })
     },
 
-    initThreeStat(){
-      this.$ajax.post(this.$api.getPersonalStatByTime,{date: this.selectDate}).then(res => {
+    initThreeStat () {
+      this.$ajax.post(this.$api.getPersonalStatByTime, { date: this.selectDate }).then(res => {
         if (res) {
           this.threeData = res.data
           let sums = [], sums2 = [];
@@ -221,9 +234,9 @@ export default {
               sums[column] = "";
             }
             sums2[column] = (sums[column])
-            sums[column] = (sums[column]/60).toFixed(2)
+            sums[column] = (sums[column] / 60).toFixed(2)
 
-            if (column == 'bommc' || column == 'edgs'|| column == 'jgjs' || column == 'sbmc' || column == 'jyrymc'|| column == 'jgkssj'|| column == 'jgjssj') {
+            if (column == 'bommc' || column == 'edgs' || column == 'jgjs' || column == 'sbmc' || column == 'jyrymc' || column == 'jgkssj' || column == 'jgjssj') {
               sums2[column] = "";
               sums[column] = ''
             }
@@ -238,14 +251,44 @@ export default {
       this.initThreeStat()
     },
 
-    changeTab(tab){
-      if(tab.name === 'first'){
+    changeTab (tab) {
+      if (tab.name === 'first') {
         this.initData()
-      }else if(tab.name === 'second'){
+      } else if (tab.name === 'second') {
         this.initMonth()
-      }else{
+      } else {
         this.initThreeStat()
       }
+    },
+
+    handlerChecked(val){
+      console.log(val)
+    },
+
+    handlerExport () {
+      this.$ajax.getBolb(this.$api.exportPersonalGRGSTJ, {
+        date: this.selectDate,
+        hours: this.radio
+      }).then(res => {
+        console.log(res)
+        if (res.data) {
+          let url = URL.createObjectURL(res.data)
+          let fileName = res.headers['content-disposition'].split('=')[1]
+          fileName = decodeURI(fileName)
+          let link = document.createElement('a')
+          link.style.display = 'none'
+          link.href = url
+          link.setAttribute('id', 'downloadLink')
+          link.setAttribute('download', fileName)
+          document.body.appendChild(link)
+          link.click()
+          // 删除添加的a链接
+          let objLink = document.getElementById('downloadLink')
+          document.body.removeChild(objLink)
+        }else{
+          this.$message.error('没有数据')
+        }
+      })
     }
   }
 }
@@ -254,5 +297,13 @@ export default {
 <style>
 .personal {
   margin: 30px;
+}
+.flex-right {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  position: absolute;
+  right: 30px;
+  z-index: 999;
 }
 </style>
