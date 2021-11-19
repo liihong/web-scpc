@@ -41,9 +41,9 @@ _exports.exportXls = function(data, list, res, type, tjInfo) {
     }
   }; // <====设置xlsx单元格样式
 
-  var keyMap = ['xh', 'ljmc', 'ljcz', 'ljgg', 'jgsl', 'ljlx', 'sccj', 'zjee', 'yjdhrq', 'sjdhrq', 'bz'];
+  var keyMap = ['xh', 'ljmc', 'ljcz', 'ljgg', 'jgsl', 'ljlx', 'sccj', 'zjee', 'yjdhrq', 'endtime', 'bz'];
   if (type == '1') {
-    keyMap = ['xh', 'ljmc', 'ljcz', 'ljgg', 'jgsl', 'ljlx', 'sccj', 'dj', 'zje', 'sjdhrq', 'bz'];
+    keyMap = ['xh', 'ljmc', 'ljcz', 'ljgg', 'jgsl', 'ljlx', 'sccj', 'dj', 'zje', 'endtime', 'bz'];
   }
   var dataList = xlsxUtils.format2Sheet(list, 0, 7, keyMap); // 偏移8行按keyMap顺序转换
 

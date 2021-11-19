@@ -81,6 +81,7 @@ export default {
     },
     handleSuccess(){
         this.$message.success('图纸上传成功')
+        this.dialogState.show = false
     },
     // 获取图纸信息
     getTzData() {

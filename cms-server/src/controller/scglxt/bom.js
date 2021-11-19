@@ -354,7 +354,7 @@ module.exports = class extends Base {
     return new Promise(async resolve => {
       const wjData = await this.model(bomModel).where({
         ssdd: ssdd,
-        zddzt: ['!=', '0506']
+        zddzt: ['in', ['0501,0502,0503,0504,0505']]
       }).select();
       if (wjData.length === 0) {
         updateList.push(ssdd);
@@ -396,7 +396,7 @@ module.exports = class extends Base {
       } else {
         const allBom = await this.model(bomModel).where({
           ssdd: bomData[0].ssdd,
-          zddzt: ['!=', '0506']
+          zddzt: ['in', ['0501,0502,0503,0504,0505']]
         }).select();
         // 如果该订单下所有BOM都完成了就更新订单状态为完成
         if (allBom.length == 0) {

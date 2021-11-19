@@ -520,12 +520,10 @@ export default {
       this.getResList();
     },
     "query.SSDD" () {
-      console.log(this.queryParams)
       if(this.queryParams.tableId == '0102') return
       if (this.query != undefined) {
         this.queryParams.query = this.query;
       }
-      console.log(this.query)
       this.getConfig();
       this.getResList();
     },

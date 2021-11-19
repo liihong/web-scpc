@@ -111,7 +111,37 @@
                                  v-model="volume.d"
                                  :min="0"></el-input-number>
               </el-col>
-              <el-col v-if="formData.CLXZ !== 3"
+               <!--六方棒 （对边长*对边长)*高*密度*0.275-->
+              <el-col v-if="formData.CLXZ == 4"
+                      :span="8">
+                <span>对边长(mm)</span>
+                <el-input-number @blur="calculateVolume"
+                                 size="mini"
+                                 :controls="false"
+                                 v-model="volume.dbc"
+                                 :min="0"></el-input-number>
+              </el-col>
+              <!--圆管 （外径-壁厚)*壁厚*高*密度-->
+              <el-col v-if="formData.CLXZ == 6 || formData.CLXZ == 5|| formData.CLXZ == 7"
+                      :span="8">
+                <span>外径(mm)</span>
+                <el-input-number @blur="calculateVolume"
+                                 size="mini"
+                                 :controls="false"
+                                 v-model="volume.wj"
+                                 :min="0"></el-input-number>
+              </el-col>
+              <el-col v-if="formData.CLXZ == 6 || formData.CLXZ == 5 || formData.CLXZ == 7"
+                      :span="8">
+                <span>壁厚(mm)</span>
+                <el-input-number @blur="calculateVolume"
+                                 size="mini"
+                                 :controls="false"
+                                 v-model="volume.bh"
+                                 :min="0"></el-input-number>
+              </el-col>
+
+              <el-col v-if="formData.CLXZ !=3"
                       :span="8">
                 <span>高(mm)</span>
                 <el-input-number @blur="calculateVolume"
@@ -120,11 +150,10 @@
                                  v-model="volume.h"
                                  :min="0"></el-input-number>
               </el-col>
-              <el-col v-if="formData.CLXZ == 3"
-                      :span="8">
-                <el-input placeholder="材料大小"
-                          v-model="formData.CLDX"></el-input>
-              </el-col>
+
+              <!--角钢  （边长+边长-壁厚)*壁厚*高*密度*1-->
+
+             
             </template>
           </el-form-item>
         </el-col>
@@ -240,7 +269,10 @@ export default {
         w: 0,
         d: 0,
         cldj: 0,
-        mi: 0
+        dbc: 0,
+        mi: 0,
+        wj:0,
+        bh:0
       }
     };
   },
@@ -378,20 +410,70 @@ export default {
     //计算材料体积
     calculateVolume() {
       let radio = this.formData.CLXZ;
-      let { l, h, w, d, cldj, mi } = this.volume;
+      let { l, h, w, d, cldj, mi, dbc, wj,bh } = this.volume;
 
+      // 长方体
       if (radio == 1) {
         this.$set(this.formData, "CLTJ", ((l * w * h) / 1000).toFixed(2));
         this.formData.CLDX = l + "*" + w + "*" + h;
-      } else {
+        this.formData.CLZL = this.formData.CLTJ * mi;
+      } 
+      // 圆柱体
+      else if (radio == 2) {
         this.$set(
           this.formData,
           "CLTJ",
           ((3.1415926 * ((d / 2) * (d / 2)) * h) / 1000).toFixed(2)
         );
         this.formData.CLDX = "φ" + d + "*" + h;
+        this.formData.CLZL = this.formData.CLTJ * mi;
       }
-      this.formData.CLZL = this.formData.CLTJ * mi;
+
+       // 六方棒
+      else if (radio == 4) {
+        this.$set(
+          this.formData,
+          "CLTJ",
+          ((3.14 * ((dbc*dbc) * h) *0.275) / 1000).toFixed(2)
+        );
+        this.formData.CLDX = "φ" + dbc + '*' + dbc  + "*" + h+'*0.275';
+
+        this.formData.CLZL = this.formData.CLTJ * mi;
+      }
+
+       // 角钢
+      else if (radio == 5) {
+        this.$set(
+          this.formData,
+          "CLTJ",
+          (((wj+wj-bh)*bh * h) / 1000).toFixed(2)
+        );
+        this.formData.CLDX = '('+ wj + '+' + wj + '-' + bh  + ")*"+bh+"*" + h;
+        this.formData.CLZL = this.formData.CLTJ * mi;
+      }
+
+       // 圆管
+      else if (radio == 6) {
+        this.$set(
+          this.formData,
+          "CLTJ",
+          (((wj-bh)*bh * h) / 10000).toFixed(2)
+        );
+        this.formData.CLDX = '('+wj + '-' + bh  + ")*"+bh+"*" + h;
+        this.formData.CLZL = this.formData.CLTJ * mi;
+      }
+
+       // 圆管
+      else if (radio == 7) {
+        this.$set(
+          this.formData,
+          "CLTJ",
+          (((wj-bh)*bh * h*4) / 1000).toFixed(2)
+        );
+        this.formData.CLDX = '('+wj + '-' + bh  + ")*"+bh+"*4*" + h;
+        this.formData.CLZL = this.formData.CLTJ * mi;
+      }
+      
       this.formData.CLJE = (
         this.formData.BLJS *
         (this.formData.CLTJ * mi * cldj)

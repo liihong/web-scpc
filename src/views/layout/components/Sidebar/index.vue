@@ -3,9 +3,7 @@
     <div style="background-color: rgb(48, 65, 86);" class="main-logo">
       <!-- <a href="#/dashboard" class="router-link-exact-active router-link-active">
       </a> -->
-      <svg width="200px" height="60px" viewBox="0 0 200 74" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-    <!-- Generator: Sketch 55.1 (78136) - https://sketchapp.com -->
-    <title>编组 2</title>
+      <!-- <svg width="200px" height="60px" viewBox="0 0 200 74" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
     <desc>Created with Sketch.</desc>
     <g id="页面1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
         <g id="画板备份" transform="translate(-88.000000, -29.000000)" fill-rule="nonzero">
@@ -53,7 +51,8 @@
             </g>
         </g>
     </g>
-</svg>
+</svg> -->
+      <img src="../../../../assets/logo.png" />
     </div>
     <el-menu :show-timeout="200" :default-active="$route.path" :collapse="isCollapse" mode="vertical" background-color="#304156" text-color="#bfcbd9" active-text-color="#006633">
       <sidebar-item v-for="route in routes" :key="route.name" :item="route" :base-path="route.path" />

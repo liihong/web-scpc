@@ -580,11 +580,13 @@ module.exports = class extends Base {
       const nextKjgjs = await this.model('scglxt_t_gygc').where({
         id: nextJGgy[0].id
       }).getField('kjgjs', true);
-      console.log(nextKjgjs);
-      console.log(kjgjs);
 
       // 容错处理，如果已加工件数+送检件数大于可加工件数，则默认将已加工件数更新为可加工件数
       if (nextKjgjs > kjgjs) {
+        await this.model('scglxt_t_error_bak').add({
+          error: JSON.stringify({bomid: bomid,gygcid: gygcid,serial: serial,kjgjs: kjgjs, yjgjs: yjgjs}), 
+          info: '已加工件数+送检件数大于可加工件数，则默认将已加工件数更新为可加工件数'});
+
         await this.model('scglxt_t_gygc').where({
           id: nextJGgy[0].id
         }).update({

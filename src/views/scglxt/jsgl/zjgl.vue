@@ -1,7 +1,7 @@
 <template>
   <div class="ddgl">
     <ResList tableId='0117' noEdit ref="zjgl">
-      <el-table-column slot="operate" fixed="left" label="操作" min-width="110" align="center">
+      <el-table-column slot="operate" fixed="left" label="操作" min-width="120" align="center">
         <template slot-scope="scope">
           <el-button-group size="mini">
             <el-button size="mini" type="primary" @click="exportZj(scope.row)">导出</el-button>
@@ -131,6 +131,7 @@ export default {
           // 删除添加的a链接
           let objLink = document.getElementById("downloadLink");
           document.body.removeChild(objLink);
+          this.dialogVisible = false
         }
       });
     }
