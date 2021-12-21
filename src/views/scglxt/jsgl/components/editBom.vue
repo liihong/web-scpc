@@ -463,7 +463,7 @@ export default {
         this.formData.CLZL = this.formData.CLTJ * mi;
       }
 
-       // 圆管
+       // 方管
       else if (radio == 7) {
         this.$set(
           this.formData,
@@ -500,7 +500,14 @@ export default {
               this.volume.l = dx[0];
               this.volume.w = dx[1];
               this.volume.h = dx[2];
-            } else {
+            } else if(this.formData.CLXZ == 7) {
+              let dx = this.formData.CLDX.split("*");
+              this.volume.bh=dx[1]
+              console.log(dx[0].split('-')[0])
+              this.volume.wj=dx[0].split('-')[0].replace('(','')
+              this.volume.h = dx[3];
+            }
+            else{
               let dx = this.formData.CLDX.split("*");
               this.volume.d = dx[0].slice(1, dx[0].length);
               this.volume.h = dx[1];
