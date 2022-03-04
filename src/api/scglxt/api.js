@@ -122,6 +122,7 @@ let api = {
     sureManualScrap: 'scglxt/gygx/sureManualScrap',//手工增加报废流程
     sureManualScrapCL: 'scglxt/gygx/sureManualScrapCL',// 材料报废
     sureManualScrapJS: 'scglxt/gygx/sureManualScrapJS',// 技术报废
+    jyScrap: 'scglxt/gygx/jyScrap', // 工艺过程的材料报废
 
     //人工修改加工记录
     updateJGJL: 'scglxt/gygx/updateJGJL',

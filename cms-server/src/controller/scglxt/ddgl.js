@@ -102,8 +102,8 @@ module.exports = class extends Base {
     let count = await this.model('scglxt_t_dd').query(`SELECT SUBSTRING_INDEX(xmname,'-',-1) AS count FROM scglxt_t_dd   where xmname like '${nowYear}%' order by sjcjsj desc limit 1`);
 
     if (count.length > 0) {
-      count = '00000' + (parseInt(count[0].count) + 1);
-      count = count.substring(3, count.length);
+      let s = [(parseInt(count[0].count) + 1)];
+      count = s = (Array(5).join(0) + (s.join('') || '')).slice(-5).toString();
     } else {
       count = '00001';
     }

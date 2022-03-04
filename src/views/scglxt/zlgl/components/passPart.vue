@@ -16,16 +16,18 @@
             </el-option>
             <el-option :key="1" label="报废" value="2202">
             </el-option>
+             <el-option :key="2" label="材料报废" value="2203">
+            </el-option>
           </el-select>
         </el-form-item>
-        <el-form-item prop="dhjs" label="打回件数">
+        <el-form-item prop="dhjs" :label="`${params.sjzt=='2201'?'打回':'报废'}件数`">
           <el-input-number  v-model="params.dhjs" label="打回件数"></el-input-number><br/>
         </el-form-item>
-        <el-form-item prop="dhyy" label="打回原因">
+        <el-form-item prop="dhyy" :label="`${params.sjzt=='2201'?'打回':'报废'}原因`">
           <el-input v-model="params.dhyy" />
         </el-form-item>
         <el-form-item>
-          <el-button @click="passPart" class="namesBtn" type="primary">确定打回</el-button>
+          <el-button @click="passPart" class="namesBtn" type="primary">确定{{`${params.sjzt=='2201'?'打回':'报废'}`}}</el-button>
         </el-form-item>
       </el-form>
     </div>
@@ -79,8 +81,21 @@ export default {
           this.params.yjgjs = this.row.YJGJS
           this.params.serial = this.row.serial
           this.params.iszj = this.row.ISZJ //是否是终检操作
+
           if (this.dialogState.type == 'part') {
-            this.$ajax
+            if(this.params.sjzt == '2203')// 如果是材料报废
+            {
+              this.$ajax
+              .post(this.$api.jyScrap, this.params)
+              .then(res => {
+                if (res.errno == 0) {
+                  this.$message.success('材料报废成功')
+                  this.dialogState.show = false
+                  this.$parent.initData()
+                }
+              })
+            }else{
+              this.$ajax
               .post(this.$api.gygxCheckPassPart, this.params)
               .then(res => {
                 if (res.errno == 0) {
@@ -89,6 +104,8 @@ export default {
                   this.$parent.initData()
                 }
               })
+            }
+            
           } else {// 全部打回
             this.$ajax
               .post(this.$api.gygxCheckNoPass, this.params)

@@ -8,6 +8,8 @@
           <el-radio :label="1">未通过</el-radio>
           <el-radio :label="2">已通过</el-radio>
         </el-radio-group>
+        <!-- 订单号查询：
+        <el-input v-model="orderId" placeholder="请输入订单号进行查询" /> -->
       </el-form-item>
       <el-table-column slot="operate" fixed="left" label="操作" :min-width="token=='202004042054469482761' ?120:250" align="center">
         <template slot-scope="scope">

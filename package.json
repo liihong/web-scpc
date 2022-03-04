@@ -19,6 +19,7 @@
     "js-md5": "^0.7.3",
     "jsbarcode": "^3.11.0",
     "lodash": "^4.17.11",
+    "node-sass": "^4.13",
     "nprogress": "^0.2.0",
     "sass-loader": "^7.1.0",
     "sortablejs": "^1.10.0-rc3",
@@ -40,7 +41,6 @@
     "@vue/cli-plugin-eslint": "^3.0.3",
     "@vue/cli-service": "^3.0.3",
     "compression-webpack-plugin": "^4.0.0",
-    "node-sass": "^4.13.0",
     "vue-template-compiler": "^2.6.10"
   }
 }
