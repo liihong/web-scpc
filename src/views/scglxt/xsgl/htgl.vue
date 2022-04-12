@@ -1,6 +1,6 @@
 <template>
   <div>
-    <ResList :num="num" tableId="0101" ref="htgl" @saveAfter="addDd" @editAfter="editAfter" :query="query" noEdit>
+    <DataResList :num="num" tableId="0101" @refreshData="refreshData" ref="htgl" @saveAfter="addDd" @editAfter="editAfter"  :tableData="tableList" :query="query" noEdit>
       <el-form-item slot="toolBar">
         审批状态：
         <el-radio-group @change="changeSpzt" v-model="spzt">
@@ -52,7 +52,7 @@
        <template slot="DQJD" slot-scope="scope">
           <el-progress :text-inside="true" :stroke-width="14" :percentage="getBFB(scope.row.DQJD,scope.row.ZGS)"></el-progress>
       </template>
-    </ResList>
+    </DataResList>
     <bjd :dialogState="dialogState"></bjd>
     <bjdList :dialogState="bjdState" />
     <htsp :dialogState="spState" />
@@ -60,6 +60,8 @@
 </template>
 
 <script>
+import DataResList from '../../resMgr/ResDataList'
+
 import bjdList from "../xsgl/components/bjdList";
 import bjd from "./components/bjd";
 import htsp from "./components/htsp.vue";
@@ -68,7 +70,8 @@ export default {
   components: {
     bjd,
     bjdList,
-    htsp
+    htsp,
+    DataResList
   },
   data() {
     return {
@@ -87,7 +90,11 @@ export default {
         show: false,
         row: {}
       },
-      query:{}
+      query:{
+        pageSize: 30,
+        pageNumber: 1
+      },
+      tableList: []
     };
   },
   computed: {
@@ -97,7 +104,7 @@ export default {
   },
   activated(){
     if(this.$route.query){
-      this.query = this.$route.query
+      this.query = {...this.query,...this.$route.query}
     }
     //如果是缪总登录，直接显示未审批合同
     if(this.token=='201609101108000012'){
@@ -105,8 +112,21 @@ export default {
       this.query = {SPZT: this.spzt}
       this.num++
     }
+     this.initData()
   },
   methods: {
+    async initData() {
+      let res = await this.$ajax.post(this.$api.getHtList, this.query)
+      if (res.errno == 0) {
+        this.tableList = res.data
+      }
+    },
+
+     refreshData(params) {
+      this.query = params
+      this.initData()
+    },
+
     spClick(row) {
       this.spState.row = row;
       this.spState.show = true;
@@ -212,7 +232,7 @@ export default {
         return 0
       }
       let bfb = (yjggs / ddzgs) * 100
-
+      if(bfb>100) bfb = 100
       return Math.ceil(bfb)
     }
   },

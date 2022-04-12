@@ -38,14 +38,15 @@ module.exports = class extends Base {
     let query = this.get('query');
     let whereObj = {};
 
-    if (queryKey) {
+    if (queryKey || query) {
       whereObj = await this.model('tableData').getWhereObj(query, queryColumn, queryKey, tableId);
     }
+
 
     var confs = [];
     var conf = {};
     const colArr = [];
-    const colunms = await this.model('resource_table_column').getColumnList(tableId, 'EXPORT');
+    const colunms = await this.model('resource_table_column').getColumnList(tableId);
     const tables = await this.model('resource_table').getTableInfo(tableId);
 
     colunms.map(item => {
@@ -58,7 +59,7 @@ module.exports = class extends Base {
       return item.COLUMN_NAME;
     });
     conf.cols = colArr;
-    const tableData = await this.model('tableData').getTableData(tableId, 'EXPORT', whereObj);
+    const tableData = await this.model('tableData').getTableData(tableId, whereObj);
     const infos = [];
     tableData.map(item => {
       const datas = [];

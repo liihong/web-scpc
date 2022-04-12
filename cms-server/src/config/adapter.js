@@ -36,7 +36,7 @@ exports.model = {
   },
   mysql: {
     handle: mysql,
-    database: 'scpc',
+    database: 'scpc2',
     // prefix: 'cms_',
     encoding: 'utf8',
     host: '127.0.0.1',

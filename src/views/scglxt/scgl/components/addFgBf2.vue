@@ -29,6 +29,9 @@
         <el-col :span="24">
           <span style="margin-right:20px;">勾选以下已加工记录进行报废</span>
           <el-button @click="onManualScrap" size="mini" type="warning" icon="el-icon-s-release">报废</el-button>
+          <el-button @click="onManualScrapCL" size="mini" type="danger" icon="el-icon-s-release">材料报废</el-button>
+          <el-button @click="onManualScrapJS"  size="mini" type="danger" icon="el-icon-s-release">技术报废</el-button>
+
         </el-col>
         <el-col :span="24">
           <ResList
@@ -69,35 +72,12 @@
             <el-input-number v-model="params.dhjs" :min="1" label="报废件数"></el-input-number>
             <br />
           </el-form-item>
-          
-          <el-form-item prop="type" label="报废类型">
-             <el-radio-group v-model="params.type" class="radioGroup" @change="handlerTypeChange">
-                <el-radio class="radio" :label="1">工人加工</el-radio>
-                <el-radio class="radio" :label="2">技术报废</el-radio>
-                <el-radio class="radio" :label="3">材料报废</el-radio>
-            </el-radio-group>
-          </el-form-item>
-          <el-form-item prop="isTime" label="是否保留工时">
-            <el-radio-group v-model="params.isTime" class="radioGroup">
-                <el-radio class="radio" :label="1">是</el-radio>
-                <el-radio class="radio" :label="0">否</el-radio>
-            </el-radio-group>
-          </el-form-item>
           <el-form-item prop="dhyy" label="报废原因">
             <el-input v-model="params.dhyy" />
           </el-form-item>
-          <el-form-item prop="gjjy" label="改进建议">
-            <el-input v-model="params.gjjy" />
-          </el-form-item>
-          <el-form-item prop="isAdd" label="是否生成新的加工单">
-             <el-radio-group v-model="params.isAdd" class="radioGroup">
-                <el-radio class="radio" :label="1">生成</el-radio>
-                <el-radio class="radio" :label="0">不生成</el-radio>
-            </el-radio-group>
-          </el-form-item>
-
           <el-form-item>
-            <el-button @click="sureManualScrap" class="namesBtn" type="primary">确定报废</el-button>
+            <el-button @click="sureManualScrap(false)" class="namesBtn" type="primary">确定报废</el-button>
+            <el-button @click="sureManualScrap(true)" class="namesBtn" type="success">确定报废，并生成新的加工单</el-button>
           </el-form-item>
         </el-form>
       </div>
@@ -122,12 +102,8 @@ export default {
       selectRows: [],
       isSureScrap: false,
       params: {
-        isTime: 0,
-        isAdd: 1,
-        type: 1,
         dhjs: 1,
-        dhyy: "",
-        gjjy: ''
+        dhyy: ""
       }
     };
   },
@@ -147,16 +123,6 @@ export default {
             this.selectInfo.ssdd = res.data.data;
           }
         });
-    },
-    // 报废类型切换，如果选技术或者材料报废，则自动填充报废原因
-    handlerTypeChange(val){
-      console.log(val)
-      if(val == 2){
-        this.params.dhyy="系统-技术报废"
-      }
-      if(val == 3){
-        this.params.dhyy='系统-材料报废'
-      }
     },
     ssddChange() {
       this.$ajax
@@ -185,8 +151,11 @@ export default {
       }
       this.isSureScrap = true;
     },
-    sureManualScrap() {
+    sureManualScrap(isAdd) {
       let params = this.params;
+      if (isAdd) {
+        params.isAdd = 1;
+      }
       
       params.jggl = this.selectRows[0];
       params.bomid = this.query.BOMID
@@ -201,6 +170,43 @@ export default {
         }
       });
     },
+    // 材料报废，删除所有加工记录，生成新订单
+    onManualScrapCL(){
+      if(this.selectInfo.ssbom == ''){
+         this.$message.warning(`请选择报废BOM!`);
+        return
+      }
+      this.$message.confirm('材料报废默认全部报废并生成新的加工单？',() => {
+          this.$ajax.post(this.$api.sureManualScrapCL, {
+            ssdd: this.query.SSDD,
+            bomid: this.query.BOMID
+          }).then(res => {
+        if (res.errno == 0) {
+          this.$message.success(`成功报废零件并生成新的加工单!`);
+          this.isSureScrap = false;
+          this.dialogState.show = false
+        }
+      });
+     });
+    },
+    onManualScrapJS(){
+      if (this.selectInfo.ssbom == '') {
+        this.$message.warning(`请选择报废BOM!`);
+        return
+      }
+      this.$message.confirm('技术报废默认保留现有工时并生成新的加工单？', () => {
+        this.$ajax.post(this.$api.sureManualScrapJS, {
+          ssdd: this.query.SSDD,
+          bomid: this.query.BOMID
+        }).then(res => {
+          if (res.errno == 0) {
+            this.$message.success(`成功报废零件并生成新的加工单!`);
+            this.isSureScrap = false;
+            this.dialogState.show = false
+          }
+        });
+      });
+    }
   },
   watch: {
     "dialogState.show"() {

@@ -21,6 +21,7 @@
         <el-tag effect='dark' :type="scope.row.DDLEVEL == '0402' ? 'warning' : scope.row.DDLEVEL == '0403' ? '' : 'danger'">{{scope.row.DDLEVEL_TEXT}}</el-tag>
       </template>
     </ResList>
+     <uploadTZ :dialogState="dialogState" />
   </div>
 </template>
 

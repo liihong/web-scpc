@@ -545,10 +545,11 @@ module.exports = class extends Base {
 
     const {
       yjgjs,
-      kjgjs
+      kjgjs,
+      ssdd
     } = await this.model('scglxt_t_gygc').where({
       id: gygcid
-    }).getField('yjgjs,kjgjs', true);
+    }).getField('yjgjs,kjgjs,ssdd', true);
 
     // //如果订单件数全部完成
     // if(yjgjs == kjgjs) {
@@ -615,6 +616,10 @@ module.exports = class extends Base {
         });
       }
     }
+    
+    // 更新订单的当前加工进度
+    const ddSql = `update  scglxt_t_dd set dqjd=fun_yjggs('${ssdd}') where id='${ssdd}'`
+    this.model().query(ddSql);
 
     return data;
   }
@@ -831,6 +836,16 @@ module.exports = class extends Base {
       id: id
     }).update(updateJggl);
 
+
+    const ssddObj = await this.model('scglxt_t_bom').where({
+      id: bomid
+    }).find();
+
+    // 更新订单的当前加工进度
+    const ddSql = `update  scglxt_t_dd set dqjd=fun_yjggs('${ssddObj.ssdd}') where id='${ssddObj.ssdd}'`
+    await this.model().query(ddSql);
+    
+
     return this.success(data);
   }
 
@@ -976,7 +991,10 @@ module.exports = class extends Base {
     const bomid = this.post('bomid');
     const dhjs = this.post('dhjs');
     const dhyy = this.post('dhyy');
-    const isAdd = this.post('isAdd');
+    const gjjy = this.post('gjjy');
+    const isAdd = this.post('isAdd');  // 是否生成新订单
+    const isTime = this.post('isTime'); // 是否保留工时
+    const type = this.post('type');
 
     const bomData = await this.model('scglxt_t_bom').where({
       id: bomid
@@ -994,9 +1012,10 @@ module.exports = class extends Base {
     tmpLogData.sjzt = '2202';
     tmpLogData.dhjs = dhjs;
     tmpLogData.dhyy = dhyy;
+    tmpLogData.gjjy = gjjy;
+    tmpLogData.dhlx = type;
 
     await this.model('scglxt_t_jggl_tmp').add(tmpLogData);
-    console.log(jgglData);
     // 修改
     await this.model('scglxt_t_gygc').where({
       id: jgglData.gygcid
@@ -1028,14 +1047,17 @@ module.exports = class extends Base {
           status: ['in', '1,2']
         }).decrement('yjgjs', dhjs);
       }
-
-      // 修改加工记录数据
-      await this.model('scglxt_t_jggl').where({
-        id: oldJgglID
-      }).delete();
-      await this.model('scglxt_t_jggl').where({
-        gygcid: ['in', ids]
-      }).delete();
+      console.log(isTime)
+      if(isTime == 0){
+        // 修改加工记录数据
+        await this.model('scglxt_t_jggl').where({
+          id: oldJgglID
+        }).delete();
+        await this.model('scglxt_t_jggl').where({
+          gygcid: ['in', ids]
+        }).delete();
+      }
+      
     } else {
       if (ids.length > 0) {
         // 修改
@@ -1049,13 +1071,15 @@ module.exports = class extends Base {
           status: '2'
         }).decrement('yjgjs', dhjs);
 
-        await this.model('scglxt_t_jggl').where({
-          gygcid: ['in', ids],
-          jgjs: 0
-        }).delete();
-        await this.model('scglxt_t_jggl').where({
-          gygcid: ['in', ids]
-        }).decrement('jgjs', dhjs);
+        if(isTime === 0){
+          await this.model('scglxt_t_jggl').where({
+            gygcid: ['in', ids],
+            jgjs: 0
+          }).delete();
+          await this.model('scglxt_t_jggl').where({
+            gygcid: ['in', ids]
+          }).decrement('jgjs', dhjs);
+        }
       }
 
       // 修改加工记录数据

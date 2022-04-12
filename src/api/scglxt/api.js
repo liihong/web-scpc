@@ -34,6 +34,11 @@ let api = {
     saveGygxInfo: 'scglxt/gygx/saveGygxInfo',
     deleteGygx: 'scglxt/gygx/deleteGygx',
     orderTop: 'scglxt/gygx/orderTop',
+
+
+    //合同
+    getHtList: 'scglxt/xsgl/getHtList',
+
     // 报价单
     addBjd: 'scglxt/bjd/addBjd',
     ht_sptg: 'scglxt/bjd/ht_sptg',
