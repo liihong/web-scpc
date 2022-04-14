@@ -117,7 +117,7 @@ export default {
   mounted() {
     this.getSjzdData(
       'ssdd',
-      'SELECT id,xmname NAME FROM scglxt_t_dd where ckzt is null'
+      'SELECT id,xmname NAME FROM scglxt_t_dd where ckzt is null order by sjcjsj desc'
     )
     this.getSjzdData(
       'bzj',
