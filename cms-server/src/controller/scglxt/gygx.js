@@ -972,13 +972,15 @@ module.exports = class extends Base {
   async deleteJGJLAction() {
     const id = this.post('id');
 
+    const logData = await this.model('scglxt_t_jggl').where({id: id}).find();
+
     const data = await this.model('scglxt_t_jggl').where({id: id}).delete();
 
     const errorLog = {
       id: util.getUUId(),
       type: '删除加工记录',
       operater: this.header('token'),
-      infos: JSON.stringify(this.post())
+      infos: JSON.stringify(logData)
     };
     await this.model('operate_log').add(errorLog);
 

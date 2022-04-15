@@ -43,6 +43,7 @@ module.exports = class extends Base {
     }
 
 
+
     var confs = [];
     var conf = {};
     const colArr = [];
@@ -59,7 +60,7 @@ module.exports = class extends Base {
       return item.COLUMN_NAME;
     });
     conf.cols = colArr;
-    const tableData = await this.model('tableData').getTableData(tableId, whereObj);
+    const tableData = await this.model('tableData').getTableData(tableId, 'LIST', whereObj);
     const infos = [];
     tableData.map(item => {
       const datas = [];
