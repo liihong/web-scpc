@@ -56,4 +56,26 @@ module.exports = class extends Base {
     };
     return this.success(info);
   }
+
+  // 合同金额统计
+  async getHttjByDateAction() {
+    const time = this.post("date");
+    const htmc = this.post("htmc");
+    let bomSql = `SELECT ht.id,kh.mc,ht.htbh,ht.remark,dd.xmname,kh.lxr,kh.lxdh,ht.qssj,ht.jssj,ht.htje,ht.jkje,ht.bjdzj,ht.wksj,ht.wkzt,ht.yfzt,ht.yfsj,ht.kpzt FROM scglxt_t_kh kh,scglxt_t_ht ht LEFT JOIN scglxt_t_dd dd ON ht.id=dd.ssht WHERE ht.khid=kh.id  `;
+    if (time !== undefined && time !== "") {
+      bomSql +=
+        ` and ht.sjcjsj BETWEEN  "` +
+        time.split(" ")[0] +
+        ` 00:00:00" AND "` +
+        time.split(" ")[1] +
+        `  23:59:59" And (kh.mc like '%` +
+        htmc +
+        `%' or ht.htbh like '%` +
+        htmc +
+        `%') order by ht.qssj desc`;
+    }
+    const bomData = await this.model().query(bomSql);
+    
+    return this.success(bomData);
+  }
 };

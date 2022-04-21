@@ -68,6 +68,7 @@ export default {
     }
   },
   mounted() {
+    console.log(this.selectValue)
     this.$emit(
       'sureBtnClick',
       this.selectValue ? this.selectValue.join(' ') : this.selectValue

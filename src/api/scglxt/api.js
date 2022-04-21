@@ -17,6 +17,8 @@ let api = {
     getAdminStat: 'scglxt/statistics/getAdminStat',
     exportPersonalGRGSTJ: '/api/scglxt/statistics/exportPersonalGRGSTJ',
 
+    getHttjByDate: 'scglxt/xsgl/getHttjByDate', //合同金额统计
+
 
     //数据字典操作
     getSjzdById: 'scglxt/sjzd/getSjzdById',
