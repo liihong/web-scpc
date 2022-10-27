@@ -618,7 +618,7 @@ module.exports = class extends Base {
     }
     
     // 更新订单的当前加工进度
-    const ddSql = `update  scglxt_t_dd set dqjd=fun_yjggs('${ssdd}') where id='${ssdd}'`
+    const ddSql = `update  scglxt_t_dd set dqjd=fun_yjggs('${ssdd}') where id='${ssdd}'`;
     this.model().query(ddSql);
 
     return data;
@@ -661,21 +661,13 @@ module.exports = class extends Base {
       dhjs,
       dhyy,
       jgjs,
-      yjgjs,
       serial
     } = this.post();
 
-    const jgglUpdate = {
-      sfjy: '1',
-      jgjs: jgjs - dhjs,
-      jysj: util.getNowTime(),
-      jyryid: jyryid
-    };
     const gygcUpdate = {
-      yjgjs: jgjs - dhjs,
       sfjy: '1',
       jyryid: this.header('token'),
-      status: 2,
+      status: 1,
       fgcs: 1,
       sjjs: 0
     };
@@ -842,7 +834,7 @@ module.exports = class extends Base {
     }).find();
 
     // 更新订单的当前加工进度
-    const ddSql = `update  scglxt_t_dd set dqjd=fun_yjggs('${ssddObj.ssdd}') where id='${ssddObj.ssdd}'`
+    const ddSql = `update  scglxt_t_dd set dqjd=fun_yjggs('${ssddObj.ssdd}') where id='${ssddObj.ssdd}'`;
     await this.model().query(ddSql);
     
 
@@ -1004,7 +996,7 @@ module.exports = class extends Base {
 
     // 第一步：更新bom的报废数量，第二步：增加报废操作记录，第三步：删除已操作的加工记录，第四步
     await this.model('scglxt_t_bom').where({id: bomid}).update({
-      bfjs: dhjs
+      bfjs: dhjs + bomData.bfjs
     });
     const oldJgglID = jgglData.id;
 
@@ -1023,10 +1015,16 @@ module.exports = class extends Base {
       id: jgglData.gygcid
     }).decrement('yjgjs', dhjs);
 
+    const ybfjs = await this.model('scglxt_t_gygc').where({
+      id: jgglData.gygcid
+    }).getField('bfjs');
+
+    const bfjsNum = parseInt(dhjs) + parseInt(ybfjs)
+
     await this.model('scglxt_t_gygc').where({
       id: jgglData.gygcid
     }).update({
-      bfjs: dhjs
+      bfjs: bfjsNum
     });
 
     const ids = await this.model('scglxt_t_gygc').where({
@@ -1049,7 +1047,7 @@ module.exports = class extends Base {
           status: ['in', '1,2']
         }).decrement('yjgjs', dhjs);
       }
-      console.log(isTime)
+      console.log(isTime);
       if(isTime == 0){
         // 修改加工记录数据
         await this.model('scglxt_t_jggl').where({
@@ -1267,11 +1265,11 @@ module.exports = class extends Base {
     const dhjs = this.post('dhjs');
     const jgjs = this.post('jgjs');
     const dhyy = this.post('dhyy');
-    const gygcid = this.post('gygcid')
-    const jyryid = this.post('jyryid')
-    const serial = this.post('serial')
+    const gygcid = this.post('gygcid');
+    const jyryid = this.post('jyryid');
+    const serial = this.post('serial');
 
-    const id = this.post('id')
+    const id = this.post('id');
 
     const bomData = await this.model('scglxt_t_bom').where({
       id: bomid

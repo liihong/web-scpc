@@ -189,7 +189,7 @@ export default {
       let params = this.params;
       
       params.jggl = this.selectRows[0];
-      params.bomid = this.query.BOMID
+      params.bomid =this.selectRows[0].BOMID
       this.$ajax.post(this.$api.sureManualScrap, params).then(res => {
         if (res.errno == 0) {
           this.selectInfo.ssbom = res.data.bomInfo;

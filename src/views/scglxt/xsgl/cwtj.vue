@@ -17,6 +17,7 @@
         名称：
         <el-input style="width: 150px" v-model="queryValue" />
         <el-button @click="initData" type="primary">搜索</el-button>
+        <el-checkbox v-model="isOnlyMine">只看我</el-checkbox>
       </div>
     </div>
     <el-table
@@ -33,7 +34,7 @@
           align="center"
           v-for="(el, index) in columnList"
           :key="index"
-          :width="el.width ? el.width : '80px'"
+          :width="el.width ? el.width : ''"
           :label="el.label"
         ></el-table-column>
     </el-table>
@@ -56,6 +57,7 @@ export default {
       queryValue: "",
       bzList: [],
       tableData: [],
+      isOnlyMine: false,
       columnList: [
         {
           prop: "mc",

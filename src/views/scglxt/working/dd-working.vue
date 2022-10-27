@@ -120,6 +120,21 @@
                          align="center"><template slot-scope="scope">
             {{formatNumber(scope.row['zhuangpei']/60)}}
           </template></el-table-column>
+           <el-table-column prop="wuzhou"
+                         label="四轴"
+                         align="center"><template slot-scope="scope">
+            {{formatNumber(scope.row['sizhou']/60)}}
+          </template></el-table-column>
+          <el-table-column prop="wuzhou"
+                         label="五轴"
+                         align="center"><template slot-scope="scope">
+            {{formatNumber(scope.row['wuzhou']/60)}}
+          </template></el-table-column>
+          <el-table-column prop="fuhe"
+                         label="车铣复合"
+                         align="center"><template slot-scope="scope">
+            {{formatNumber(scope.row['fuhe']/60)}}
+          </template></el-table-column>
         <el-table-column prop="sygs"
                          label="总计"
                          align="center">

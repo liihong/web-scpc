@@ -79,6 +79,8 @@ let api = {
     //bom表操作
     addBomData: 'scglxt/bom/addBom',
     addBomMany: 'scglxt/bom/addBomMany',
+    addBomAll: 'scglxt/bom/addBomAll',
+
     editBomData: 'scglxt/bom/editBom',
     copyBomData: 'scglxt/bom/copyBom',
     deleteBOM: 'scglxt/bom/deleteBOM',

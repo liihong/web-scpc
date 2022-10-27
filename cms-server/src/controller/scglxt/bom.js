@@ -79,6 +79,31 @@ module.exports = class extends Base {
     });
     return vm.success(data);
   }
+
+  // 根据报价单批量增加BOM数据
+  async addBomAllAction() {
+    const form = this.post('form');
+    const ssdd = this.post('ssdd');
+    const ssht = this.post('ssht');
+    const vm = this;
+    const pArr = [];
+    const ddinfo = await this.model('scglxt_t_dd').where({
+      ssht: ssht
+    }).field('id,ddlevel').find();
+    for (let i = 0; i < form.length; i++) {
+      form[i].zddjb = ddinfo.ddlevel;
+      form[i].ssdd = ddinfo.id;
+      form[i].endtime = ddinfo.endtime;
+      pArr.push(vm.getData(form[i]));
+    }
+    const data = {};
+    Promise.all(pArr).then(async() => {
+      // data = await this.model(bomModel).addMany(form, {
+      //     pk: 'ID'
+      // });
+    });
+    return vm.success(data);
+  }
   getData(item) {
     const vm = this;
     return new Promise(async resolve => {

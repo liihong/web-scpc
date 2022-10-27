@@ -4,6 +4,8 @@
       <span v-show="noBom" style="margin:0 10px;" slot="toolBar">
         <span style="color:#48b884;">请打钩选择想要生成BOM的零件信息</span>
         <el-button type="primary" @click="autoBOM">生成BOM</el-button>
+        <el-button type="primary" @click="autoBOMAll">全部生成BOM</el-button>
+
       </span>
     </ResList>
   </el-dialog>
@@ -66,6 +68,25 @@ export default {
       } else {
         this.$message('请先勾选零件！')
       }
+    },
+    // 全部生成BOM
+    autoBOMAll(){
+      this.$message.confirm('确定直接全部生成BOM？', () => {
+          this.$ajax
+            .post(this.$api.addBomAll, {
+              ssdd: this.dialogState.query.SSDD,
+              ssht: this.dialogState.query.SSHT
+            })
+            .then(res => {
+              if (res && res.errno == 0) {
+                this.$message.success()
+                this.dialogState.show = false
+                this.$parent.$refs.resList.getResList()
+              } else {
+                this.$message.error(res.data.errmsg)
+              }
+            })
+        })
     },
     selectChange(sels) {
       this.selectList = sels
