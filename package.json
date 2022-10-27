@@ -19,7 +19,7 @@
     "js-md5": "^0.7.3",
     "jsbarcode": "^3.11.0",
     "lodash": "^4.17.11",
-    "node-sass": "^4.13",
+    "node-sass": "^7.0",
     "nprogress": "^0.2.0",
     "sass-loader": "^7.1.0",
     "sortablejs": "^1.10.0-rc3",
