@@ -212,6 +212,10 @@ module.exports = class extends Base {
         form[idKey] = primaryKeyValue;
       }
       const table = await this.model('resource_table').getTableInfo(tableId);
+
+      if(tableId == '0101' || tableId == '0102') {
+        form.sjcjry = this.header('token')
+      }
       const affectedRows = await this.model(table.table_name).add(form);
       const whereObj = {};
       whereObj[idKey] = primaryKeyValue;

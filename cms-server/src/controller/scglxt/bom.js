@@ -64,7 +64,7 @@ module.exports = class extends Base {
     const pArr = [];
     const ddinfo = await this.model('scglxt_t_dd').where({
       ssht: ssht
-    }).field('id,ddlevel').find();
+    }).field('id,ddlevel,endtime').find();
     for (let i = 0; i < form.length; i++) {
       form[i].zddjb = ddinfo.ddlevel;
       form[i].ssdd = ddinfo.id;
@@ -82,28 +82,23 @@ module.exports = class extends Base {
 
   // 根据报价单批量增加BOM数据
   async addBomAllAction() {
-    const form = this.post('form');
+    // const form = this.post('form');
     const ssdd = this.post('ssdd');
     const ssht = this.post('ssht');
     const vm = this;
-    const pArr = [];
+    
     const ddinfo = await this.model('scglxt_t_dd').where({
       ssht: ssht
-    }).field('id,ddlevel').find();
-    for (let i = 0; i < form.length; i++) {
-      form[i].zddjb = ddinfo.ddlevel;
-      form[i].ssdd = ddinfo.id;
-      form[i].endtime = ddinfo.endtime;
-      pArr.push(vm.getData(form[i]));
-    }
-    const data = {};
-    Promise.all(pArr).then(async() => {
-      // data = await this.model(bomModel).addMany(form, {
-      //     pk: 'ID'
-      // });
-    });
+    }).field('id,ddlevel,endtime').find();
+
+    const sql = `insert into scglxt_t_bom (id,zddmc, zddcz,jgsl,bmcl,gs,ddtz,ssdd,zddzt,clzl,cldx,bljs,bjdid,zddjb,endtime)` +
+    `SELECT id,ljmc zddmc,cz zddcz,sl jgsl,'' bmcl,0 gs,th ddtz,'` + ddinfo.id + `' ssdd,'0501' zddzt,0 clzl,0 cldx,sl bljs,id bjdid,'` + ddinfo.ddlevel + `' zddjb,'` + ddinfo.endtime + `' endtime from scglxt_t_ht_bjd where ssht='` + ssht + `' and ljmc<>''`
+    
+    const data = await this.model().query(sql);
+
     return vm.success(data);
   }
+
   getData(item) {
     const vm = this;
     return new Promise(async resolve => {
