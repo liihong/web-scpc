@@ -11,7 +11,7 @@ module.exports = {
   publicPath: '/',
   outputDir: 'dist',
   devServer: {
-    port: 8080, // 端口号
+    port: 8090, // 端口号
     host: '0.0.0.0',
     disableHostCheck: true,
     https: false, // https:{type:Boolean}
