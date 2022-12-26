@@ -155,7 +155,7 @@ export default {
       })
     },
     exportDD (ddId) {
-      location.href = 'http://' + document.domain + ':8000/' + EXPORT_DDBOM + '?ddid=' + ddId
+      location.href = 'http://' + document.domain + ':8080/' + EXPORT_DDBOM + '?ddid=' + ddId
       // this.$ajax.getBolb(this.$api.exportDdBOM, {id: ddId}).then(res => {
       //   if (res.data) {
       //     let url = URL.createObjectURL(res.data)

@@ -2,7 +2,7 @@
   "apps": [{
     "name": "cms-server",
     "script": "production.js",
-    "cwd": "d:/newweb/cms-server",
+    "cwd": "./",
     "exec_mode": "fork",
     "max_memory_restart": "1G",
     "autorestart": true,

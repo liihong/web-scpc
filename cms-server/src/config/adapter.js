@@ -39,12 +39,12 @@ exports.model = {
     database: 'scpc',
     // prefix: 'cms_',
     encoding: 'utf8',
-    host: '127.0.0.1',
+    host: '152.136.159.195',
     // host: '223.72.9.67',
     // port: '12304',
     port: '3306',
     user: 'root',
-    password: 'root@123',
+    password: 'Scpc@123',
     dateStrings: true
   }
 };
