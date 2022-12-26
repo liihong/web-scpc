@@ -575,6 +575,7 @@ export default {
   watch: {
     dialogState: {
       deep: true,
+      immediate:true,
       async handler() {
         if (this.dialogState.show) {
           if (this.optionType == "edit" || this.optionType == "copy") {

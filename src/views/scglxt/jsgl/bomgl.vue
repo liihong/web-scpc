@@ -68,10 +68,10 @@
     </ResList>
     <gygxDialog  v-if="dialogState.show" :dialogState="dialogState"
                 ref="gygx" />
-    <editBom :dialogState="bomForm" />
-    <bjdList noBom
+    <editBom :dialogState="bomForm"   v-if="bomForm.show"/>
+    <bjdList noBom  v-if="bjdState.show"
              :dialogState="bjdState" />
-    <jgjlDialog :dialogState="dialogJgjl" />
+    <jgjlDialog :dialogState="dialogJgjl" v-if="dialogJgjl.show"/>
   </div>
 </template>
 

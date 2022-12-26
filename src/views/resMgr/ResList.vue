@@ -139,7 +139,7 @@ event:{
     <resEdit @initData="getResList"
              @saveAfter="saveAfter"
              @editAfter="editAfter"
-             :dialogState="dialogState" />
+             :dialogState="dialogState" v-if="dialogState.show" />
   </section>
 </template>
 
@@ -235,7 +235,7 @@ export default {
         })
         .then(res => {
           this.resRows = res.data;
-          this.getSelectQuery();
+          // this.getSelectQuery();
           this.listLoading = false;
         });
     },

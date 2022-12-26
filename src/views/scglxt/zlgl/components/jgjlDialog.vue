@@ -1,6 +1,6 @@
 <template>
   <div>
-    <el-dialog v-if="dialogState.show" title="零件加工记录" :visible.sync="dialogState.show" width="80%">
+    <el-dialog title="零件加工记录" :visible.sync="dialogState.show" width="80%" destroy-on-close>
       <ResList ref="bjdList" tableId="0109" :query="dialogState.query" noAdd noEdit>
         <el-table-column v-if="roles[0]=='759007553955134000000'" slot="operate" fixed="left" label="操作" width="100" align="center">
           <template slot-scope="scope">
@@ -87,7 +87,7 @@ export default {
     ...mapGetters(['roles'])
   },
    mounted() {
-    this.initData()
+    // this.initData()
   },
   methods: {
     initData() {
@@ -112,7 +112,7 @@ export default {
     },
     //修改加工记录
     updateJGJL(row) {
-      console.log(row)
+      this.initData()
       this.activeRow = row
       this.formData.jgjs = row.JGJS
       this.radioValue = row.JGRYID
@@ -160,6 +160,7 @@ export default {
   watch: {
     dialogState: {
       deep: true,
+      immediate:true,
       handler() {
         if (this.dialogState.show) {
           this.$nextTick(() => {

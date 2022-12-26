@@ -433,6 +433,7 @@ export default {
   watch: {
     dialogState: {
       deep: true,
+      immediate:true,
       handler() {
         if (this.dialogState.show) {
           this.showDialog()

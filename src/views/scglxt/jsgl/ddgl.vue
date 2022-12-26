@@ -69,7 +69,7 @@
       </template>
     </ResList>
     <uploadTZ :dialogState="dialogState" />
-    <editDD :dialogState="ddForm" />
+    <editDD :dialogState="ddForm" v-if="ddForm.show" />
   </div>
 </template>
 
