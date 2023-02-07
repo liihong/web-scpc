@@ -91,8 +91,8 @@ module.exports = class extends Base {
       ssht: ssht
     }).field('id,ddlevel,endtime').find();
 
-    const sql = `insert into scglxt_t_bom (id,zddmc, zddcz,jgsl,bmcl,gs,ddtz,ssdd,zddzt,clzl,cldx,bljs,bjdid,zddjb,endtime)` +
-    `SELECT id,ljmc zddmc,cz zddcz,sl jgsl,'' bmcl,0 gs,th ddtz,'` + ddinfo.id + `' ssdd,'0501' zddzt,0 clzl,0 cldx,sl bljs,id bjdid,'` + ddinfo.ddlevel + `' zddjb,'` + ddinfo.endtime + `' endtime from scglxt_t_ht_bjd where ssht='` + ssht + `' and ljmc<>''`
+    const sql = `insert into scglxt_t_bom (id,zddmc, zddcz,jgsl,bmcl,gs,ddtz,ssdd,zddzt,clzl,cldx,bljs,bjdid,zddjb,endtime,xh)` +
+    `SELECT id,ljmc zddmc,cz zddcz,sl jgsl,'' bmcl,0 gs,th ddtz,'` + ddinfo.id + `' ssdd,'0501' zddzt,0 clzl,0 cldx,sl bljs,id bjdid,'` + ddinfo.ddlevel + `' zddjb,'` + ddinfo.endtime + `' endtime,xh from scglxt_t_ht_bjd where ssht='` + ssht + `' and ljmc<>'' order by xh+0 asc`
     
     const data = await this.model().query(sql);
 

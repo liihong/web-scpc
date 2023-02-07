@@ -181,9 +181,10 @@ export default {
         .then(res => {
           this.formData = res.data
           this.queryData.query = this.primaryKey['value']
-          if(this.queryData.column_name) {
-            this.getForeingKeyData(this.tableId, this.queryData.column_name)
-          }
+          // if(this.queryData.column_name) {
+          //   this.getForeingKeyData(this.tableId, this.queryData.column_name)
+          //   this.$forceUpdate()
+          // }
         })
     },
     // 获取数据字典数据
@@ -221,11 +222,17 @@ export default {
               // 如果是外表关联字段，则需要查询外表数据
               if (item.PROPERTY_TYPE == '13') {
                 vm.isUpload = true
-                vm.queryData = {
-                  tableId: this.tableId,
-                  column_name: item.COLUMN_NAME,
-                  type: item.COLUMN_NAME
-                }
+                // vm.queryData = {
+                //   tableId: this.tableId,
+                //   column_name: item.COLUMN_NAME,
+                //   type: item.COLUMN_NAME
+                // }
+                vm.$set(vm.queryData,'tableId',this.tableId)
+                vm.$set(vm.queryData,'column_name',item.COLUMN_NAME)
+                vm.$set(vm.queryData,'type',item.COLUMN_NAME)
+
+                this.getForeingKeyData(vm.tableId, item.COLUMN_NAME)
+                this.$forceUpdate()
               }
               if (item.PROPERTY_TYPE == '10') {
                 this.primaryKey.name = item.COLUMN_NAME

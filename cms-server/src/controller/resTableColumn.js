@@ -55,9 +55,15 @@ module.exports = class extends Base {
   async getDropDownListDataAction() {
     try {
       const sql = this.get('typesql');
-
-      const data = await this.model('resource_table_column').getTypeSqlData(sql);
-      return this.success(data);
+      if (sql.includes('SELECT') || sql.includes('select')) {
+        const data = await this.model('resource_table_column').getTypeSqlData(sql);
+        return this.success(data);
+      } else {
+        return this.fail({
+          msg: '只能执行查询语句',
+          code: 0
+        });
+      }
     } catch (err) {
       return this.fail(err);
     }
