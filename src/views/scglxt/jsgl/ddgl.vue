@@ -87,6 +87,7 @@ export default {
   data () {
     return {
       isDetail: false,
+      radio3: 0,
       dialogState: {
         row: {},
         show: false

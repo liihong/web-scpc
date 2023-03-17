@@ -173,6 +173,13 @@
                       placeholder="材料金额"></el-input>
           </el-form-item>
         </el-col>
+        <!-- <el-col :span="8">
+          <el-form-item prop="CLJE"
+                        label="材料金额">
+            <el-input v-model="formData.CLJE"
+                      placeholder="材料金额"></el-input>
+          </el-form-item>
+        </el-col> -->
         <el-col :span="12">
           <el-form-item prop="STARTTIME"
                         label="开始时间">
@@ -473,7 +480,7 @@ export default {
         this.formData.CLDX = '('+wj + '-' + bh  + ")*"+bh+"*4*" + h;
         this.formData.CLZL = this.formData.CLTJ * mi;
       }
-      
+      console.log(this.formData.CLTJ, mi, cldj)
       this.formData.CLJE = (
         this.formData.BLJS *
         (this.formData.CLTJ * mi * cldj)

@@ -180,7 +180,8 @@ export default {
         })
         .then(res => {
           this.formData = res.data
-          this.queryData.query = this.primaryKey['value']
+          // this.queryData.query = this.primaryKey['value']
+          this.$set(this.queryData, 'query', this.primaryKey['value'])
           // if(this.queryData.column_name) {
           //   this.getForeingKeyData(this.tableId, this.queryData.column_name)
           //   this.$forceUpdate()
@@ -199,6 +200,7 @@ export default {
     },
     // 根据tableId,column_name 获取配置返回外键表数据
     getForeingKeyData(tableId, column_name) {
+      console.log(this.queryData)
       this.$ajax
         .get(this.$api.getForeingKeyListData, this.queryData)
         .then(res => {
@@ -230,6 +232,7 @@ export default {
                 vm.$set(vm.queryData,'tableId',this.tableId)
                 vm.$set(vm.queryData,'column_name',item.COLUMN_NAME)
                 vm.$set(vm.queryData,'type',item.COLUMN_NAME)
+                vm.$set(vm.queryData,'query', this.primaryKey['value'])
 
                 this.getForeingKeyData(vm.tableId, item.COLUMN_NAME)
                 this.$forceUpdate()

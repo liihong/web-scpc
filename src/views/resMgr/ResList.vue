@@ -22,8 +22,7 @@ event:{
             <el-input size="small"
                       v-model="queryParams.queryKey"
                       placeholder="模糊查询"
-                      @input="debounceQuery"
-                      @change="queryResList"></el-input>
+                      @input="debounceQuery"></el-input>
           </el-form-item>
           <el-form-item>
             <el-button size="mini"
@@ -245,7 +244,7 @@ export default {
       }
       this.timer = setTimeout(() => {
         this.queryResList();
-      }, 1000);
+      }, 500);
     },
     queryResList () {
       if (this.query != undefined) {

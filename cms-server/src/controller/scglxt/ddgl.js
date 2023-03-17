@@ -407,7 +407,13 @@ SELECT (@rownum:=@rownum+1) AS rownum,gy.gymc sbmc,gc.ZYSX gynr,null as t,edgs,g
     });
     tjInfo.info = tjInfo.info.substring(0, tjInfo.info.length - 1);
     tjInfo.zgs = tjInfo.zgs.toFixed(2).toString();
-    exportXls.exportDdBlXls(infos[0], datas, tjInfo, res);
+
+    // 如果是管理组，则导出带金额，如果不是管理组则不带金额
+    if (this.header('token') === '759007553955134000000') {
+      exportXls.exportDdBlXls(infos[0], datas, tjInfo, res);
+    } else {
+      exportXls.exportDdBlNoMoney(infos[0], datas, tjInfo, res);
+    }
   }
   // 上传订单图纸
   async uploadDrawingAction() {

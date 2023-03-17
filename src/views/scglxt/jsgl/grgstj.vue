@@ -141,13 +141,14 @@ export default {
     },
     //导出
     exportExcel () {
+      let xlsxParam = { raw: true }
       /* generate workbook object from table */
       // var wb = XLSX.utils.table_to_book(document.querySelector('#out-table'))
       const id = '#out-table'
       var fix = document.querySelector('.el-table__fixed');
       var wb;
       if (fix) {
-        wb = XLSX.utils.table_to_book(document.querySelector(id).removeChild(fix));
+        wb = XLSX.utils.table_to_book(document.querySelector(id).removeChild(fix),xlsxParam);
         document.querySelector(id).appendChild(fix);
       } else {
         wb = XLSX.utils.table_to_book(document.querySelector(id));
