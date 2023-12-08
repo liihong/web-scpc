@@ -17,7 +17,7 @@
             },
             fontSizeMax: { // 字体最大值
                 type: Number,
-                default: 35
+                default: 40
             },
             backgroundColorMin: { // 验证码图片背景色最小值
                 type: Number,

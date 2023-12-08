@@ -92,7 +92,7 @@ export default {
   },
   computed: {
     token() {
-      return this.$store.getters.roles;
+      return this.$store.getters.token;
     }
   },
   activated(){
@@ -104,6 +104,10 @@ export default {
       this.spzt = 0
       this.query = {SPZT: this.spzt}
       this.num++
+    }else{
+      if(this.$store.getters.roles[0]==='202104161059505422247'){
+        this.query = {SJCJRY: this.token}
+      }
     }
   },
   methods: {

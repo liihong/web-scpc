@@ -47,7 +47,9 @@ export default {
   data () {
     return {
       bykList: [],
-      activeItem: {},
+      activeItem: {
+        jgsl:0
+      },
       cksl: 0,
     }
   },
@@ -68,9 +70,9 @@ export default {
             this.bykList = res.data;
             console.log(this.dialogState.row.BOMID_TEXT)
             const bom = res.data.find(item=>{
-              return item.zddmc === this.dialogState.row.BOMID_TEXT
+              return item.zddmc === (this.dialogState.row.BOMID_TEXT).trim()
             })
-            this.activeItem = bom
+            this.activeItem = {...bom}
           }
         });
     },

@@ -92,7 +92,7 @@ export default {
       let params = new FormData();
       params.append("password", md5(this.form.password));
       params.append("oldPassword", md5(this.form.oldPassword));
-      params.append("newPassword", md5(this.form.newPassword));
+      params.append("newPassword", this.form.newPassword);
       let res = await this.$ajax.post("/user/updatePwd", params);
       if (res.errno == 0) {
         this.isShow = false;

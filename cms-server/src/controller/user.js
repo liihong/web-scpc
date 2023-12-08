@@ -99,13 +99,17 @@ module.exports = class extends Base {
   // 修改密码
   async updatePwdAction() {
     try {
-      const {oldPassword, password} = this.post();
+      const {oldPassword, password, newPassword} = this.post();
       const token = this.header('token');
       const data = await this.model('cms_user').where({token: token}).find();
       let sussData = {};
-      if (data.password == oldPassword) {
+      if (data.password === oldPassword) {
         sussData = await this.model('cms_user').where({token: token}).update({
           password: password
+        });
+
+        await this.model('scglxt_t_ry').where({id: token}).update({
+          password: newPassword
         });
 
         return this.success(sussData);

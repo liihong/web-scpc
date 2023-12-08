@@ -25,6 +25,7 @@
           <el-button-group size="mini">
             <el-button @click="exportBL(scope.row.ID)"
                        size="mini"
+                       v-checkAuth="editRoles"
                        type="primary">备料</el-button>
             <el-button @click="exportDD(scope.row.ID)"
                        size="mini"
@@ -34,12 +35,15 @@
                        type="primary">图纸</el-button>
             <el-button size="mini"
                        type="primary"
+                       v-checkAuth="editRoles"
                        @click="copyRow(scope.row)">复制</el-button>
             <el-button size="mini"
                        type="primary"
+                       v-checkAuth="editRoles"
                        @click="handleEdit(scope.row)">编辑</el-button>
             <el-button size="mini"
                        type="primary"
+                       v-checkAuth="editRoles"
                        @click="handleDelete(scope.row)">删除</el-button>
           </el-button-group>
         </template>
@@ -86,6 +90,8 @@ export default {
   },
   data () {
     return {
+      //只有管理组合技术部有编辑删除权限
+      editRoles:['759007553955134000000','2023112713030793361'],
       isDetail: false,
       radio3: 0,
       dialogState: {

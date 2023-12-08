@@ -1,6 +1,6 @@
 <template>
   <div class="rygl">
-    <ResList tableId="0107" @deleteAfter="deleteUser" @saveAfter="addCMS_User" />
+    <ResList tableId="0107" @deleteAfter="deleteUser" @saveAfter="addCMS_User" @editAfter="editCMS_User" />
   </div>
 </template>
 
@@ -33,6 +33,18 @@ export default {
         }
         services.editUser(params)
       }
+    },
+    editCMS_User(info){
+      let params = {
+          id:info.id,
+          data:{
+            name:info.rymc,
+            username:info.rymc,
+            roles:info.ssbz,
+            password:md5(info.password)
+          }
+        }
+        services.editUser(params)
     },
     deleteUser(id){
         services.deleteUser({

@@ -8,8 +8,8 @@
         </template>
       </el-table-column>
       <template slot="SSDD" slot-scope="scope">
-        <el-badge  v-show="!!scope.row.DDLEVEL" :value="scope.row.DDLEVEL == '0402' ? '重要' : scope.row.DDLEVEL == '0403' ? '' : '紧急'" class="item" :type="scope.row.DDLEVEL == '0402' ? 'warning' : scope.row.DDLEVEL == '0403' ? 'info' : 'danger'">
-          <span style="margin:0 5px;">{{scope.row.SSDD_TEXT}}</span>
+        <el-badge  v-show="!!scope.row.DDLEVEL"  class="item" :type="scope.row.DDLEVEL == '0402' ? 'warning' : scope.row.DDLEVEL == '0403' ? 'info' : 'danger'">
+          <span  class="spanText"  @click="openTZClick(scope.row)" style="margin:0 5px;">{{scope.row.SSDD_TEXT}}</span>
         </el-badge>
       </template>
       <template slot="BOMID" slot-scope="scope">
@@ -37,6 +37,7 @@
       <el-radio v-model="isRelevance" label="2">不关联</el-radio><br/><br/>
       <el-button type="primary" @click="onSureRele">确定</el-button>
     </el-dialog>
+    <showTZ :dialogState="dialogStateTZ"></showTZ>
   </div>
 </template>
 
@@ -45,6 +46,8 @@ import gybp from '../jsgl/components/gygx'
 import selectPerson from './components/selectPerson'
 import selectBakStore from './components/selectBakStore' //选择备用库
 import overWork from './components/overWork'
+import showTZ from './components/showTZ'
+
 
 import { mapGetters } from 'vuex'
 
@@ -54,11 +57,17 @@ export default {
     gybp,
     selectPerson,
     selectBakStore,
-    overWork
+    overWork,
+    showTZ
   },
   data() {
     return {
       dialogState: {
+        row: {},
+        type: 'read',
+        show: false
+      },
+      dialogStateTZ: {
         row: {},
         type: 'read',
         show: false
@@ -92,6 +101,11 @@ export default {
     gybpClick(row) {
       this.dialogState.show = true
       this.dialogState.row = row
+    },
+    //点击订单号打开图纸
+    openTZClick(row){
+      this.dialogStateTZ.show = true
+      this.dialogStateTZ.row = row
     },
     // 开始加工
     beginWork(row) {

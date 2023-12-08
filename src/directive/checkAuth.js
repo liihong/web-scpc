@@ -6,8 +6,8 @@ export default {
                     let auth = store.state.user.roles;
                     let id = binding.value.toString()
                     auth = auth.join(',')
-                    if(!auth.includes(id)){
-                        // el.style.display = 'none'
+                    if(!id.includes(auth)){
+                        el.style.display = 'none'
                         return false
                     }else{
                         return true

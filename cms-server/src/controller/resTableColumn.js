@@ -76,15 +76,19 @@ module.exports = class extends Base {
       const column_name = this.get('column_name');
       const query = this.get('query');
 
-      const columnData = await this.model('resource_table_column').where({
-        table_id: tableId,
-        column_name: column_name
-      }).find();
-
-      const whereObj = {};
-      whereObj[columnData.FOREIGNKEY_TABLE_COLUMN] = query;
-      const data = await this.model(columnData.FOREIGNKEY_TABLENAME).where(whereObj).select();
-      return this.success(data);
+      if (query) {
+        const columnData = await this.model('resource_table_column').where({
+          table_id: tableId,
+          column_name: column_name
+        }).find();
+  
+        const whereObj = {};
+        whereObj[columnData.FOREIGNKEY_TABLE_COLUMN] = query;
+        const data = await this.model(columnData.FOREIGNKEY_TABLENAME).where(whereObj).select();
+        return this.success(data);
+      } else {
+        return this.success({});
+      }
     } catch (err) {
       return this.fail(err);
     }
