@@ -3,6 +3,8 @@
   <ResList tableId='010407' :query="this.$route.query" noEdit noAdd @selectChange="getChecks" ref="zjryjy">
     <el-form-item slot="toolBar">
       <el-button type="primary" icon="el-icon-s-unfold" @click="passMany" class="radio" :label="1">批量通过</el-button>
+      <el-button type="danger" icon="el-icon-s-unfold" @click="addFgBfClick"  :label="1">手工报废</el-button>
+
     </el-form-item>
     <el-table-column slot="operate" fixed="left" label="操作" width="170" align="center">
       <template slot-scope="scope">
@@ -22,15 +24,18 @@
     </template>
   </ResList>
    <endCheckCrap isBF :dialogState="dialogState" />
+   <addFgBf :dialogState="dialogState2"></addFgBf>
    </div>
 </template>
 
 <script>
 import endCheckCrap from './components/endCheckCrap'
+import addFgBf from '../scgl/components/addFgBf'
 
 export default {
   components:{
-    endCheckCrap
+    endCheckCrap,
+    addFgBf
   },
   data() {
     return {
@@ -40,6 +45,10 @@ export default {
         type: 'part',
         row: {}
       },
+      dialogState2:{
+        show: false,
+        row: {}
+      }
     }
   },
   methods: {
@@ -87,6 +96,12 @@ export default {
       this.dialogState.row.BOMID_TEXT = row.ZDDMC
       this.dialogState.row.ISZJ = 1
       this.dialogState.show = true
+    },
+
+    // 手工报废
+    addFgBfClick(row){
+      this.dialogState2.row = row
+      this.dialogState2.show = true
     }
   }
 }

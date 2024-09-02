@@ -1,7 +1,9 @@
+import util from '../../../utils/util';
 /**
  * 报价单操作的接口
  */
 const Base = require("../base.js");
+
 module.exports = class extends Base {
   // 获取合同列表
   async getHtListAction() {
@@ -77,5 +79,90 @@ module.exports = class extends Base {
     const bomData = await this.model().query(bomSql);
     
     return this.success(bomData);
+  }
+
+  // 销售合同开发票
+  async addHTFPAction() {
+    const ids = this.post('ids');
+    const names = this.post('names');
+    const ssht = this.post('ssht');
+    const vm = this;
+    
+    const id = util.getUUId();
+    const data = {
+      id: id,
+      ssht: ssht,
+      bjdid: ids.join(','),
+      ljmc: names.join(','),
+      kprid: this.header('token')
+    };
+
+    await this.model('scglxt_t_ht_bjd').where({
+      id: ids
+    }).update({
+      fph: id
+    });
+
+    await this.model('scglxt_t_ht').where({
+      id: ssht
+    }).update({
+      kpzt: '已开',
+      kpsj: util.getNowTime()
+    });
+
+    const result = await this.model('scglxt_t_fp').add(data);
+
+    return vm.success(result);
+  }
+
+  // 回款记录
+  async addRefundAction() {
+    const htid = this.post('htid');
+    const fkzt = this.post('fkzt');
+    const jkje = this.post('jkje');
+
+    const data = await this.model('scglxt_t_ht').where({id: htid}).update({
+      fkzt: fkzt,
+      jkje: jkje
+    });
+    
+    return this.success(data);
+  }
+
+  // 销售统计-客户行业统计
+  async getKHHYStatAction() {
+    const time = this.post('date');
+   
+    let whereSql = ` 1 = 1`;
+    if (time !== undefined && time !== '') {
+      whereSql =
+        ` ht.jssj BETWEEN  "` +
+        time.split(' ')[0] +
+        ` 00:00:00" AND "` +
+        time.split(' ')[1] +
+        `  23:59:59" `;
+    } else {
+      return this.fail();
+    }
+    const khhySql = `SELECT zd.mc name,ROUND(sum(ht.htje),2) value from scglxt_t_kh kh,scglxt_t_ht ht,scglxt_tyzd zd where ht.khid = kh.id and  kh.lx=zd.id
+    AND ` + whereSql + 'GROUP BY kh.lx';
+    const bomData = await this.model().query(khhySql);
+
+    const khlxSql = `SELECT zd.mc name,ROUND(sum(ht.htje),2) value from scglxt_t_kh kh,scglxt_t_ht ht,scglxt_tyzd zd where ht.khid = kh.id and  kh.hyfl=zd.id
+    AND ` + whereSql + 'GROUP BY kh.hyfl';
+    
+    const khlxData = await this.model().query(khlxSql);
+
+    const khSql = `SELECT kh.id id,kh.mc,zd.mc khlx,ROUND(sum(ht.htje),2)  FROM scglxt_t_ht ht,scglxt_t_kh kh LEFT JOIN scglxt_tyzd zd ON kh.lx=zd.id WHERE ht.khid=kh.id AND ht.jssj BETWEEN "${time.split(' ')[0]} 00:00:00" AND "${time.split(' ')[1]} 23:59:59" GROUP BY kh.id`;
+
+    const khData = await this.model().query(khSql);
+
+    const data = {
+      khhy: bomData,
+      khlx: khlxData,
+      khtj: khData
+    };
+    
+    return this.success(data);
   }
 };

@@ -5,9 +5,6 @@
         <template slot-scope="scope">
           <el-button-group size="mini">
             <el-button size="mini" type="primary" @click="exportClick(scope.row)">导出</el-button>
-            <el-button size="mini" type="warning" @click="copyZj(scope.row)">复制</el-button>
-            <el-button size="mini" type="primary" @click="editBomRow(scope.row)">编辑</el-button>
-            <el-button size="mini" type="danger" @click="handleDelete(scope.row)">删除</el-button>
           </el-button-group>
         </template>
       </el-table-column>
@@ -36,7 +33,7 @@ export default {
   data() {
     return {
       dialogVisible: false,
-      radio:"2",
+      radio:"1",
       exportId:'',
       dialogState: {
         show: false,

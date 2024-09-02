@@ -1,92 +1,193 @@
 <template>
   <el-card>
-    <datePicker @sureBtnClick="sureBtnClick"
-    v-model="selectDate" />
+    <div style="display: flex; align-items: center">
+      <datePicker @sureBtnClick="sureBtnClick" v-model="selectDate" />
+      <!-- 统计方式：<el-radio-group @change="changeSpzt" v-model="spzt">
+        <el-radio :label="0">待审批</el-radio>
+        <el-radio :label="1">未通过</el-radio>
+        <el-radio :label="2">已通过</el-radio>
+      </el-radio-group> -->
+      <el-button
+        style="margin-left: 10px"
+        @click="exportExcel"
+        type="primary"
+        icon="el-icon-s-promotion"
+        >导出</el-button
+      >
+    </div>
+    <div style="display: flex; align-items: center">
       <bar-echarts :option="option" class="echarts-container"></bar-echarts>
+      <bar-echarts :option="option2" class="echarts-container"></bar-echarts>
+    </div>
   </el-card>
 </template>
 
 <script>
-import barEcharts from '@/components/Echarts/barEcharts'
+import barEcharts from "@/components/Echarts/barEcharts";
+import datePicker from "@/components/DatePicker";
 export default {
-components: {
-  barEcharts
-},
-data() {
-  return {
-    selectDate:'',
-    option: {
-      title: {
-        text: '销售分类统计'
-      },
-      tooltip: {
-        show: true,
-        trigger: 'axis',
-        axisPointer: {
-          type: 'line',
-          textStyle: {
-            color: '#fff'
-          }
+  components: {
+    barEcharts,
+    datePicker,
+  },
+  data() {
+    return {
+      selectDate: "",
+      totalValue: 0,
+      option: {
+        title: {
+          text: "根据客户行业统计",
+          left: "center",
+        },
+        tooltip: {
+          trigger: 'item',
+          formatter: '{a} <br/>{b} : {c} ({d}%)'
+        },
+        legend: {
+          orient: "vertical",
+          left: "left",
+        },
+        label:{
+          normal:{
+            show: true,
+            position: 'center',
+            formatter: '{b} {d}%',
+          },
+        },
+      graphic: {
+        type: 'text',
+        left: 'center',
+        top: 'center',
+        style: {
+          text:'总计:',
+          textAlign: 'center',
+          fill: '#333',
+          width: 30,
+          height: 30,
+          fontSize: 14
         }
       },
-      barGap: 0,
-      xAxis: [
-        {
-          data: []
-        }
-      ],
-      series: [
-        {
-          name: '排产天数',
-          type: 'bar',
-          stack: '总量 ',
-          itemStyle: {
-            normal: {
-              label: {
-                show: true,
-                position: 'top',
-                formatter: '{b}\n{c}天'
-              },
-              barBorderRadius: 5
+        series: [
+          {
+            name: "客户行业统计",
+            type: "pie",
+            radius: ["30%",'50%'],
+            data: [],
+            label: {
+                formatter: '{b|{b}：}{c}  {per|{d}%}  ',
+                rich: {
+                    b: {
+                        fontSize: 16,
+                        lineHeight: 33
+                    },
+                    per: {
+                        color: '#eee',
+                        backgroundColor: '#334455',
+                        padding: [2, 4],
+                        borderRadius: 2
+                    }
+                }
             },
             emphasis: {
-              barBorderRadius: 5
-            }
+              itemStyle: {
+                shadowBlur: 10,
+                shadowOffsetX: 0,
+                shadowColor: "rgba(0, 0, 0, 0.5)",
+              },
+            },
           },
-          data: []
+        ],
+      },
+      option2: {
+        title: {
+          text: "根据客户类型统计",
+          left: "center",
+        },
+        tooltip: {
+          trigger: "item",
+        },
+        legend: {
+          orient: "vertical",
+          left: "left",
+        },
+        graphic: {
+        type: 'text',
+        left: 'center',
+        top: 'center',
+        style: {
+          text:'总计:',
+          textAlign: 'center',
+          fill: '#333',
+          width: 30,
+          height: 30,
+          fontSize: 14
         }
-      ]
-    }
-  }
-},
-created() {
-  this.initData()
-},
-methods: {
-  async initData() {
-    let res = await this.$ajax.get(this.$api.getSblxPc)
-    if (res.errno == 0) {
-      let xAxis = [],
-        datas = []
-      res.data.map(item => {
-        xAxis.push(item.k)
-        datas.push(item.t)
-      })
-      this.option.xAxis[0].data = xAxis
-      this.option.series[0].data = datas
-    }
+      },
+        series: [
+          {
+            name: "客户类型统计",
+            type: "pie",
+            radius: ["30%",'50%'],
+            label: {
+              formatter: '{b|{b}：}{c}  {per|{d}%}  ',
+                rich: {
+                   
+                    b: {
+                        fontSize: 16,
+                        lineHeight: 33
+                    },
+                    per: {
+                        color: '#eee',
+                        backgroundColor: '#334455',
+                        padding: [2, 4],
+                        borderRadius: 2
+                    }
+                }
+            },
+            data: [],
+            emphasis: {
+              itemStyle: {
+                shadowBlur: 10,
+                shadowOffsetX: 0,
+                shadowColor: "rgba(0, 0, 0, 0.5)",
+              },
+            },
+          },
+        ],
+      },
+    };
   },
-  sureBtnClick (time) {
-      this.selectDate = time
-      this.initData()
+  mounted() {
+    // this.sureBtnClick()
+  },
+  methods: {
+    async initData() {
+      let res = await this.$ajax.post(this.$api.getKHHYStat,{date: this.selectDate});
+      if (res.errno == 0) {
+        let totalValue = res.data.khhy.reduce((a,curr) => a + curr.value, 0)
+        let totalValue2 = res.data.khlx.reduce((a,curr) => a + curr.value, 0)
+
+        this.option.graphic.style.text = totalValue.toLocaleString('zh-CN', {style: 'currency', currency: 'CNY'});
+        this.option2.graphic.style.text = totalValue2.toLocaleString('zh-CN', {style: 'currency', currency: 'CNY'});
+
+        this.option.series[0].data = res.data.khhy;
+        this.option2.series[0].data = res.data.khlx;
+      }
     },
-}
-}
+    sureBtnClick(time) {
+      this.selectDate = time;
+      this.initData();
+    },
+    exportExcel() {
+      console.log("121");
+    },
+  },
+};
 </script>
 
 <style>
 .echarts-container {
-width: 100%;
-height: 500px;
+  width: 100%;
+  height: 500px;
 }
 </style>

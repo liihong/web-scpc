@@ -118,6 +118,7 @@ export default {
       this.$ajax.post(this.$api.getBzList).then(res => {
         if (res.errno == 0) {
           let data = res.data
+          console.log(data)
           data = data.filter(item => {
             return item.sftj == 1
           })

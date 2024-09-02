@@ -81,7 +81,7 @@ _exports.exportXls = function(data, list, res, type, tjInfo) {
   res.end(result, 'buffer');
 };
 
-_exports.exportBOMXls = function(data, list, tjInfo, res) {
+_exports.exportBOMXls = function(data, list, tjInfo, res, tj2Info) {
   // 打开文件
   const PUBLIC_PATH = path.resolve(__dirname, 'bomModel.xlsx');
 
@@ -123,8 +123,9 @@ _exports.exportBOMXls = function(data, list, tjInfo, res) {
   var dataList = xlsxUtils.format2Sheet(list, 0, 7, keyMap); // 偏移8行按keyMap顺序转换
 
   var d2 = xlsxUtils.format2Sheet([tjInfo], 0, list.length + 7, ['info', '', '', '', '', '', '', '', 'zgs']);
+  var d3 = xlsxUtils.format2Sheet([tj2Info], 0, list.length + 7, ['info', '', '', '', '', '', '', '', 'zgs']);
 
-  dataList = Object.assign(dataList, d2);
+  dataList = Object.assign(dataList, d2, d3);
 
   var dataKeys = Object.keys(dataList);
 

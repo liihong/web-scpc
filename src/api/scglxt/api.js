@@ -40,11 +40,15 @@ let api = {
 
     //合同
     getHtList: 'scglxt/xsgl/getHtList',
-
+    getKHHYStat: 'scglxt/xsgl/getKHHYStat',
+    addHTFP: 'scglxt/xsgl/addHTFP',
+    addRefund: 'scglxt/xsgl/addRefund',
+    
     // 报价单
     addBjd: 'scglxt/bjd/addBjd',
     ht_sptg: 'scglxt/bjd/ht_sptg',
     getHtSpyy: 'scglxt/bjd/getHtSpyy',
+
     //订单操作
     getOrderList: 'scglxt/ddgl/getOrderList',
     getDdDetail: 'scglxt/ddgl/getDdDetail',

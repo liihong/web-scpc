@@ -105,7 +105,8 @@ export default {
       this.query = {SPZT: this.spzt}
       this.num++
     }else{
-      if(this.$store.getters.roles[0]==='202104161059505422247'){
+      // 如果是销售部的人登录系统，只能看到自己的合同，其他能看到全部
+      if(this.$store.getters.roles[0]==='2023113011456613889'){
         this.query = {SJCJRY: this.token}
       }
     }

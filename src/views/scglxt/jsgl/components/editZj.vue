@@ -43,6 +43,7 @@
                   <span style="float: right; color: #8492a6; font-size: 13px">{{ item.bzjcz }}({{item.bzjgg}})</span>
                 </el-option>
               </el-select>
+              <span style="width:120px;    display: inline-block;">单价：{{selBzjList[i].ljdj}}</span>
               数量：
               <el-input-number :controls=false v-model="el.bzjsl" :min="1" label="加工数量"></el-input-number>
               <i style="font-size:18px;" class="el-icon-circle-plus" @click="addBzj"></i>
@@ -95,6 +96,7 @@ export default {
           bzjsl: 1,
           bzjid: '',
           bzjmc: '',
+          ljdj: 0,
           bz: ''
         }
       ],
@@ -121,7 +123,7 @@ export default {
     )
     this.getSjzdData(
       'bzj',
-      'SELECT id bzjid,ljmc bzjmc,ljcz bzjcz,ljgg bzjgg,1 as bzjsl FROM scglxt_t_bzj'
+      'SELECT id bzjid,ljmc bzjmc,ljcz bzjcz,ljgg bzjgg,1 as bzjsl,ljdj FROM scglxt_t_bzj'
     )
   },
   methods: {
@@ -156,6 +158,8 @@ export default {
         return item.bzjid == zjbzj
       })
       this.selBzjList[i]['bzjmc'] = czArr[0]['bzjmc']
+      this.selBzjList[i]['ljdj'] = czArr[0]['ljdj']
+
     },
     changeJgj(bom, i) {
       let obj = {

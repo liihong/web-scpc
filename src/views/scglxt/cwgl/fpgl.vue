@@ -1,35 +1,204 @@
 <template>
-  <div class="invoice-class">
-    <div>发票管理</div>
-    <el-button type="primary" @click="addInvoice">开发票</el-button>
-
-    <addInvoice :isShow.sync="isShow" />
+  <div>
+    <ResList :num="num" tableId="0101" ref="htgl" @saveAfter="addDd" @editAfter="editAfter" :query="query" noEdit>
+      <el-table-column slot="operate" fixed="left" label="操作" align="center">
+        <template slot-scope="scope">
+          <el-button-group size="mini">
+            <el-button size="mini" @click="bjdClickLook(scope.row)" type="primary">开发票</el-button>
+          </el-button-group>
+        </template>
+      </el-table-column>
+      <template slot="KHID" slot-scope="scope">
+        <router-link
+          style="color:#48b884;"
+          :to="{path: 'khxxgl', query: {SSHT: scope.row.ID}}"
+        >{{scope.row.KHID_TEXT}}</router-link>
+      </template>
+      <template slot="HTBH" slot-scope="scope">
+        <router-link
+          style="color:#48b884;"
+          :to="{path: 'ddgl', query: {SSHT: scope.row.ID}}"
+        >{{scope.row.HTBH}}</router-link>
+      </template>
+       <template slot="SSDD" slot-scope="scope">
+        <router-link
+          style="color:#48b884;"
+          :to="{path: 'ddgl', query: {XMNAME: scope.row.SSDD}}"
+        >{{scope.row.SSDD}}</router-link>
+      </template>
+      
+       <template slot="DQJD" slot-scope="scope">
+          <el-progress :text-inside="true" :stroke-width="14" :percentage="getBFB(scope.row.DQJD,scope.row.ZGS)"></el-progress>
+      </template>
+    </ResList>
+    <bjd :dialogState="dialogState"></bjd>
+    <bjdList :dialogState="bjdState" />
   </div>
-
 </template>
 
 <script>
-import addInvoice from './components/addInvoice'
+import bjdList from "./components/bjdList";
+import bjd from "./components/bjd";
+
 export default {
-  components:{addInvoice},
-  props: {
-    
+  components: {
+    bjd,
+    bjdList,
   },
   data() {
     return {
-      isShow:false
+      num:0,
+      spzt:null,
+      oldData:{},
+      dialogState: {
+        show: false,
+        row: {}
+      },
+      bjdState: {
+        show: false,
+        query: {}
+      },
+      spState: {
+        show: false,
+        row: {}
+      },
+      query:{}
     };
   },
-  methods:{
-    addInvoice(){
-      this.isShow = true
+  computed: {
+    token() {
+      return this.$store.getters.token;
+    }
+  },
+  activated(){
+    if(this.$route.query){
+      this.query = this.$route.query
+    }
+    //如果是缪总登录，直接显示未审批合同
+    if(this.token=='201609101108000012'){
+      this.spzt = 0
+      this.query = {SPZT: this.spzt}
+      this.num++
+    }else{
+      // 如果是销售部的人登录系统，只能看到自己的合同，其他能看到全部
+      if(this.$store.getters.roles[0]==='2023113011456613889'){
+        this.query = {SJCJRY: this.token}
+      }
+    }
+  },
+  methods: {
+    spClick(row) {
+      this.spState.row = row;
+      this.spState.show = true;
+    },
+    //查看驳回原因
+    lookSpyy(row){
+      this.$ajax.post(this.$api.getHtSpyy, {htid:row.ID}).then(res => {
+        if (res && res.errno == 0) {
+          this.$alert('原因：' + res.data, '审批驳回', {
+          confirmButtonText: '确定'
+        });
+        }
+      });
+    },
+    //过滤审批状态
+    changeSpzt(){
+      this.query = {SPZT: this.spzt}
+      this.num++
+    },
+    handleEdit(row){
+      this.oldData = row
+      this.$refs.htgl.handleEdit(row)
+    },
+    bjdClick(row) {
+      this.dialogState.row = row;
+      this.dialogState.show = true;
+      // this.$router.push({ path: 'bjd', query: { SSHT: row.ID } })
+    },
+    // 查看报价单
+    bjdClickLook(row) {
+      let ssht = row.ID;
+      this.bjdState.query = { SSHT: ssht };
+      this.bjdState.show = true;
+    },
+    // 删除合同时，先删除该合同下的订单，订单下的bom信息再删除合同
+    handleDelete(row) {
+      this.$message.confirm(
+        "删除合同会同时删除合同的订单和BOM信息请谨慎",
+        () => {
+          this.$ajax
+            .post(this.$api.deleteDd, {
+              ssht: row["ID"]
+            })
+            .then(res => {
+              if (res && res.errno == 0) {
+                this.$message.deleteSuccess("删除订单信息成功！");
+                this.$refs.htgl.handleDelete(row, false);
+              } else {
+                this.$message.deleteError(res.data.errmsg);
+              }
+            });
+        }
+      );
+    },
+    // 增加合同后自动增加一条订单信息
+    async addDd(htInfo) {
+      let ddbh = await this.$ajax.post(this.$api.getNewDDbh);
+
+      let ddData = {
+        ssht: htInfo.data.id,
+        xmname: (new Date()).getFullYear() + "-" + htInfo.data.htjc + "-" + ddbh.data,
+        ddlevel: "0403",
+        starttime: htInfo.data.kssj,
+        endtime: htInfo.data.jssj,
+        xmfzr: "李勇",
+        xmlxr: "李勇",
+        dqjd: 0,
+        zgs: 0
+      };
+
+      let params = {};
+      params.tableId = "0102"; //订单tableId
+      params.form = ddData;
+      this.$ajax.post(this.$api.addTableData, params).then(res => {
+        if (res && res.errno == 0) {
+          this.$message.addSuccess(
+            "合同：【" + htInfo.data.htbh + "】生成了一条新订单。"
+          );
+        } else {
+          this.$message.addError(res.errmsg);
+        }
+      });
+    },
+    // 编辑后判断结束时间是否有变动，如果有 同时改变该合同下所有订单和BOM的结束时间
+    editAfter(params){
+      if(params.jssj !== this.oldData.JSSJ){
+          this.$ajax.post(this.$api.updateEndTime, {
+                ddid: this.formData.ID,
+                endTime: this.formData.ENDTIME
+              }).then(()=>{
+                this.$message.addSuccess("您修改了合同结束时间，将同步修改订单和BOM的结束时间");
+              })
+      }
+    },
+     //获取订单百分比
+    getBFB(dqjd = 0, zgs = 0) {
+      let ddzgs = zgs || 0
+      let yjggs = dqjd || 0
+      if (yjggs*1 == 0) {
+        return 0
+      }
+      if (ddzgs*1 == 0) {
+        return 0
+      }
+      let bfb = (yjggs / ddzgs) * 100
+
+      return Math.ceil(bfb)
+    }
+  },
+  watch:{
+    query(){
     }
   }
-}
+};
 </script>
-
-<style  lang="scss" scoped>
-.invoice-class{
-
-}
-</style>

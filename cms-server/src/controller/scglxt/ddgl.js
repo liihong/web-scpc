@@ -323,20 +323,35 @@ SELECT (@rownum:=@rownum+1) AS rownum,gy.gymc sbmc,gc.ZYSX gynr,null as t,edgs,g
 
     const tjSql = "SELECT gymc,ROUND( SUM( bzgs )/ 60,2 ) zgs FROM scglxt_t_gygc gc,`scglxt_t_jggy` gy WHERE gc.`gynr`=gy.id AND bomid IN (SELECT id FROM scglxt_t_bom WHERE ssdd='" + ddid + "') GROUP BY gymc";
 
+    const tj2Sql="SELECT gymc,ROUNd(sum(edgs*bom.jgsl+zbgs)/60 ,1) zgs FROM scglxt_t_bom bom,scglxt_t_gygc gc,`scglxt_t_jggy` gy WHERE bom.id=gc.bomid AND gc.`gynr`=gy.id AND bomid IN (SELECT id FROM scglxt_t_bom WHERE ssdd='"+ddid+"') GROUP BY gymc";
+    
     const tjInfo = {
-      info: '工时合计：',
+      info: '排产工时合计：',
+      zgs: 0
+    };
+    const tj2Info = {
+      info: '额定工时合计：',
       zgs: 0
     };
 
     const datas = await this.model().query(sql);
     const tjData = await this.model().query(tjSql);
+    const tj2Data = await this.model().query(tj2Sql);
     tjData.forEach(item => {
       tjInfo.info += item.gymc + '(' + item.zgs + ')' + '-';
       tjInfo.zgs += parseFloat(item.zgs);
     });
+    tj2Data.forEach(item => {
+      tj2Info.info += item.gymc + '(' + item.zgs + ')' + '-';
+      tj2Info.zgs += parseFloat(item.zgs);
+    });
     tjInfo.info = tjInfo.info.substring(0, tjInfo.info.length - 1);
     tjInfo.zgs = '合计：' + tjInfo.zgs.toFixed(2).toString();
-    exportXls.exportBOMXls(infos[0], datas, tjInfo, res);
+
+    tj2Info.info = tjInfo.info.substring(0, tjInfo.info.length - 1);
+    tj2Info.zgs = '合计：' + tjInfo.zgs.toFixed(2).toString();
+
+    exportXls.exportBOMXls(infos[0], datas, tjInfo, res, tj2Info);
   }
   // 导出组件
   async exportDdByZjAction() {

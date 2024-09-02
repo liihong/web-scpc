@@ -294,26 +294,31 @@ export default {
       return this.dialogState.id;
     }
   },
-  mounted() {
-    this.getSjzdData(
+  async created() {
+    await this.getSjzdData(
       "ssdd",
       "SELECT id,xmname NAME FROM scglxt_t_dd where ckzt is null order by sjcjsj desc"
     );
-    this.getSjzdData("clmc", "SELECT id,clmc name,cldj,mi FROM scglxt_t_cl");
-    this.getSjzdData("zj", "SELECT id zjid,zjmc,zjdj FROM scglxt_t_zj");
-    this.getSjzdData(
+    await this.getSjzdData("clmc", "SELECT id,clmc name,cldj,mi FROM scglxt_t_cl");
+    await this.getSjzdData("zj", "SELECT id zjid,zjmc,zjdj FROM scglxt_t_zj");
+    await this.getSjzdData(
       "tz",
       "SELECT url id,tzmc FROM scglxt_t_dd_tz where ssdd = '" +
         this.formData.SSDD +
         "'"
     );
-    this.getSjzdData(
+    await this.getSjzdData(
       "clxz",
       "SELECT id,mc from scglxt_tyzd where xh like '03__'"
     );
     this.dialogByk.isAdd = false
     this.dialogByk.JGSL = 0
     this.dialogByk.show = false
+  },
+  mounted(){
+    if (this.optionType == "edit" || this.optionType == "copy") {
+      this.changeCZ(this.formData.ZDDCZ)
+    }
   },
   methods: {
     getBYKC() {
@@ -405,14 +410,18 @@ export default {
     },
     // 选择材质时，保存材料单价
     changeCZ(key) {
-      let arr = this.dropDownListData.clmc.filter(item => {
-        return item.id == key;
-      });
-      if (arr.length == 1) {
-        this.volume.cldj = arr[0].cldj || 0;
-        this.volume.mi = arr[0].mi || 0;
+        if(this.dropDownListData.clmc){
+          console.log('--->',this.dropDownListData.clmc)
+          let arr = this.dropDownListData.clmc.filter(item => {
+          return item.id == key;
+        });
+        if (arr.length == 1) {
+          this.volume.cldj = arr[0].cldj || 0;
+          this.volume.mi = arr[0].mi || 0;
+        }
+        this.calculateVolume();
       }
-      this.calculateVolume();
+      
     },
     //计算材料体积
     calculateVolume() {
@@ -480,7 +489,7 @@ export default {
         this.formData.CLDX = '('+wj + '-' + bh  + ")*"+bh+"*4*" + h;
         this.formData.CLZL = this.formData.CLTJ * mi;
       }
-      console.log(this.formData.CLTJ, mi, cldj)
+        
       this.formData.CLJE = (
         this.formData.BLJS *
         (this.formData.CLTJ * mi * cldj)
@@ -519,7 +528,9 @@ export default {
               this.volume.d = dx[0].slice(1, dx[0].length);
               this.volume.h = dx[1];
             }
-            this.changeCZ(this.formData.ZDDCZ);
+            if(this.formData.ZDDCZ) {
+              this.changeCZ(this.formData.ZDDCZ);
+            }
             resolve()
           }
         }).then(()=>{

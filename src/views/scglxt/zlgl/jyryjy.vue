@@ -3,6 +3,7 @@
     <div class="tool_desc">提示：点击零件名称查看加工记录</div>
     <DataResList @refreshData="refreshData" @selectChange="getChecks" :tableData="checkList" tableId='010403' noEdit noAdd>
       <el-form-item slot="toolBar">
+        <el-button type="danger" icon="el-icon-s-unfold" @click="addFgBfClick"  :label="1">手工报废</el-button>
         <el-button type="primary" icon="el-icon-s-unfold" @click="passMany"  :label="1">批量通过</el-button>
       </el-form-item>
       <el-table-column slot="operate" fixed="left" label="操作" width="250" align="center">
@@ -25,6 +26,7 @@
     <passPart :dialogState="dialogState" />
     <jgjlDialog :isBF=isBF :dialogState="dialogJgjl" />
     <rbjsDialog :dialogState="dialogRbjs" />
+    <addFgBf :dialogState="dialogStateFgBf" />
   </div>
 </template>
 
@@ -59,6 +61,10 @@ export default {
         show: false,
         type:'rbjs',
         sjzt: '2203',
+        row:{}
+      },
+      dialogStateFgBf:{
+        show: false,
         row:{}
       }
     }
@@ -161,6 +167,11 @@ export default {
             }
           })
       })
+    },
+    // 手工报废
+    addFgBfClick(row){
+      this.dialogStateFgBf.row = row
+      this.dialogStateFgBf.show = true
     }
   }
 }
@@ -168,7 +179,7 @@ export default {
 <style lang="scss" scoped>
 .tool_desc{
   position: absolute;
-  left: 600px;
+  left: 800px;
   top:20px;
   color:red;
 }

@@ -91,9 +91,12 @@ module.exports = class extends Base {
             let zjData = await this.model(zjModel).where({
                 id: Id
             }).find()
-            let data = await this.model('scglxt_t_bzj_zj').where({
-                zjid: Id
-            }).field('id,zjmc,zjid,bzjmc,bzjid,bzjsl,bz').select()
+            // let data = await this.model('scglxt_t_bzj_zj').where({
+            //     zjid: Id
+            // }).field('id,zjmc,zjid,bzjmc,bzjid,bzjsl,bz').select()
+
+            let data = await this.model().query(` SELECT gx.id,zjmc,zjid,bzjmc,bzjid,bzjsl,bzj.ljdj,gx.bz from scglxt_t_bzj_zj gx,scglxt_t_bzj bzj where gx.bzjid=bzj.id and gx.zjid = '` + Id + `'`)
+
             let jgjData = await this.model('scglxt_t_bom_zj').where({
                 zjid: Id
             }).field('id,zjmc,zjid,zjsl,bomid').select()
