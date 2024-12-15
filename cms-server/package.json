@@ -25,7 +25,7 @@
     "think-websocket": "^1.0.6",
     "think-websocket-socket.io": "^1.0.10",
     "thinkjs": "^3.2.10",
-    "xlsx": "^0.14.3",
+    "xlsx": "^0.17.0",
     "xlsx-style": "^0.8.13"
   },
   "devDependencies": {
