@@ -93,7 +93,6 @@
                 v-else-if="item.PROPERTY_TYPE == '13'"
               >
                 <!--附件上传13-->
-                {{ dropDownListData[item.COLUMN_NAME] }}
                 <el-upload
                   class="upload-demo"
                   :data="queryData"

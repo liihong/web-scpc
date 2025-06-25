@@ -348,8 +348,8 @@ SELECT (@rownum:=@rownum+1) AS rownum,gy.gymc sbmc,gc.ZYSX gynr,null as t,edgs,g
     tjInfo.info = tjInfo.info.substring(0, tjInfo.info.length - 1);
     tjInfo.zgs = '合计：' + tjInfo.zgs.toFixed(2).toString();
 
-    tj2Info.info = tjInfo.info.substring(0, tjInfo.info.length - 1);
-    tj2Info.zgs = '合计：' + tjInfo.zgs.toFixed(2).toString();
+    tj2Info.info = tj2Info.info.substring(0, tj2Info.info.length - 1);
+    tj2Info.zgs = '合计：' + tj2Info.zgs.toFixed(2).toString();
 
     exportXls.exportBOMXls(infos[0], datas, tjInfo, res, tj2Info);
   }

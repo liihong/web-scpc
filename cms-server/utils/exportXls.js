@@ -123,9 +123,11 @@ _exports.exportBOMXls = function(data, list, tjInfo, res, tj2Info) {
   var dataList = xlsxUtils.format2Sheet(list, 0, 7, keyMap); // 偏移8行按keyMap顺序转换
 
   var d2 = xlsxUtils.format2Sheet([tjInfo], 0, list.length + 7, ['info', '', '', '', '', '', '', '', 'zgs']);
-  var d3 = xlsxUtils.format2Sheet([tj2Info], 0, list.length + 7, ['info', '', '', '', '', '', '', '', 'zgs']);
+  var d3 = xlsxUtils.format2Sheet([tj2Info], 0, list.length + 8, ['info', '', '', '', '', '', '', '', 'zgs']);
 
-  dataList = Object.assign(dataList, d2, d3);
+  dataList = Object.assign(dataList, d2);
+
+  dataList = Object.assign(dataList, d3);
 
   var dataKeys = Object.keys(dataList);
 
@@ -140,6 +142,15 @@ _exports.exportBOMXls = function(data, list, tjInfo, res, tj2Info) {
     e: { // e结束
       c: 7, // 结束列
       r: list.length + 7 // 结束行
+    }
+  }, {
+    s: { // s为开始
+      c: 0, // 开始列
+      r: list.length + 8 // 可以看成开始行,实际是取值范围
+    },
+    e: { // e结束
+      c: 7, // 结束列
+      r: list.length + 8 // 结束行
     }
   });
 
@@ -161,7 +172,7 @@ _exports.exportBOMXls = function(data, list, tjInfo, res, tj2Info) {
   });
 
   res.setHeader('Content-Type', 'application/vnd.openxmlformats;charset=utf-8');
-  res.setHeader('Content-Disposition', 'filename=1111.xlsx');
+  res.setHeader('Content-Disposition', `filename=${data.xmname}.xlsx`);
   res.end(result, 'buffer');
 };
 

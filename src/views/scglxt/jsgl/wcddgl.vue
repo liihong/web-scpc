@@ -100,7 +100,8 @@ export default {
       this.$ajax.getBolb(this.$api.exportDdBOM, {id: ddId}).then(res => {
         if (res.data) {
           let url = URL.createObjectURL(res.data)
-          let fileName = res.headers['content-disposition'].split('=')[1]
+          // let fileName = res.headers['Content-Disposition'].split('=')[1]
+          let fileName = ddId+ '.xls'
           fileName = decodeURI(fileName)
           let link = document.createElement('a')
           link.style.display = 'none'
