@@ -91,6 +91,7 @@ module.exports = class extends Base {
 
     const queryColumn = this.get('queryColumn');
     const queryKey = this.get('queryKey');
+
     const order = this.get('order');
 
     const table = await this.model('resource_table').getTableInfo(tableId);
@@ -154,6 +155,7 @@ module.exports = class extends Base {
     whereObj = await this.model('tableData').getWhereObj(query, queryColumn, queryKey, tableId);
     // }
 
+    console.log(whereObj)
     if(join.length>0) {
       let newJoin=[]
       join.map(item=>{

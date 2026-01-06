@@ -5,7 +5,7 @@
              :query="this.$route.query"
              noEdit
              ref="ddList">
-      <div slot="query">
+      <!-- <div slot="query">
         <el-radio v-model="radio3"
                   label="1"
                   size="small">全部</el-radio>
@@ -15,7 +15,7 @@
         <el-radio v-model="radio3"
                   label="2"
                   size="small">已完成</el-radio>
-      </div>
+      </div> -->
       <el-table-column slot="operate"
                        fixed="left"
                        label="操作"

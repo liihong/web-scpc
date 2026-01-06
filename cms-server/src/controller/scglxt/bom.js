@@ -35,6 +35,21 @@ module.exports = class extends Base {
     return this.success(deleteData);
   }
 
+  // 批量删除BOM
+  async deleteBOMBatchAction() {
+    const ids = this.post('ids');
+    
+    await this.model(gyModel).where({
+      bomid: ids
+    }).delete();
+
+    const deleteData = await this.model('scglxt_t_bom').where({
+      id: ids
+    }).delete();
+
+    return this.success(deleteData);
+  }
+
   // 新增BOM
   async addBomAction() {
     const form = this.post('form');

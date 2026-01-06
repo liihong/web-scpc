@@ -21,6 +21,8 @@
                    @click="beginBl">发往备料</el-button>
         <el-button type="warning"
                    @click="htBjd">报价单</el-button>
+        <el-button type="danger"
+                   @click="DeleteBOMBatch">批量删除</el-button>
       </span>
       <el-table-column slot="operate"
                        fixed="left"
@@ -185,6 +187,30 @@ export default {
           })
           .then(res => {
             if (res && res.data == 1) {
+              this.$message.deleteSuccess("删除BOM信息成功！");
+              this.$refs.resList.getResList();
+            } else {
+              this.$message.deleteError(res.data.errmsg);
+            }
+          });
+      });
+    },
+    // 批量删除
+    DeleteBOMBatch(){
+
+      if(this.selectRows.length === 0){
+        this.$message.deleteError('请勾选任意一行再进行操作');
+        return
+      }
+      const ids = Object.keys(this.selectRows).map(key => this.selectRows[key].ID)
+      console.log(ids)
+      this.$message.confirm("确定批量删除BOM并删除该BOM下所有工艺?", () => {
+        this.$ajax
+          .post(this.$api.deleteBOMBatch, {
+            ids: ids
+          })
+          .then(res => {
+            if (res && res.data > 0) {
               this.$message.deleteSuccess("删除BOM信息成功！");
               this.$refs.resList.getResList();
             } else {

@@ -52,7 +52,26 @@ module.exports = class extends Base {
     }
   }
 
+  // 获取如果是下拉列表查询的话返回数据列表，这个直接传SQL语句有隐患，再封装一个根据字段参数返回数据的，更安全一些，这个要逐渐废弃
   async getDropDownListDataAction() {
+    try {
+      const sql = this.get('typesql');
+      if (sql.includes('SELECT') || sql.includes('select')) {
+        const data = await this.model('resource_table_column').getTypeSqlData(sql);
+        return this.success(data);
+      } else {
+        return this.fail({
+          msg: '只能执行查询语句',
+          code: 0
+        });
+      }
+    } catch (err) {
+      return this.fail(err);
+    }
+  }
+
+  // 新版获取字段选项数据列表
+  async getDropDownListsAction() {
     try {
       const sql = this.get('typesql');
       if (sql.includes('SELECT') || sql.includes('select')) {

@@ -88,6 +88,7 @@ let api = {
     editBomData: 'scglxt/bom/editBom',
     copyBomData: 'scglxt/bom/copyBom',
     deleteBOM: 'scglxt/bom/deleteBOM',
+    deleteBOMBatch: 'scglxt/bom/deleteBOMBatch',
     updateBLZT: 'scglxt/bom/updateBLZT',
     getBLlist: 'scglxt/bom/getBLlist',
     getZjByBomId: 'scglxt/bom/getZjByBomId',

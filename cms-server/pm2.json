@@ -1,6 +1,6 @@
 {
   "apps": [{
-    "name": "cms-server",
+    "name": "cms-server  --port=9002",
     "script": "production.js",
     "cwd": "./",
     "exec_mode": "fork",

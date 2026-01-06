@@ -1,6 +1,6 @@
 <template>
   <div class="jgryjg">
-    <ResList tableId='010401' :query="query" noEdit noAdd ref="jgList">
+    <ResList tableId='010401' :query="query" noEdit noAdd ref="jgList" noQuery>
       <el-table-column slot="operate" fixed="left" label="操作" min-width="80" align="center">
         <template slot-scope="scope">
           <el-button v-if="!scope.row.CZRYID" size="mini" type="primary" @click="beginWork(scope.row)">开始</el-button>
